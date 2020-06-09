@@ -268,7 +268,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 		case cRmKey_Record:                                        // 录音及暂停功能，现在暂时用来测试I2C总线读取
 			FDIP_ScreenFill = ~FDIP_ScreenFill;
-			if (FDIP_ScreenFill){
+			if (!FDIP_ScreenFill){
 				MDIP_ScreenFill(0xff);	
 				MDIP_ScreenUpdata();
 			}else {

@@ -1,0 +1,1336 @@
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 1   
+
+
+C51 COMPILER V6.14, COMPILATION OF MODULE DISPLAY
+OBJECT MODULE PLACED IN display.OBJ
+COMPILER INVOKED BY: D:\SDK\kc3xm51\Tools\C51.EXE display.c SMALL WL(1) 
+
+stmt level    source
+
+   1          
+   2          // Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+   3          // SPDX-License-Identifier: Apache-2.0
+   4          // https://gitee.com/hsav20/kc3xm51.git
+   5          // https://github.com/hsav20/kc3xm51.git
+   6          // http://www,hsav.com/download/kc3xm51.zip
+   7          
+   8          #include "main.h"           
+   9          
+  10          void MDIP_Initialize(){										  
+  11   1          BYTE gLocal_0;
+  12   1      
+  13   1      	HAL_DIP_LED(0);
+  14   1          HAL_DIP_STB(0);											// TA6932∆¨—°
+  15   1          MUSDELAY(1);
+  16   1      	MDIP_WriteByte(0x40);		  							// ≥ı ºªØ…œµÁ ±£¨µÿ÷∑µ›‘ˆº”1
+  17   1          MUSDELAY(1);
+  18   1          HAL_DIP_STB(1);    
+  19   1      
+  20   1          MUSDELAY(1);
+  21   1          HAL_DIP_STB(0);
+  22   1          MUSDELAY(1);
+  23   1      	MDIP_WriteByte(0xc0);		  							// ¥´ ‰µÿ÷∑ 
+  24   1          MUSDELAY(1);
+  25   1      	gLocal_0 = 0;
+  26   1      	do{
+  27   2      		MDIP_WriteByte(0x00);		  						// ƒ⁄»›1
+  28   2      	    MUSDELAY(1);
+  29   2      	}while(++gLocal_0 < 16);
+  30   1      	MUSDELAY(10);
+  31   1          HAL_DIP_STB(1);    
+  32   1      
+  33   1      	MDIP_Brightness(0, 0);
+  34   1      	MDIP_ScreenFill(0x00);
+  35   1      	gSYS_WifiCommand = 0;
+  36   1      }	  
+  37          void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
+  38   1          if (FDIP_ScreenUpdata){
+  39   2          	FDIP_ScreenUpdata = 0;
+  40   2          	MDIP_ScreenUpdata();
+  41   2      	}
+  42   1      	if ((baseTimer & 0x02) > 0){ 							// 100ms
+  43   2      		if (gSYS_WifiCommand){
+  44   3      			if (--gSYS_WifiCommand == 0){
+  45   4      				MDIP_WifiSymbol(1);	
+  46   4      			}
+  47   3      			else {
+  48   4      				MDIP_WifiSymbol(gSYS_WifiCommand & 0x01);	
+  49   4      			}
+  50   3      		}
+  51   2      		
+  52   2      		if (gDIP_MenuLock > 0){								// ‘› ±À¯∂®œ‘ æ
+  53   3      			return;
+  54   3      		}
+  55   2      		if (FSYS_MuteEnable && (gDIP_MenuTimer == 0)){
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 2   
+
+  56   3      			MDIP_MenuSelect(cMenu_AudioMute, 0);
+  57   3      		}
+  58   2      		if (!FSYS_Standby && gDIP_MenuTimer){
+  59   3      			if (--gDIP_MenuTimer == 0) {
+  60   4                  	if (!FSYS_TestTone){
+  61   5      					MDIP_MenuSelect(cMenu_Restore, 0);
+  62   5      				}
+  63   4      				else {                                      // ≤‚ ‘‘Î“Ù¥Úø™÷Æ÷–
+  64   5      					BYTE channel = MDIP_GetNextChannel(gDIP_MenuSelect - cMenu_TToneFL);
+  65   5      					MDIP_MenuSelect(channel + cMenu_TToneFL, MENU_NORMAL);
+  66   5                          MAUD_TestToneChannel(channel);
+  67   5      //MDEBUG(0xc7);MDEBUG(gDIP_MenuSelect);MDEBUG(gDIP_MenuTimer);
+  68   5      				}
+  69   4      			}
+  70   3      			else if (FDIP_MenuTwinkle){						// ≤Àµ•–Ë“™…¡À∏
+  71   4      				if ((gDIP_MenuTimer % 5) == 0){	  			// √ø0.5√Î÷”…¡À∏
+  72   5      					BYTE twinkle = (gDIP_MenuTimer / 5);
+  73   5      					MDIP_MenuSelect(gDIP_MenuSelect, (twinkle & 0x01) ? 2 : 1);
+  74   5      				}
+  75   4      			}
+  76   3              }
+  77   2      		if (!FSYS_Standby && !FSYS_MuteEnable && !FSYS_TestTone && FDIP_FreqSymbol && gAUD_SrcFormat > KCM_SRC_N
+             -OS){
+  78   3                  MDIP_ReadSpectrum();
+  79   3      		}
+  80   2      
+  81   2      	}
+  82   1          return;
+  83   1      }
+  84          void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò
+  85   1      	if (mode == MENU_NORMAL){								// ’˝≥£µƒœ‘ æƒ£ Ω
+  86   2      		gDIP_MenuTimer = 20;
+  87   2      		FDIP_MenuTwinkle = 0;
+  88   2      	}
+  89   1      	FDIP_FreqSymbol = 0;
+  90   1          HAL_DIP_LED(0);
+  91   1      	MDIP_ClearSpectrum();
+  92   1          
+  93   1          DIP_DOT_OFF();
+  94   1      	
+  95   1      //g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);
+  96   1      	switch (index){
+  97   2      	case cMenu_Restore:
+  98   2      		if (!FKCM_I2C_Error){
+  99   3      			MDIP_InputSource();
+ 100   3      		}
+ 101   2      		else {
+ 102   3      			MDIP_WriteString("KCM-NO");
+ 103   3      		}
+ 104   2      		gDIP_MenuSelect = 0;
+ 105   2      		gDIP_MenuTimer = 0;
+ 106   2      		FDIP_FreqSymbol = 1;
+ 107   2      		break;
+ 108   2      	case cMenu_InputSource:
+ 109   2      		MDIP_InputSource();
+ 110   2      		break;
+ 111   2      	case cMenu_Standby:
+ 112   2      		MDIP_WriteString(" -OFF-");
+ 113   2      		break;
+ 114   2      	case cMenu_PowerOn:
+ 115   2      		MDIP_WriteString(" HELLO");
+ 116   2      		MDIP_ScreenUpdata();
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 3   
+
+ 117   2      		gDIP_MenuTimer = 10;
+ 118   2      		break;
+ 119   2      	case cMenu_Brightness:
+ 120   2      		if (mode == 4){
+ 121   3      			gDIP_MenuTimer = 20;
+ 122   3      			if (++gDIP_Brightness > 2){
+ 123   4      				gDIP_Brightness = 0;
+ 124   4      			}
+ 125   3      			MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_BRIGHTNESS, gDIP_Brightness);
+ 126   3      		}
+ 127   2      		MDIP_Brightness(1, gDIP_Brightness);
+ 128   2      		break;
+ 129   2      	case cMenu_Surround2Ch:
+ 130   2              MAUD_AutoCanclTestTone();
+ 131   2      		MDIP_SurroundMode(cMenu_Surround2Ch, mode);
+ 132   2      		break;
+ 133   2      	case cMenu_Surround8Ch:
+ 134   2              MAUD_AutoCanclTestTone();
+ 135   2      		MDIP_SurroundMode(cMenu_Surround8Ch, mode);
+ 136   2      		break;
+ 137   2      	case cMenu_SoundEffect:
+ 138   2              MAUD_AutoCanclTestTone();
+ 139   2      		MDIP_SoundEffect(4);
+ 140   2      		break;
+ 141   2      	case cMenu_VideoSrc:
+ 142   2      		gDIP_MenuTimer = 50;
+ 143   2      		MDIP_VideoSrc();
+ 144   2      		break;
+ 145   2      	case cMenu_SrcFormat:
+ 146   2      		MDIP_SourceFormat();
+ 147   2      		break;
+ 148   2      	case cMenu_NightMode:
+ 149   2      		MDIP_NightMode();
+ 150   2      		break;
+ 151   2      	case cMenu_NoiseSignal:
+ 152   2      		MDIP_NoiseSignal();
+ 153   2      		break;
+ 154   2      	case cMenu_Fireware:                                    // œ‘ æπÃº˛…˝º∂
+ 155   2      		MDIP_Fireware();
+ 156   2      		break;
+ 157   2          case cMenu_SdInsert:                                   // œ‘ æSD≤Â»Î
+ 158   2          case cMenu_SdRemove:                                   // œ‘ æSD≤Â≥ˆ
+ 159   2          case cMenu_UDiskInsert:                                // œ‘ æU≈Ã≤Â»Î
+ 160   2          case cMenu_UDiskRemove:                                // œ‘ æU≈Ã≤Â≥ˆ
+ 161   2      		MDIP_DiskInOut(index - cMenu_SdInsert);
+ 162   2      		break;
+ 163   2          case cMenu_PlayTrack:                                  // œ‘ æ∂‡√ΩÃÂŒƒº˛–≈œ¢
+ 164   2              MDIP_PlayTrack();
+ 165   2      		break;
+ 166   2          case cMenu_PlayTime:                                   // œ‘ æ∂‡√ΩÃÂ≤•∑≈ ±º‰
+ 167   2      		gDIP_MenuTimer = 20;
+ 168   2              MDIP_PlayTime();
+ 169   2      		break;
+ 170   2      
+ 171   2      
+ 172   2      	case cMenu_AudioMute:
+ 173   2      		if (mode == 0 || mode == 4){ 						 // 0“ª∞„ƒ£ Ω ªÚ’ﬂ 4æ≤“Ù”––ß
+ 174   3      			gDIP_MenuTimer = 80;
+ 175   3      			FDIP_MenuTwinkle = 1;
+ 176   3      		}
+ 177   2      		if (mode < 2 || mode == 4){
+ 178   3      			MDIP_WriteString("MUTE  ");
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 4   
+
+ 179   3      		}	
+ 180   2      		else if (mode == 2){
+ 181   3      			MDIP_WriteString("MUTE--");
+ 182   3      		}
+ 183   2      		if (mode == 4){										// æ≤“Ù”––ß
+ 184   3      			MKCM_WriteRegister(KCM_VOLUME_MUTE, 0x03);      // B1Œ™øÿ÷∆“Ù∆µµƒæ≤“Ù B0=1æ≤“Ù¥Úø™
+ 185   3      		}
+ 186   2      		else if (mode == 3){								// »°œ˚æ≤“Ù
+ 187   3      			gDIP_MenuTimer = 20;
+ 188   3      			MKCM_WriteRegister(KCM_VOLUME_MUTE, 0x02);      // B1Œ™øÿ÷∆“Ù∆µµƒæ≤“Ù B0=1æ≤“Ù¥Úø™ 
+ 189   3      		}
+ 190   2      //MDEBUG(0xa9);MDEBUG(mode); MDEBUG(FSYS_MuteEnable);
+ 191   2      		break;
+ 192   2      	case cMenu_MasterVolume:
+ 193   2      		if (mode >= 3){										// 3µ˜’˚- 4µ˜’˚+
+ 194   3      			if (gDIP_MenuSelect == cMenu_MasterVolume){
+ 195   4      				MAUD_MixMasterVolume((mode == 4) ? 1 : 0); 	
+ 196   4      			}
+ 197   3      		}
+ 198   2      		if (mode == 2){										// 2…¡À∏œ®√
+ 199   3      			MDIP_WriteString("VOL   ");
+ 200   3      		}
+ 201   2      		else {
+ 202   3      			MDIP_WriteString("VOL ");
+ 203   3      			MDIP_Write2Digit(4, gAUD_MasterVolume);
+ 204   3      			if (mode == 0){
+ 205   4      				gDIP_MenuTimer = 80;
+ 206   4      				FDIP_MenuTwinkle = 1;
+ 207   4      			}
+ 208   3      		}
+ 209   2      		break;
+ 210   2      
+ 211   2      	case cMenu_TToneFL:                                     // ≤‚ ‘‘Î“Ù«∞÷√◊Û…˘µ¿
+ 212   2      	case cMenu_TToneCE:                                     // ≤‚ ‘‘Î“Ù÷–÷√…˘µ¿
+ 213   2      	case cMenu_TToneSW:                                     // ≤‚ ‘‘Î“Ù≥¨µÕ“Ù…˘µ¿
+ 214   2      	case cMenu_TToneFR:                                     // ≤‚ ‘‘Î“Ù«∞÷√”“…˘µ¿
+ 215   2      	case cMenu_TToneSR:                                     // ≤‚ ‘‘Î“Ùª∑»∆”“…˘µ¿
+ 216   2      	case cMenu_TToneBR:                                     // ≤‚ ‘‘Î“Ù∫Û÷√”“…˘µ¿
+ 217   2      	case cMenu_TToneBL:                                     // ≤‚ ‘‘Î“Ù∫Û÷√◊Û…˘µ¿
+ 218   2      	case cMenu_TToneSL:                                     // ≤‚ ‘‘Î“Ùª∑»∆◊Û…˘µ¿
+ 219   2      //MDEBUG(0xb2);MDEBUG(index);
+ 220   2              MDIP_TestTone(index, mode);                         // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
+ 221   2              break;
+ 222   2      	case cMenu_ChTrimFL:                                    // …˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿
+ 223   2      	case cMenu_ChTrimCE:                                    // …˘µ¿Œ¢µ˜÷–÷√…˘µ¿
+ 224   2      	case cMenu_ChTrimSW:                                    // …˘µ¿Œ¢µ˜≥¨µÕ“Ù…˘µ¿
+ 225   2      	case cMenu_ChTrimFR:                                    // …˘µ¿Œ¢µ˜«∞÷√”“…˘µ¿
+ 226   2      	case cMenu_ChTrimSR:                                    // …˘µ¿Œ¢µ˜ª∑»∆”“…˘µ¿
+ 227   2      	case cMenu_ChTrimBR:                                    // …˘µ¿Œ¢µ˜∫Û÷√”“…˘µ¿
+ 228   2      	case cMenu_ChTrimBL:                                    // …˘µ¿Œ¢µ˜∫Û÷√◊Û…˘µ¿
+ 229   2      	case cMenu_ChTrimSL:                                    // …˘µ¿Œ¢µ˜ª∑»∆◊Û…˘µ¿
+ 230   2              MAUD_AutoCanclTestTone();
+ 231   2      		MDIP_TrimControl(index, mode);                      // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
+ 232   2      		break;
+ 233   2      
+ 234   2      	case cMenu_MicVolume1:                                  // ª∞Õ≤1“Ù¡ø
+ 235   2          case cMenu_MicVolume2:                                  // ª∞Õ≤2“Ù¡ø
+ 236   2          case cMenu_MicEcho:                                     // ª∞Õ≤ªÿ…˘±»¿˝
+ 237   2          case cMenu_MicRepeat:                                   // ª∞Õ≤÷ÿ∏¥±»¿˝
+ 238   2          case cMenu_MicDelay:                                    // ª∞Õ≤—”≥Ÿ ±º‰
+ 239   2          case cMenu_MicReverb:                                   // ª∞Õ≤ªÏœÏ±»¿˝
+ 240   2              MAUD_AutoCanclTestTone();
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 5   
+
+ 241   2      		MDIP_MicControl(index, mode);                       // ª∞Õ≤∏˜÷÷≤Œ ˝µ˜Ω⁄
+ 242   2      		break;
+ 243   2      	case cMenu_SpeakFront:
+ 244   2      	case cMenu_SpeakCenter:
+ 245   2      	case cMenu_SpeakWoofer:
+ 246   2      	case cMenu_SpeakSurround:
+ 247   2      	case cMenu_SpeakBack:
+ 248   2              MAUD_AutoCanclTestTone();
+ 249   2      		MDIP_SpeakSetup(index, mode);
+ 250   2      		break;
+ 251   2      	case cMenu_LipSync:
+ 252   2      	case cMenu_DelayFront:
+ 253   2      	case cMenu_DelayCenter:
+ 254   2      	case cMenu_DelaySurround:
+ 255   2      	case cMenu_DelayBack:
+ 256   2              MAUD_AutoCanclTestTone();
+ 257   2      		MDIP_DelayTime(index, mode);
+ 258   2      		break;
+ 259   2      	}
+ 260   1      	gDIP_MenuSelect = index;
+ 261   1      }
+ 262          void MDIP_NoiseSignal(){
+ 263   1      	BYTE gLocal_1 = MKCM_ReadRegister(KCM_TEST_TONE);
+ 264   1      	if (FSYS_TestTone){									// “—æ≠¥Úø™¡À‘Î“Ù≤‚ ‘
+ 265   2      		if (gDIP_MenuSelect == cMenu_NoiseSignal){	
+ 266   3      			if (++gLocal_1 > 7){
+ 267   4      				gLocal_1 = 0;
+ 268   4      			}
+ 269   3      		}
+ 270   2      	}
+ 271   1      	MKCM_WriteRegister(KCM_TEST_TONE, gLocal_1); 
+ 272   1      	MDIP_WriteString("NOISE ");
+ 273   1      	MDIP_SingleChar(5, gLocal_1 + '1');
+ 274   1      	if (FSYS_TestTone){									// “—æ≠¥Úø™¡À‘Î“Ù≤‚ ‘
+ 275   2      		gDIP_TestToneChannel = 0;
+ 276   2      		MAUD_TestToneChannel(gDIP_TestToneChannel);
+ 277   2      	}
+ 278   1      }
+ 279          BYTE MDIP_GetNextChannel(BYTE index){                       // ≤‚ ‘‘Î“Ù…˘µ¿Œ¢µ˜ªÒ»°œ¬“ª∏ˆ…˘µ¿
+ 280   1          switch (index){						                    // 0«∞◊Û 1÷–÷√ 2≥¨µÕ“Ù 3«∞”“ 4ª∑”“ 5∫Û”“ 6∫Û◊Û 7ª∑◊Û
+ 281   2      	case 0 : 											    // «∞◊Û ±
+ 282   2      		if (gDIP_SpeakSetup[1]){						    // ”–÷–÷√
+ 283   3      			return 1;                                       // œ¬“ª∏ˆ÷–÷√
+ 284   3      		}
+ 285   2      		if (gDIP_SpeakSetup[2]){						    // ”–≥¨µÕ“Ù
+ 286   3      			return 2;                                       // œ¬“ª∏ˆ≥¨µÕ“Ù
+ 287   3      		}
+ 288   2      		return 3;						                    // √ª”–÷–÷√º∞≥¨µÕ“Ù ÷±Ω”Ã¯µΩ«∞”“
+ 289   2      	case 1 : 											    // ÷–÷√ ±
+ 290   2      		if (gDIP_SpeakSetup[2]){						    // ”–≥¨µÕ“Ù
+ 291   3      			return 2;                                       // œ¬“ª∏ˆ≥¨µÕ“Ù
+ 292   3      		}
+ 293   2      		return 3;						                    // √ª”–≥¨µÕ“Ù ÷±Ω”Ã¯µΩ«∞”“
+ 294   2      	case 2 : 											    // ≥¨µÕ“Ù ±
+ 295   2      		return 3;						                    // ÷±Ω”Ã¯µΩ«∞”“
+ 296   2      	case 3 : 											    // «∞”“ ±
+ 297   2      		if (gDIP_SpeakSetup[3]){						    // ”–ª∑»∆
+ 298   3      			return 4;                                       // ª∑»∆”“…˘µ¿
+ 299   3      		}
+ 300   2              if (gDIP_SpeakSetup[4]){						    // ”–∫Û÷√…˘µ¿
+ 301   3      			return 5;                                       // ∫Û÷√…˘µ¿
+ 302   3      		}
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 6   
+
+ 303   2      		return 0;						                    // √ª”–ª∑»∆º∞∫Û÷√£¨÷±Ω”Ã¯µΩ«∞◊Û
+ 304   2      	case 4 : 											    // ª∑”“ ±
+ 305   2      		if (gDIP_SpeakSetup[4]){						    // ”–∫Û÷√…˘µ¿
+ 306   3      			return 5;                                       // ∫Û÷√…˘µ¿
+ 307   3      		}
+ 308   2      		return 0;						                    // √ª”–∫Û÷√£¨÷±Ω”Ã¯µΩ«∞◊Û
+ 309   2      	case 5 : 											    // ∫Û”“ ±
+ 310   2      		return 6;						                    // ÷±Ω”Ã¯µΩ∫Û◊Û
+ 311   2      	case 6 : 											    // ∫Û”“◊Û
+ 312   2      		return 7;						                    // ÷±Ω”Ã¯µΩ∫Û◊Û
+ 313   2      	default : 											    // ◊Û”“ ±
+ 314   2      		return 0;						                    // ÷±Ω”Ã¯µΩ∫Û◊Û
+ 315   2      	}
+ 316   1      }
+ 317          
+ 318          CONST_CHAR Tab_DIP_TToneShow[] = {
+ 319          	"FLTtCETtSWTtFRTtSRTtBRTtBLTtSLTt"
+ 320          //	 ++++----++++----++++----++++----
+ 321          };
+ 322          
+ 323          void MDIP_TestTone(BYTE index, MENU_MODE mode){             // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
+ 324   1      	if (mode >= MENU_ADJ_DOWN){							    // MENU_ADJ_DOWNªÚMENU_ADJ_UP 
+ 325   2      		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
+ 326   3      		    MAUD_MixTrimAdjust(index - cMenu_TToneFL, (mode == MENU_ADJ_UP) ? 1 : 0); 	
+ 327   3      			gDIP_MenuTimer = 80;
+ 328   3      		}
+ 329   2      	}
+ 330   1          index -= cMenu_TToneFL;                             // ¥”…˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿ø™ º
+ 331   1          MDIP_WriteString((char*)&Tab_DIP_TToneShow[index * 4]);
+ 332   1      	if (mode == MENU_TWINKLE_OFF){							// MENU_TWINKLE_OFF…¡À∏œ®√
+ 333   2      		MDIP_SingleChar(4, ' ');
+ 334   2      		MDIP_SingleChar(5, ' ');
+ 335   2      	}
+ 336   1      	else {											        // MENU_NORMALªÚMENU_TWINKLE_ON…¡À∏µ„¡¡
+ 337   2          	BYTE value = gDIP_TrimCtrl[index];
+ 338   2      //if(mode!=MENU_TWINKLE_ON&&mode!=MENU_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(value);}
+ 339   2              if (value < 9){
+ 340   3                  MDIP_SingleChar(4, '-');
+ 341   3                  MDIP_SingleChar(5, (9 - value) + '0');
+ 342   3              }else {
+ 343   3                  MDIP_SingleChar(4, ' ');
+ 344   3                  MDIP_SingleChar(5, (value - 9) + '0');
+ 345   3              }
+ 346   2      		FDIP_MenuTwinkle = 1;
+ 347   2      	}
+ 348   1      }
+ 349          
+ 350          CONST_CHAR Tab_DIP_TrimShow[] = {
+ 351          	"FLTrCETrSWTrFRTrSRTrBRTrBLTrSLTr"
+ 352          //	 ++++----++++----++++----++++----
+ 353          };
+ 354          void MDIP_TrimControl(BYTE index, MENU_MODE mode){          // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
+ 355   1      	if (mode >= MENU_ADJ_DOWN){							    // MENU_ADJ_DOWNªÚMENU_ADJ_UP 
+ 356   2      		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
+ 357   3                  MAUD_MixTrimAdjust(index - cMenu_ChTrimFL, (mode == MENU_ADJ_UP) ? 1 : 0); 	
+ 358   3      			gDIP_MenuTimer = 80;
+ 359   3      		}
+ 360   2      	}
+ 361   1          index -= cMenu_ChTrimFL;                            // ¥”…˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿ø™ º
+ 362   1          MDIP_WriteString((char*)&Tab_DIP_TrimShow[index * 4]);
+ 363   1      	if (mode == MENU_TWINKLE_OFF){							// MENU_TWINKLE_OFF…¡À∏œ®√
+ 364   2      		MDIP_SingleChar(4, ' ');
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 7   
+
+ 365   2      		MDIP_SingleChar(5, ' ');
+ 366   2      	}
+ 367   1      	else {											        // MENU_NORMALªÚMENU_TWINKLE_ON…¡À∏µ„¡¡
+ 368   2          	BYTE value = gDIP_TrimCtrl[index];
+ 369   2      //if(mode!=MENU_TWINKLE_ON&&mode!=MENU_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(value);}
+ 370   2              if (value < 9){
+ 371   3                  MDIP_SingleChar(4, '-');
+ 372   3                  MDIP_SingleChar(5, (9 - value) + '0');
+ 373   3              }else {
+ 374   3                  MDIP_SingleChar(4, ' ');
+ 375   3                  MDIP_SingleChar(5, (value - 9) + '0');
+ 376   3              }
+ 377   2      		if (mode == MENU_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
+ 378   3      			gDIP_MenuTimer = 80;
+ 379   3      			FDIP_MenuTwinkle = 1;
+ 380   3      		}
+ 381   2             
+ 382   2      	}
+ 383   1      }
+ 384          // ª∞Õ≤1“Ù¡ø ª∞Õ≤2“Ù¡ø ª∞Õ≤ªÿ…˘±»¿˝ ª∞Õ≤÷ÿ∏¥±»¿˝ ª∞Õ≤—”≥Ÿ ±º‰ ª∞Õ≤ªÏœÏ±»¿˝
+ 385          CONST_CHAR Tab_DIP_MicShow[] = {
+ 386          	"MIC1MIC2ECHOREPTDELYREVB"
+ 387          //	 ++++----++++----++++----
+ 388          };
+ 389          void MDIP_MicControl(BYTE index, MENU_MODE mode){
+ 390   1      //if(mode!=MENU_TWINKLE_ON&&mode!=MENU_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(mode);}
+ 391   1      	if (mode >= MENU_ADJ_DOWN){							    // MENU_ADJ_DOWNªÚMENU_ADJ_UP 
+ 392   2      		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
+ 393   3      			MAUD_MixMicAdjust(index, (mode == MENU_ADJ_UP) ? 1 : 0); 	
+ 394   3      			gDIP_MenuTimer = 80;
+ 395   3      		}
+ 396   2      	}
+ 397   1          index -= cMenu_MicVolume1;                              // ¥”ª∞Õ≤1“Ù¡øø™ º
+ 398   1      	MDIP_WriteString((char*)&Tab_DIP_MicShow[index * 4]);
+ 399   1          MDIP_SingleChar(4, ' ');
+ 400   1      
+ 401   1      	if (mode == MENU_TWINKLE_OFF){							// MENU_TWINKLE_OFF…¡À∏œ®√
+ 402   2      		MDIP_SingleChar(5, ' ');
+ 403   2      	}
+ 404   1      	else {											        // MENU_NORMALªÚMENU_TWINKLE_ON…¡À∏µ„¡¡
+ 405   2          	BYTE gLocal_1 = gDIP_MicCtrl[index];
+ 406   2              MDIP_SingleChar(5, gLocal_1 + '0');
+ 407   2      		if (mode == MENU_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
+ 408   3      			gDIP_MenuTimer = 80;
+ 409   3      			FDIP_MenuTwinkle = 1;
+ 410   3      		}
+ 411   2             
+ 412   2      	}
+ 413   1      }
+ 414          
+ 415          void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À∏œ®√ 3µ˜’˚- 4µ˜’˚+  
+ 416   1      	BYTE gLocal_1;
+ 417   1      	g2DIP_ShowBuffer[6] |= 0x5000;	
+ 418   1      	gDIP_MenuTimer = 80;
+ 419   1      	MDIP_SingleChar(4, ' ');
+ 420   1      	MDIP_SingleChar(5, ' ');
+ 421   1      	switch (index){
+ 422   2      	case cMenu_SpeakFront :
+ 423   2      		MDIP_WriteString("FRSP ");
+ 424   2      		if (mode >= 3){
+ 425   3      			if (++gDIP_SpeakSetup[0] > 1){
+ 426   4      				gDIP_SpeakSetup[0] = 0;
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 8   
+
+ 427   4      			}
+ 428   3      			MKCM_WriteRegister(KCM_SPK_CONFIG, MKCM_ToRegister(KCM_SPK_CONFIG, 0));
+ 429   3      		}
+ 430   2      		MDIP_SingleChar(5, MDIP_GetSpeakerChar(0));
+ 431   2      		break;
+ 432   2      	case cMenu_SpeakCenter :
+ 433   2      		MDIP_WriteString("CESP ");
+ 434   2      		if (mode >= 3){
+ 435   3      			if (++gDIP_SpeakSetup[1] > 2){
+ 436   4      				gDIP_SpeakSetup[1] = 0;
+ 437   4      			}
+ 438   3      			MKCM_WriteRegister(KCM_SPK_CONFIG, MKCM_ToRegister(KCM_SPK_CONFIG, 0));
+ 439   3      		}
+ 440   2      		MDIP_SingleChar(5, MDIP_GetSpeakerChar(1));
+ 441   2      		break;
+ 442   2      	case cMenu_SpeakWoofer :
+ 443   2      		MDIP_WriteString("SWSP ");
+ 444   2      		if (mode >= 3){
+ 445   3      			if (++gDIP_SpeakSetup[2] > 1){
+ 446   4      				gDIP_SpeakSetup[2] = 0;
+ 447   4      			}
+ 448   3      			MKCM_WriteRegister(KCM_SPK_CONFIG, MKCM_ToRegister(KCM_SPK_CONFIG, 0));
+ 449   3      		}
+ 450   2      		MDIP_SingleChar(5, MDIP_GetSpeakerChar(2));
+ 451   2      		break;
+ 452   2      	case cMenu_SpeakSurround :
+ 453   2      		MDIP_WriteString("SRSP ");
+ 454   2      		if (mode >= 3){
+ 455   3      			if (++gDIP_SpeakSetup[3] > 2){
+ 456   4      				gDIP_SpeakSetup[3] = 0;
+ 457   4      			}
+ 458   3      			MKCM_WriteRegister(KCM_SPK_CONFIG, MKCM_ToRegister(KCM_SPK_CONFIG, 0));
+ 459   3      		}
+ 460   2      		MDIP_SingleChar(5, MDIP_GetSpeakerChar(3));
+ 461   2      		break;
+ 462   2      	case cMenu_SpeakBack :
+ 463   2      		MDIP_WriteString("BKSP ");
+ 464   2      		if (mode >= 3){
+ 465   3      			if (++gDIP_SpeakSetup[4] > 2){
+ 466   4      				gDIP_SpeakSetup[4] = 0;
+ 467   4      			}
+ 468   3      			MKCM_WriteRegister(KCM_SPK_CONFIG, MKCM_ToRegister(KCM_SPK_CONFIG, 0));
+ 469   3      		}
+ 470   2      		MDIP_SingleChar(5, MDIP_GetSpeakerChar(4));
+ 471   2      		break;
+ 472   2      	case cMenu_SpeakFilter :
+ 473   2      		MDIP_WriteString("LPF ");
+ 474   2      		if (mode >= 3){
+ 475   3      		}
+ 476   2      		break;
+ 477   2      	}
+ 478   1      }
+ 479          void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À∏œ®√ 3µ˜’˚- 4µ˜’˚+  
+ 480   1      	switch (index){
+ 481   2      	case cMenu_LipSync :
+ 482   2      		g2DIP_ShowBuffer[6] |= 0x4000;	
+ 483   2      		MDIP_WriteString("LIPS");
+ 484   2      		if (mode >= 3){
+ 485   3      			MDIP_AdjDelayTime(0, mode);
+ 486   3      		}
+ 487   2      		break;
+ 488   2      	case cMenu_DelayFront :
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 9   
+
+ 489   2      		MDIP_WriteString("FRDL ");
+ 490   2      		g2DIP_ShowBuffer[6] |= 0x5000;	
+ 491   2      		if (mode >= 3){
+ 492   3      			MDIP_AdjDelayTime(1, mode);
+ 493   3      		}
+ 494   2      		break;
+ 495   2      	case cMenu_DelayCenter :
+ 496   2      		MDIP_WriteString("CEDL ");
+ 497   2      		g2DIP_ShowBuffer[6] |= 0x5000;	
+ 498   2      		if (mode >= 3){
+ 499   3      			MDIP_AdjDelayTime(2, mode);
+ 500   3      		}
+ 501   2      		break;
+ 502   2      	case cMenu_DelaySurround :
+ 503   2      		MDIP_WriteString("SWDL ");
+ 504   2      		g2DIP_ShowBuffer[6] |= 0x5000;	
+ 505   2      		if (mode >= 3){
+ 506   3      			MDIP_AdjDelayTime(3, mode);
+ 507   3      		}
+ 508   2      		break;
+ 509   2      	case cMenu_DelayBack :
+ 510   2      		MDIP_WriteString("BKDL ");
+ 511   2      		g2DIP_ShowBuffer[6] |= 0x5000;	
+ 512   2      		if (mode >= 3){
+ 513   3      			MDIP_AdjDelayTime(4, mode);
+ 514   3      		}
+ 515   2      		break;
+ 516   2      	}
+ 517   1      	gDIP_MenuTimer = 50;
+ 518   1      //MDEBUG(0xc8);MDEBUG(index - cMenu_LipSync);
+ 519   1      	MDIP_Write2Digit(4, gDIP_DelayTime[index - cMenu_LipSync] * 5);
+ 520   1      }
+ 521          
+ 522          
+ 523          CONST_CHAR Tab_DIP_InputSwitch[] = {
+ 524          	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB-HDMI-1HDMI-2HDMI-3HDMI-A"
+ 525          //	 ++++++------++++++------++++++------++++++------++++++------
+ 526          };
+ 527          
+ 528          void MDIP_InputSource(){
+ 529   1      	BYTE index = (gSUB_SrcAuto == INPUT_SWITCH_NONE) ? mINPUT_SWITCH : gSUB_SrcAuto;
+ 530   1          MLOG("InSource:%d %d %d\r\n", (u32)index, (u32)gSUB_SrcAuto, (u32)mINPUT_SWITCH);
+ 531   1      	if (index == INPUT_SWITCH_SD || index == INPUT_SWITCH_UDISK){
+ 532   2      		g2DIP_ShowBuffer[6] |= 0x0020;	
+ 533   2      	}
+ 534   1      	else {
+ 535   2      		g2DIP_ShowBuffer[6] &= ~0x0020;	
+ 536   2      	}
+ 537   1      
+ 538   1      	MDIP_WriteString((char*)&Tab_DIP_InputSwitch[index * 6]);
+ 539   1      }
+ 540          void MDIP_VideoSrc(){
+ 541   1      	MDIP_WriteString("VIDE0 ");
+ 542   1      	MDIP_SingleChar(5, (gAUD_AutoInputSrc >> 5) + '1');
+ 543   1      }
+ 544          
+ 545          
+ 546          
+ 547          CONST_CHAR Tab_DIP_Surround2Ch[] = {
+ 548          	"  HIFI 2+1CH"
+ 549          //	 ++++++------
+ 550          };
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 10  
+
+ 551          CONST_CHAR Tab_DIP_Surround8Ch[] = {
+ 552          	"MODE"
+ 553          };
+ 554          void MDIP_SurroundMode(BYTE index, MENU_MODE mode){
+ 555   1      	// [6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:‘∆  B4:DSP 
+             -B3:ATMOS B2:DD  B1:AUTO B0:ST
+ 556   1      //MDEBUG(0x99);MDEBUG(change);MDEBUG(gDIP_MenuSelect);MDEBUG(index);
+ 557   1          if (index == gDIP_MenuSelect){                          // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
+ 558   2              if (index == cMenu_Surround2Ch){                    // ¡¢ÃÂ…˘
+ 559   3          		gDIP_Surround[0] ^= 1;
+ 560   3              	MKCM_WriteRegister(KCM_LISTEN_MODE, gDIP_Surround[0]);
+ 561   3      
+ 562   3                  MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SURROUND_2CH, gDIP_Surround[0]);
+ 563   3                  if (gDIP_Select2Ch != 1){
+ 564   4                      gDIP_Select2Ch = 1;
+ 565   4                      MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 1);
+ 566   4                  }
+ 567   3              }else {                                             // ∂‡…˘µ¿
+ 568   3                  if (++gDIP_Surround[1] >= 4){
+ 569   4                      gDIP_Surround[1] = 0;
+ 570   4                  }
+ 571   3      //MDEBUG(0x99);MDEBUG(gDIP_Surround[1]);
+ 572   3                  if (gDIP_Surround[1] < 3){
+ 573   4                      MKCM_WriteRegister(KCM_LISTEN_MODE, 0x10 | gDIP_Surround[1]);
+ 574   4                  }else {
+ 575   4                      MKCM_WriteRegister(KCM_LISTEN_MODE, 0x30);  // —°‘Ò∂‡…˘µ¿“Ù–ß£¨B1:0Œ™∏˜÷÷≤ªÕ¨À„∑®µƒ∂‡…˘µ¿“
+             -Ù–ß
+ 576   4                  }
+ 577   3                  MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SURROUND_8CH, gDIP_Surround[1]);
+ 578   3                  if (gDIP_Select2Ch != 0){
+ 579   4                      gDIP_Select2Ch = 0;
+ 580   4                      MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 0);
+ 581   4                  }
+ 582   3              }
+ 583   2          }else if (gDIP_MenuSelect == cMenu_Surround8Ch && index == cMenu_Surround2Ch){  // …œ¥Œ «∂‡…˘µ¿£¨µ±«∞Œ
+             -™¡¢ÃÂ…˘
+ 584   2              MKCM_WriteRegister(KCM_LISTEN_MODE, gDIP_Surround[0]);
+ 585   2              gDIP_Select2Ch = 1;
+ 586   2              MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 1);
+ 587   2          }else if (gDIP_MenuSelect == cMenu_Surround2Ch && index == cMenu_Surround8Ch){  // …œ¥Œ «¡¢ÃÂ…˘£¨µ±«∞Œ
+             -™∂‡…˘µ¿
+ 588   2              if (gDIP_Surround[1] < 3){
+ 589   3                  MKCM_WriteRegister(KCM_LISTEN_MODE, 0x10 | gDIP_Surround[1]);
+ 590   3              }else {
+ 591   3                  MKCM_WriteRegister(KCM_LISTEN_MODE, 0x30);      // —°‘Ò∂‡…˘µ¿“Ù–ß£¨B1:0Œ™∏˜÷÷≤ªÕ¨À„∑®µƒ∂‡…˘µ¿“
+             -Ù–ß
+ 592   3              }
+ 593   2              gDIP_Select2Ch = 0;
+ 594   2              MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 0);
+ 595   2          }
+ 596   1      
+ 597   1          if (index == cMenu_Surround2Ch){
+ 598   2      		MDIP_WriteString((char*)&Tab_DIP_Surround2Ch[gDIP_Surround[0] * 6]);
+ 599   2          }else {
+ 600   2              MDIP_WriteString((char*)Tab_DIP_Surround8Ch);
+ 601   2              MDIP_SingleChar(4, ' ');
+ 602   2              MDIP_SingleChar(5, gDIP_Surround[1] + '1');
+ 603   2          }
+ 604   1      	MDIP_SurroundSymbol();
+ 605   1      }
+ 606          void MDIP_SurroundSymbol(){
+ 607   1          BYTE surround = gDIP_Select2Ch ? gDIP_Surround[0] : (2 + gDIP_Surround[1]);
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 11  
+
+ 608   1      	//g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);	
+ 609   1          DIP_SURROUND_OFF();
+ 610   1      	switch (surround){
+ 611   2      	case cDIP_SURR_STEREO :
+ 612   2      	case cDIP_SURR_ST_SW :
+ 613   2      		g2DIP_ShowBuffer[6] |= 0x0001;	
+ 614   2      		break;
+ 615   2      	case cDIP_SURR_MODE1 :
+ 616   2      		g2DIP_ShowBuffer[6] |= 0x0002;	
+ 617   2      		break;
+ 618   2      	case cDIP_SURR_MODE2 :
+ 619   2      		g2DIP_ShowBuffer[6] |= 0x0080;	
+ 620   2      		break;
+ 621   2      	case cDIP_SURR_MODE3 :
+ 622   2      		g2DIP_ShowBuffer[6] |= 0x0040;	
+ 623   2      		break;
+ 624   2      	case cDIP_SURR_MODE4 :
+ 625   2      		g2DIP_ShowBuffer[6] |= 0x0010;	
+ 626   2      		break;
+ 627   2      	}
+ 628   1      	FDIP_ScreenUpdata = 1;
+ 629   1      }
+ 630          void MDIP_SrcFormatSymbol(){
+ 631   1      	DIP_SRC_FORMAT_OFF();
+ 632   1      	//g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);	
+ 633   1      	// –¬[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:‘∆  B4:DS
+             -P B3:ATMOS B2:DD  B1:AUTO B0:ST
+ 634   1      	// æ…[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:‘∆   B9:PAUSE B8:PLAY B7:RPALL    B6:RP1   B5:DTS B4:DD
+             -  B3:AUTO  B2:DSP B1:PLII B0:ST
+ 635   1      	
+ 636   1      //MDEBUG(0xa9);MDEBUG(gSYS_ModelType);MDEBUG(gAUD_SrcFormat);
+ 637   1      	switch (gAUD_SrcFormat & 0x0f){
+ 638   2      	case KCM_SRC_PCM :
+ 639   2      		if (gSYS_ModelType != KCM_MODEL_35H && gSYS_ModelType != KCM_MODEL_36H){
+ 640   3      			g2DIP_ShowBuffer[6] |= 0x0400;	
+ 641   3      		}
+ 642   2      		break;
+ 643   2      	case KCM_SRC_AC3 :                                      //  ‰»ÎAC-3–≈∫≈
+ 644   2      	case KCM_SRC_E_AC3 :                                    //  ‰»ÎEnhanced AC-3–≈∫≈
+ 645   2      	case KCM_SRC_AC3_HD :                                   //  ‰»Î∂≈±»TRUE HD–≈∫≈    
+ 646   2      		g2DIP_ShowBuffer[6] |= 0x0004;	
+ 647   2      		break;
+ 648   2      	case KCM_SRC_DTS :                                      //  ‰»ÎDTS–≈∫≈
+ 649   2          case KCM_SRC_DTS_CD:				                    //  ‰»ÎDTS CD–≈∫≈
+ 650   2          case KCM_SRC_DTS_ES:				                    //  ‰»ÎDTS Extended Surround–≈∫≈
+ 651   2          case KCM_SRC_DTS_HRA:				                    //  ‰»ÎDTS HD High Resolution Audio–≈∫≈
+ 652   2          case KCM_SRC_DTS_MA:				                    //  ‰»ÎDTS HD Master Audio–≈∫≈
+ 653   2      		g2DIP_ShowBuffer[6] |= 0x0100;	
+ 654   2      		break;
+ 655   2      	case KCM_SRC_LPCM :
+ 656   2      		g2DIP_ShowBuffer[6] |= 0x0400;	
+ 657   2      		break;
+ 658   2      	}
+ 659   1      	FDIP_ScreenUpdata = 1;
+ 660   1      }
+ 661          void MDIP_WifiSymbol(BYTE turnOn){
+ 662   1      	if (turnOn == 0xff){
+ 663   2      		turnOn = (MKCM_ReadRegister(KCM_WIFI_STATUS) & 0x80) ? 1 : 0;
+ 664   2      	}
+ 665   1      	if (turnOn){
+ 666   2      		g2DIP_ShowBuffer[6] |= 0x0800;	
+ 667   2      	}
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 12  
+
+ 668   1      	else {
+ 669   2      		g2DIP_ShowBuffer[6] &= ~0x0800;	
+ 670   2      	}
+ 671   1      	FDIP_ScreenUpdata = 1;
+ 672   1      }
+ 673          
+ 674          CONST_CHAR Tab_DIP_SRC_CH[] = {
+ 675          	"2/01/02/03/02/13/12/23/23/33/42/32/4"
+ 676          //	 +++---+++---+++---+++---+++---+++---
+ 677          };
+ 678          void MDIP_SourceFormat(){
+ 679   1      	if ((gAUD_SrcFormat & 0x0f) >= KCM_SRC_PCM){
+ 680   2          	BYTE gLocal_1;
+ 681   2          	BYTE gLocal_Buffer[4];
+ 682   2      
+ 683   2          	gLocal_Buffer[3] = 0;
+ 684   2          	gLocal_1 = (gAUD_SrcFormat >> 4) * 3;
+ 685   2          	MDIP_WriteString("      ");
+ 686   2      	
+ 687   2          //MDEBUG(0xa8);MDEBUG(gAUD_SrcFormat);	
+ 688   2          	MDIP_SrcFormatSymbol();
+ 689   2          	switch (gAUD_SrcFormat & 0x0f){
+ 690   3          	case KCM_SRC_PCM :
+ 691   3          		MDIP_WriteString("PCM");
+ 692   3          		break;
+ 693   3          	case KCM_SRC_AC3 :                                      //  ‰»ÎAC-3–≈∫≈
+ 694   3          	case KCM_SRC_E_AC3 :                                    //  ‰»ÎEnhanced AC-3–≈∫≈
+ 695   3          	case KCM_SRC_AC3_HD :                                   //  ‰»Î∂≈±»TRUE HD–≈∫≈    
+ 696   3          		MAPI_COPY_BUFF8(3, &Tab_DIP_SRC_CH[gLocal_1], gLocal_Buffer);
+ 697   3          		MDIP_WriteString(gLocal_Buffer);
+ 698   3          		break;
+ 699   3          	case KCM_SRC_DTS :                                      //  ‰»ÎDTS–≈∫≈
+ 700   3              case KCM_SRC_DTS_CD:				                    //  ‰»ÎDTS CD–≈∫≈
+ 701   3              case KCM_SRC_DTS_ES:				                    //  ‰»ÎDTS Extended Surround–≈∫≈
+ 702   3              case KCM_SRC_DTS_HRA:				                    //  ‰»ÎDTS HD High Resolution Audio–≈∫≈
+ 703   3              case KCM_SRC_DTS_MA:				                    //  ‰»ÎDTS HD Master Audio–≈∫≈
+ 704   3          		MAPI_COPY_BUFF8(3, &Tab_DIP_SRC_CH[gLocal_1], gLocal_Buffer);
+ 705   3          		MDIP_WriteString(gLocal_Buffer);
+ 706   3          		break;
+ 707   3          	case KCM_SRC_LPCM :
+ 708   3          		MDIP_WriteString("2/4");
+ 709   3          		break;
+ 710   3          	}
+ 711   2      	}else {
+ 712   2              MDIP_InputSource();    
+ 713   2          }
+ 714   1      }
+ 715          BYTE MDIP_GetSpeakerChar(BYTE index){						// 0«∞÷√ 1÷–÷√ 2≥¨µÕ“Ù 3ª∑»∆ 4∫Û÷√
+ 716   1      	if (index == 0){										// «∞÷√
+ 717   2      		return gDIP_SpeakSetup[0] ? 'L' : 'S';				// 0=–°¿Æ∞» 1=¥Û¿Æ∞»
+ 718   2      	}
+ 719   1      	if (index == 2){										// ≥¨µÕ“Ù
+ 720   2      		return gDIP_SpeakSetup[2] ? 'Y' : 'N';				// 0=√ª”– 1=”–
+ 721   2      	}
+ 722   1      	if (gDIP_SpeakSetup[index] == 2){						// ¥Û¿Æ∞»
+ 723   2      		return 'L';											
+ 724   2      	}
+ 725   1      	if (gDIP_SpeakSetup[index] == 1){						// –°¿Æ∞»
+ 726   2      		return 'S';											
+ 727   2      	}
+ 728   1      	return 'N';												// √ª”–∞≤◊∞
+ 729   1      }
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 13  
+
+ 730          
+ 731          
+ 732          void MDIP_SoundEffect(BYTE mode){
+ 733   1      	if (mode >= 3){
+ 734   2      		if (gDIP_MenuSelect == cMenu_SoundEffect){      
+ 735   3      			MAUD_MixSoundEffect();
+ 736   3      		}
+ 737   2      	}
+ 738   1          if (gDIP_SoundEffect == 0){
+ 739   2          	MDIP_WriteString(" FLAT ");
+ 740   2          }else {
+ 741   2          	MDIP_WriteString("SOUND");
+ 742   2          	MDIP_SingleChar(5, gDIP_SoundEffect + '0');
+ 743   2          }
+ 744   1      }
+ 745          void MDIP_NightMode(){
+ 746   1      	BYTE gLocal_1 = MKCM_ReadRegister(KCM_DYN_COMPRES);
+ 747   1      MDEBUG(0xd1);MDEBUG(gLocal_1);
+ 748   1      	if (gDIP_MenuSelect == cMenu_NightMode){	
+ 749   2      		if (gLocal_1 < 50){                                 
+ 750   3                  gLocal_1 = 50;                                  // 50%
+ 751   3              }else {
+ 752   3      			gLocal_1 = 0;                                   // 0%
+ 753   3      		}
+ 754   2      MDEBUG(0xd2);MDEBUG(gLocal_1);
+ 755   2      		MKCM_WriteRegister(KCM_DYN_COMPRES, gLocal_1); 
+ 756   2      	}
+ 757   1      	if (gLocal_1){
+ 758   2      		MDIP_WriteString("NIG-ON");
+ 759   2      	}
+ 760   1      	else {
+ 761   2      		MDIP_WriteString("NIG-OF");
+ 762   2      	}
+ 763   1      }
+ 764          void MDIP_Fireware(){
+ 765   1      	gDIP_MenuTimer = 50;
+ 766   1          MDIP_WriteString("FWDONE");
+ 767   1      }
+ 768          
+ 769          
+ 770          CONST_CHAR Tab_DIP_DiskInOut[] = {
+ 771          	"SD-IN SD-OUTUD-IN UD-OUT"
+ 772          //	 ++++++------++++++------
+ 773          };
+ 774          
+ 775          void MDIP_DiskInOut(BYTE type){
+ 776   1      	gDIP_MenuTimer = 50;
+ 777   1      //MDEBUG(0xd9);MDEBUG(type);
+ 778   1          MDIP_WriteString((char*)&Tab_DIP_DiskInOut[type * 6]);
+ 779   1      }
+ 780          void MDIP_PlayTrack(){
+ 781   1          BYTE temp;
+ 782   1      
+ 783   1          gDIP_MenuTimer = 20;
+ 784   1          g2DIP_ShowBuffer[6] &= ~0x4000;                     // :
+ 785   1          MDIP_WriteString("      ");
+ 786   1          temp = MDIP_WriteDec(0, g2PlayIndex+1);
+ 787   1          MDIP_SingleChar(temp++, '/');
+ 788   1          MDIP_WriteDec(temp, (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty);
+ 789   1      }
+ 790          CONST_CHAR Tab_DIP_Bps[] = {
+ 791              "32K48K56K64K80K96K112128160192224256320384"
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 14  
+
+ 792          //	 +++---+++---+++---+++---+++---+++---+++---
+ 793          	
+ 794          };
+ 795          void MDIP_PlayTime(){
+ 796   1          if (g2PlayTime < 3){
+ 797   2              MDIP_PlayTrack();
+ 798   2              return;
+ 799   2          }
+ 800   1          if (g2PlayTime < 5){
+ 801   2              BYTE temp = gAUD_BpsRate >> 3;
+ 802   2              if ((gAUD_SrcFormat & 0x0f) == KCM_SRC_MP3){
+ 803   3                  gDIP_MenuTimer = 20;
+ 804   3                  if (temp > 0 && temp < 16){
+ 805   4                      BYTE gLocal_Buffer[6];
+ 806   4                      MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
+ 807   4                      MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
+ 808   4                      MDIP_WriteString((char*)gLocal_Buffer);
+ 809   4                      return;
+ 810   4                  }
+ 811   3              }
+ 812   2          }
+ 813   1          gDIP_MenuTimer = 10;
+ 814   1      	MDIP_WriteString("  ");
+ 815   1          MDIP_Write2Digit(2, g2PlayTime/60);
+ 816   1          MDIP_Write2Digit(4, g2PlayTime%60);
+ 817   1          g2DIP_ShowBuffer[6] |= 0x4000;                          // :
+ 818   1      }
+ 819          
+ 820          
+ 821          CONST_CHAR Tab_DIP_Brightness[] = {
+ 822          	0x00,0x02,0x07,  
+ 823          };
+ 824          void MDIP_Brightness(BYTE show, BYTE bright){
+ 825   1      	if (show > 0){
+ 826   2      		MDIP_WriteString("BRIGH");
+ 827   2      		MDIP_SingleChar(5, bright + '1');
+ 828   2      	}
+ 829   1      
+ 830   1          HAL_DIP_STB(0);
+ 831   1          MUSDELAY(1);
+ 832   1      	MDIP_WriteByte(0x88 | Tab_DIP_Brightness[bright]);		  					// œ‘ æ∆¡¡¡∂»
+ 833   1          MUSDELAY(1);
+ 834   1          HAL_DIP_STB(1);    
+ 835   1      }
+ 836          
+ 837          
+ 838          
+ 839          void MDIP_AdjDelayTime(BYTE index, BYTE mode){				// 0=LINSYNC 1«∞÷√ 2÷–÷√ 3ª∑»∆ 4∫Û÷√ 
+ 840   1      	BYTE gLocal_1;
+ 841   1      	switch (index == 0){
+ 842   2      	case 0: gLocal_1 = 19; break;
+ 843   2      	case 1: gLocal_1 = 9; break;
+ 844   2      	case 2: gLocal_1 = 9; break;
+ 845   2      	case 3: gLocal_1 = 9; break;
+ 846   2      	case 4: gLocal_1 = 9; break;
+ 847   2      	}
+ 848   1      	if (mode == 4){	   											// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À∏œ®√ 3µ˜’˚- 4µ˜’˚+
+ 849   2      		if (gDIP_DelayTime[index] > gLocal_1){
+ 850   3      			gDIP_DelayTime[index] = gLocal_1;
+ 851   3      		}
+ 852   2      		if (gDIP_DelayTime[index] < gLocal_1){
+ 853   3      			++gDIP_DelayTime[index];
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 15  
+
+ 854   3      		}
+ 855   2      	}
+ 856   1      	else if (mode == 3){
+ 857   2      		if (gDIP_DelayTime[index] > 0){
+ 858   3      			--gDIP_DelayTime[index];
+ 859   3      		}
+ 860   2      	}
+ 861   1      //MDEBUG(0xc7);MDEBUG(index);MDEBUG(gDIP_DelayTime[index]);
+ 862   1      }
+ 863          
+ 864          void MDIP_WriteString(char* string){
+ 865   1      	BYTE gLocal_1;
+ 866   1      	char counter = 0;
+ 867   1      	do {
+ 868   2      		gLocal_1 = *string++;
+ 869   2      		if (gLocal_1 == 0){
+ 870   3      			break;
+ 871   3      		}
+ 872   2      		MDIP_SingleChar(counter, gLocal_1);
+ 873   2      	} while (++counter < 6);
+ 874   1      }
+ 875          BYTE MDIP_WriteDec(BYTE number, WORD value){                // œ‘ æ ÆΩ¯÷∆ ˝£¨∑µªÿœ¬“ª∏ˆ◊÷ø™ ºµƒŒª÷√
+ 876   1          if (value / 10000){
+ 877   2              MDIP_SingleChar(number++, (value / 10000) + '0');
+ 878   2              value = value % 10000;
+ 879   2          }
+ 880   1          if (value / 1000){
+ 881   2              MDIP_SingleChar(number++, (value / 1000) + '0');
+ 882   2              value = value % 1000;
+ 883   2          }
+ 884   1          if (value / 100){
+ 885   2              MDIP_SingleChar(number++, (value / 100) + '0');
+ 886   2              value = value % 100;
+ 887   2          }
+ 888   1          if (value / 10){
+ 889   2              MDIP_SingleChar(number++, (value / 10) + '0');
+ 890   2              value = value % 10;
+ 891   2          }
+ 892   1          MDIP_SingleChar(number++, value + '0');
+ 893   1          return number;
+ 894   1      }
+ 895          void MDIP_Write2Digit(BYTE number, BYTE value){             // œ‘ æ2∏ˆ ˝◊÷
+ 896   1      	MDIP_SingleChar(number, (value / 10) + '0');
+ 897   1      	MDIP_SingleChar(number+1, (value % 10) + '0');
+ 898   1      }
+ 899          /*
+ 900          void MDIP_WriteHex(BYTE number, BYTE value){                // œ‘ æΩ¯∂˛Ω¯÷∆µƒ ˝
+ 901              MDIP_SingleChar(number, MDIP_Hex2String(value >> 4));
+ 902          	MDIP_SingleChar(number+1, MDIP_Hex2String(value & 0x0f));
+ 903          } 
+ 904          char MDIP_Hex2String(BYTE hex){                             // ∑µªÿ Æ¡˘Ω¯÷∆µƒ÷µ
+ 905              if (hex > 9){
+ 906                  return hex - 10 + 'A';
+ 907              }
+ 908              return hex + '0';
+ 909          }
+ 910          */
+ 911          
+ 912          CONST_CHAR TabDIPmiLED_BASE[] = { // √◊◊÷π‹
+ 913              0x00,0x00,         // ' '
+ 914              0x24,0x3f,         // '0'
+ 915              0x00,0x06,         // '1'		   		____A____  
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 16  
+
+ 916              0x00,0xdb,         //  2		       |\	|  	/| 	  A 0x0001 B 0x0002	C  0x0004 D  0x0008 
+ 917              0x00,0xcf,         //  3		       | H	J  K | 	  E 0x0010 F 0x0020 G1 0x0040 G2 0x0080
+ 918              0x00,0xe6,         //  4		       F  \	| /  B 	  H 0x0100 J 0x0200 K  0x0400 L  0x0800
+ 919              0x00,0xed,         //  5		       | 	|	 | 	  M 0x1000 N 0x2000
+ 920              0x00,0xfd,         //  6		       |_G1___G2_| 
+ 921              0x00,0x07,         //  7		       |		 | 
+ 922              0x00,0xff,         //  8		       |  	|    | 
+ 923              0x00,0xef,         //  9		       E  /	M \  C 
+ 924              0x00,0xf7,         //  'A'		       | N	|  L | 
+ 925              0x12,0x8f,         //  'B'		       |/___D___\| 
+ 926              0x00,0x39,         //  'C'		                  
+ 927              0x12,0x0f,         //  'D'
+ 928              0x00,0xf9,         //  'E'
+ 929              0x00,0xf1,         //  'F'
+ 930              0x00,0xbd,         //  'G'
+ 931              0x00,0xf6,         //  'H'
+ 932              0x12,0x09,         //  'I'
+ 933              0x00,0x1e,         //  'J' 
+ 934              0x0C,0x70,         //  'K'
+ 935              0x00,0x38,         //  'L'
+ 936              0x05,0x36,         //  'M'
+ 937              0x09,0x36,         //  'N'
+ 938              0x00,0x3f,         //  'O'
+ 939              0x00,0xf3,         //  'P'
+ 940              0x08,0x3f,         //  'Q'
+ 941              0x08,0xf3,         //  'R'
+ 942              0x00,0xed,         //  'S'
+ 943              0x12,0x01,         //  'T'
+ 944              0x00,0x3e,         //  'U'
+ 945              0x24,0x30,         //  'V'
+ 946              0x28,0x36,         //  'W'
+ 947              0x2d,0x00,         //  'X'
+ 948              0x00,0xee,         //  'y'
+ 949              0x24,0x09,         //  'Z'
+ 950              0x00,0xc0,         //  '-'
+ 951              0x24,0x00,         //  '/'
+ 952              0x12,0xc0,         //  '+'
+ 953          };  						 
+ 954          
+ 955          void MDIP_SingleChar(
+ 956          					BYTE gLocal_1,		  			// 0-2 (√◊◊÷π‹) 3-5 (8◊÷π‹) 6 (STEREO-WIFI+3∏ˆDOT) 7-12 (∆µ∆◊µ⁄1-6¡–)
+ 957          					BYTE gLocal_2){			 
+ 958   1      	BYTE gLocal_Tab;
+ 959   1      
+ 960   1      	if (gLocal_1 < 3){ 								// 0-2 (√◊◊÷π‹)
+ 961   2      	    if ((gLocal_2 >= '0') && (gLocal_2 <= '9')) {
+ 962   3      	       gLocal_2 -= '0';
+ 963   3      	       gLocal_Tab = gLocal_2+1;
+ 964   3      	    }
+ 965   2      	    else if ((gLocal_2 >= 'a') && (gLocal_2 <= 'z')){
+ 966   3      	        gLocal_Tab = gLocal_2 - 'a' + 0x0b;            // ±‰¥Û–¥
+ 967   3      	    }
+ 968   2      	    else if ((gLocal_2 >= 'A') && (gLocal_2 <= 'Z')){
+ 969   3      	        gLocal_Tab = (gLocal_2 - 'A') + 0x0b; // 0x14
+ 970   3      	    }
+ 971   2      	    else {
+ 972   3      			switch (gLocal_2){
+ 973   4      			case '-': gLocal_Tab = 37; break;
+ 974   4      			case '/': gLocal_Tab = 38; break;
+ 975   4      			case '+': gLocal_Tab = 39; break;
+ 976   4      	    	default :
+ 977   4      	    		gLocal_Tab = 0; 
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 17  
+
+ 978   4      				break;
+ 979   4      			}
+ 980   3      		}
+ 981   2      		g2DIP_ShowBuffer[gLocal_1] = ((WORD)TabDIPmiLED_BASE[gLocal_Tab*2])<<8;
+ 982   2      		g2DIP_ShowBuffer[gLocal_1] |= TabDIPmiLED_BASE[gLocal_Tab*2+1];
+ 983   2      	}
+ 984   1      	else if (gLocal_1 < 6){ 								// 3-5 (8◊÷π‹) 
+ 985   2      	    if ((gLocal_2 >= '0') && (gLocal_2 <= '9')) {
+ 986   3      	       gLocal_2 -= '0';
+ 987   3      	       gLocal_Tab = gLocal_2+1;
+ 988   3      			g2DIP_ShowBuffer[gLocal_1] = ((WORD)TabDIPmiLED_BASE[gLocal_Tab*2])<<8;
+ 989   3      			g2DIP_ShowBuffer[gLocal_1] |= TabDIPmiLED_BASE[gLocal_Tab*2+1];
+ 990   3      	    }
+ 991   2      	    else {
+ 992   3      			switch (gLocal_2){
+ 993   4      			case '-': gLocal_2 = 0xc0; break;
+ 994   4      			case 'A': gLocal_2 = 0xf7; break;
+ 995   4      			case 'B': gLocal_2 = 0x7c; break;
+ 996   4      			case 'C': gLocal_2 = 0x39; break;
+ 997   4      			case 'D': gLocal_2 = 0xde; break;
+ 998   4      			case 'E': gLocal_2 = 0xf9; break;
+ 999   4      			case 'F': gLocal_2 = 0xf1; break;
+1000   4      			case 'G': gLocal_2 = 0xef; break;
+1001   4      			case 'I': gLocal_2 = 0x06; break;
+1002   4      			case 'H': gLocal_2 = 0xf6; break;
+1003   4      			case 'L': gLocal_2 = 0x38; break;
+1004   4      			case 'N': gLocal_2 = 0x37; break;
+1005   4      			case 'O': gLocal_2 = 0x3f; break;
+1006   4      			case 'P': gLocal_2 = 0xf3; break;
+1007   4      			case 'R':
+1008   4      			case 'r': gLocal_2 = 0x50; break;
+1009   4      			case 'S': gLocal_2 = 0xed; break;
+1010   4      			case 'T':
+1011   4      			case 't': gLocal_2 = 0xf8; break;
+1012   4      			case 'U': gLocal_2 = 0x3e; break;
+1013   4      			case 'Y': gLocal_2 = 0x6e; break;
+1014   4      	    	default :
+1015   4      				gLocal_2 = 0x0000;
+1016   4      				break;
+1017   4      			}
+1018   3      			g2DIP_ShowBuffer[gLocal_1] = gLocal_2;
+1019   3      
+1020   3      		}
+1021   2      	}
+1022   1      	else {
+1023   2      		if(gLocal_1 > 6 && gLocal_1 < 13){ // ≤®–Œ
+1024   3      		    if ((gLocal_2 >= 1) && (gLocal_2 <= 5)) {
+1025   4      		       gLocal_Tab = gLocal_2+10+3+26-1;
+1026   4      		    }
+1027   3      		}
+1028   2      		else {
+1029   3      		}
+1030   2      
+1031   2      		g2DIP_ShowBuffer[gLocal_1] = ((WORD)TabDIPmiLED_BASE[gLocal_Tab*2])<<8;
+1032   2      		g2DIP_ShowBuffer[gLocal_1] |= TabDIPmiLED_BASE[gLocal_Tab*2+1];
+1033   2      	//	g2DIP_ShowBuffer[gLocal_1]=0xffff;
+1034   2      //MDEBUG(0xbc);MDEBUG(gLocal_Tab);MDEBUG(g2DIP_ShowBuffer[gLocal_1]>>8);MDEBUG(g2DIP_ShowBuffer[gLocal_1])
+             -;
+1035   2      	}
+1036   1      	FDIP_ScreenUpdata = 1;
+1037   1          return;
+1038   1      }
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 18  
+
+1039          CONST_CHAR Tab_DIP_Spectrum1[] = {
+1040          	// 			   ÷ÿ∏¥		 ÷ÿ∏¥
+1041          	0x00,0x10,0x18,0x1c,0x1c,0x1e,0x1e,0x1f,
+1042          };
+1043          
+1044          void MDIP_ClearSpectrum(){
+1045   1      	BYTE gLocal_1 = 0;
+1046   1          do {
+1047   2      		g2DIP_ShowBuffer[8 + gLocal_1] = 0;
+1048   2          } while (++gLocal_1 < 5);
+1049   1      }
+1050          
+1051          BYTE MDIP_GetLevel(BYTE level){
+1052   1      //MDEBUG(0xaa);MDEBUG(level& 0x07);
+1053   1          return Tab_DIP_Spectrum1[level & 0x07];
+1054   1      }
+1055          void MDIP_ReadSpectrum(){
+1056   1      	BYTE counter;
+1057   1      	BYTE outData[3];
+1058   1      
+1059   1      	// 5∂Œ∆µ∆◊£¨◊÷Ω⁄0µƒB2:0Œ™µ⁄1¡–£¨B5:3Œ™µ⁄2¡–£¨◊÷Ω⁄1µƒ B2:0Œ™µ⁄3¡–£¨B5:3Œ™µ⁄4¡–£¨◊÷Ω⁄2µƒ B2:0Œ™µ⁄5¡–
+1060   1      	MKCM_ReadXByte(KCM_RD_SPECTRUM, 3, outData);
+1061   1      //MDEBUG(0xaa);/*MDEBUG(outData[0]);MDEBUG(outData[1]);*/MDEBUG(outData[2]);
+1062   1      	if (FKCM_I2C_Error){
+1063   2      		MDIP_ClearSpectrum();
+1064   2      		return;
+1065   2      	}
+1066   1          g2DIP_ShowBuffer[8 + 0] = MDIP_GetLevel(outData[0]);
+1067   1          g2DIP_ShowBuffer[8 + 1] = MDIP_GetLevel(outData[0]>>3);
+1068   1          g2DIP_ShowBuffer[8 + 2] = MDIP_GetLevel(outData[1]);
+1069   1          g2DIP_ShowBuffer[8 + 3] = MDIP_GetLevel(outData[1]>>3);
+1070   1          g2DIP_ShowBuffer[8 + 4] = MDIP_GetLevel(outData[2]);
+1071   1          FDIP_ScreenUpdata = 1;
+1072   1      }
+1073          void MDIP_CleanSpectrum(){
+1074   1      	BYTE gLocal_1;
+1075   1          gLocal_1 = 0;
+1076   1          do {
+1077   2      		g2DIP_ShowBuffer[8] = 0;
+1078   2          } while (++gLocal_1 < 5);
+1079   1      	FDIP_ScreenUpdata = 1;
+1080   1      }
+1081          
+1082          void MDIP_ScreenFill(BYTE value){							// ÃÓ≥‰À˘”–œ‘ æ‘™Àÿµƒ ˝÷µ£¨0x00Œ™»´≤øœ®√
+1083   1      	BYTE gLocal_1;
+1084   1          gLocal_1 = 0;
+1085   1          do{
+1086   2      		g2DIP_ShowBuffer[gLocal_1] = value;    
+1087   2          } while (++gLocal_1 < 13);
+1088   1      }
+1089          void MDIP_ScreenUpdata(){    
+1090   1      	BYTE gLocal_0;
+1091   1      	BYTE gLocal_1;
+1092   1      
+1093   1          gLocal_1 = 0;
+1094   1          do{
+1095   2      		gDIP_Buffer[gLocal_1] = 0;    
+1096   2          } while (++gLocal_1 < 16);    						  
+1097   1      
+1098   1      	// √◊◊÷π‹1
+1099   1      	if (g2DIP_ShowBuffer[0] & 0x0001) gDIP_Buffer[14] |= 0x08;
+1100   1      	if (g2DIP_ShowBuffer[0] & 0x0002) gDIP_Buffer[7]  |= 0x08;
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 19  
+
+1101   1      	if (g2DIP_ShowBuffer[0] & 0x0004) gDIP_Buffer[0]  |= 0x08;
+1102   1      	if (g2DIP_ShowBuffer[0] & 0x0008) gDIP_Buffer[3]  |= 0x08;
+1103   1      	if (g2DIP_ShowBuffer[0] & 0x0010) gDIP_Buffer[11] |= 0x08;
+1104   1      	if (g2DIP_ShowBuffer[0] & 0x0020) gDIP_Buffer[15] |= 0x08;
+1105   1        	if (g2DIP_ShowBuffer[0] & 0x0040) gDIP_Buffer[9]  |= 0x08;
+1106   1        	if (g2DIP_ShowBuffer[0] & 0x0080) gDIP_Buffer[6]  |= 0x08;
+1107   1        	if (g2DIP_ShowBuffer[0] & 0x0100) gDIP_Buffer[13] |= 0x08;
+1108   1        	if (g2DIP_ShowBuffer[0] & 0x0200) gDIP_Buffer[12] |= 0x08;
+1109   1        	if (g2DIP_ShowBuffer[0] & 0x0400) gDIP_Buffer[5]  |= 0x08;
+1110   1        	if (g2DIP_ShowBuffer[0] & 0x0800) gDIP_Buffer[1]  |= 0x08;
+1111   1        	if (g2DIP_ShowBuffer[0] & 0x1000) gDIP_Buffer[2]  |= 0x08;
+1112   1        	if (g2DIP_ShowBuffer[0] & 0x2000) gDIP_Buffer[8]  |= 0x08;
+1113   1      
+1114   1      	// √◊◊÷π‹2
+1115   1      	if (g2DIP_ShowBuffer[1] & 0x0001) gDIP_Buffer[14] |= 0x20;
+1116   1      	if (g2DIP_ShowBuffer[1] & 0x0002) gDIP_Buffer[7]  |= 0x20;
+1117   1      	if (g2DIP_ShowBuffer[1] & 0x0004) gDIP_Buffer[0]  |= 0x20;
+1118   1      	if (g2DIP_ShowBuffer[1] & 0x0008) gDIP_Buffer[3]  |= 0x20;
+1119   1      	if (g2DIP_ShowBuffer[1] & 0x0010) gDIP_Buffer[11] |= 0x20;
+1120   1      	if (g2DIP_ShowBuffer[1] & 0x0020) gDIP_Buffer[15] |= 0x20;
+1121   1        	if (g2DIP_ShowBuffer[1] & 0x0040) gDIP_Buffer[9]  |= 0x20;
+1122   1        	if (g2DIP_ShowBuffer[1] & 0x0080) gDIP_Buffer[6]  |= 0x20;
+1123   1        	if (g2DIP_ShowBuffer[1] & 0x0100) gDIP_Buffer[13] |= 0x20;
+1124   1        	if (g2DIP_ShowBuffer[1] & 0x0200) gDIP_Buffer[12] |= 0x20;
+1125   1        	if (g2DIP_ShowBuffer[1] & 0x0400) gDIP_Buffer[5]  |= 0x20;
+1126   1        	if (g2DIP_ShowBuffer[1] & 0x0800) gDIP_Buffer[1]  |= 0x20;
+1127   1        	if (g2DIP_ShowBuffer[1] & 0x1000) gDIP_Buffer[2]  |= 0x20;
+1128   1        	if (g2DIP_ShowBuffer[1] & 0x2000) gDIP_Buffer[8]  |= 0x20;
+1129   1      
+1130   1      	// √◊◊÷π‹3
+1131   1      	if (g2DIP_ShowBuffer[2] & 0x0001) gDIP_Buffer[14] |= 0x10;
+1132   1      	if (g2DIP_ShowBuffer[2] & 0x0002) gDIP_Buffer[7]  |= 0x10;
+1133   1      	if (g2DIP_ShowBuffer[2] & 0x0004) gDIP_Buffer[0]  |= 0x10;
+1134   1      	if (g2DIP_ShowBuffer[2] & 0x0008) gDIP_Buffer[3]  |= 0x10;
+1135   1      	if (g2DIP_ShowBuffer[2] & 0x0010) gDIP_Buffer[11] |= 0x10;
+1136   1      	if (g2DIP_ShowBuffer[2] & 0x0020) gDIP_Buffer[15] |= 0x10;
+1137   1        	if (g2DIP_ShowBuffer[2] & 0x0040) gDIP_Buffer[9]  |= 0x10;
+1138   1        	if (g2DIP_ShowBuffer[2] & 0x0080) gDIP_Buffer[6]  |= 0x10;
+1139   1        	if (g2DIP_ShowBuffer[2] & 0x0100) gDIP_Buffer[13] |= 0x10;
+1140   1        	if (g2DIP_ShowBuffer[2] & 0x0200) gDIP_Buffer[12] |= 0x10;
+1141   1        	if (g2DIP_ShowBuffer[2] & 0x0400) gDIP_Buffer[5]  |= 0x10;
+1142   1        	if (g2DIP_ShowBuffer[2] & 0x0800) gDIP_Buffer[1]  |= 0x10;
+1143   1        	if (g2DIP_ShowBuffer[2] & 0x1000) gDIP_Buffer[2]  |= 0x10;
+1144   1        	if (g2DIP_ShowBuffer[2] & 0x2000) gDIP_Buffer[8]  |= 0x10;
+1145   1      
+1146   1      	// ∞À◊÷π‹1
+1147   1      	if (g2DIP_ShowBuffer[3] & 0x0001) gDIP_Buffer[14] |= 0x04;
+1148   1      	if (g2DIP_ShowBuffer[3] & 0x0002) gDIP_Buffer[7]  |= 0x04;
+1149   1      	if (g2DIP_ShowBuffer[3] & 0x0004) gDIP_Buffer[0]  |= 0x04;
+1150   1      	if (g2DIP_ShowBuffer[3] & 0x0008) gDIP_Buffer[3]  |= 0x04;
+1151   1      	if (g2DIP_ShowBuffer[3] & 0x0010) gDIP_Buffer[11] |= 0x04;
+1152   1      	if (g2DIP_ShowBuffer[3] & 0x0020) gDIP_Buffer[15] |= 0x04;
+1153   1        	if (g2DIP_ShowBuffer[3] & 0x0040) gDIP_Buffer[9]  |= 0x04;
+1154   1      
+1155   1      	// ∞À◊÷π‹2
+1156   1      	if (g2DIP_ShowBuffer[4] & 0x0001) gDIP_Buffer[14] |= 0x80;
+1157   1      	if (g2DIP_ShowBuffer[4] & 0x0002) gDIP_Buffer[7]  |= 0x80;
+1158   1      	if (g2DIP_ShowBuffer[4] & 0x0004) gDIP_Buffer[0]  |= 0x80;
+1159   1      	if (g2DIP_ShowBuffer[4] & 0x0008) gDIP_Buffer[3]  |= 0x80;
+1160   1      	if (g2DIP_ShowBuffer[4] & 0x0010) gDIP_Buffer[11] |= 0x80;
+1161   1      	if (g2DIP_ShowBuffer[4] & 0x0020) gDIP_Buffer[15] |= 0x80;
+1162   1        	if (g2DIP_ShowBuffer[4] & 0x0040) gDIP_Buffer[9]  |= 0x80;
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 20  
+
+1163   1      
+1164   1      	// ∞À◊÷π‹3
+1165   1      	if (g2DIP_ShowBuffer[5] & 0x0001) gDIP_Buffer[14] |= 0x02;
+1166   1      	if (g2DIP_ShowBuffer[5] & 0x0002) gDIP_Buffer[7]  |= 0x02;
+1167   1      	if (g2DIP_ShowBuffer[5] & 0x0004) gDIP_Buffer[0]  |= 0x02;
+1168   1      	if (g2DIP_ShowBuffer[5] & 0x0008) gDIP_Buffer[3]  |= 0x02;
+1169   1      	if (g2DIP_ShowBuffer[5] & 0x0010) gDIP_Buffer[11] |= 0x02;
+1170   1      	if (g2DIP_ShowBuffer[5] & 0x0020) gDIP_Buffer[15] |= 0x02;
+1171   1        	if (g2DIP_ShowBuffer[5] & 0x0040) gDIP_Buffer[9]  |= 0x02;
+1172   1      
+1173   1      	// STEREO -- WIFI µ»
+1174   1      	if (g2DIP_ShowBuffer[6] & 0x0001) gDIP_Buffer[14] |= 0x01;
+1175   1      	if (g2DIP_ShowBuffer[6] & 0x0002) gDIP_Buffer[7]  |= 0x01;
+1176   1      	if (g2DIP_ShowBuffer[6] & 0x0004) gDIP_Buffer[0]  |= 0x01;
+1177   1      	if (g2DIP_ShowBuffer[6] & 0x0008) gDIP_Buffer[3]  |= 0x01;
+1178   1      	if (g2DIP_ShowBuffer[6] & 0x0010) gDIP_Buffer[11] |= 0x01;
+1179   1      	if (g2DIP_ShowBuffer[6] & 0x0020) gDIP_Buffer[15] |= 0x01;
+1180   1        	if (g2DIP_ShowBuffer[6] & 0x0040) gDIP_Buffer[9]  |= 0x01;
+1181   1        	if (g2DIP_ShowBuffer[6] & 0x0080) gDIP_Buffer[6]  |= 0x01;
+1182   1        	if (g2DIP_ShowBuffer[6] & 0x0100) gDIP_Buffer[13] |= 0x01;
+1183   1        	if (g2DIP_ShowBuffer[6] & 0x0200) gDIP_Buffer[12] |= 0x01;
+1184   1        	if (g2DIP_ShowBuffer[6] & 0x0400) gDIP_Buffer[5]  |= 0x01;
+1185   1        	if (g2DIP_ShowBuffer[6] & 0x0800) gDIP_Buffer[1]  |= 0x01;
+1186   1        	// dot ':''.' ':'
+1187   1        	if (g2DIP_ShowBuffer[6] & 0x1000) gDIP_Buffer[10]  |= 0x20;
+1188   1        	if (g2DIP_ShowBuffer[6] & 0x2000) gDIP_Buffer[10]  |= 0x10;
+1189   1        	if (g2DIP_ShowBuffer[6] & 0x4000) gDIP_Buffer[10]  |= 0x04;
+1190   1      
+1191   1      	// ∆µ∆◊œ‘ æ
+1192   1      	// P5 P15 P25 
+1193   1      	// P31	(60 330 1K 3K3 10K 20K)
+1194   1      	// Ω”µÁ‘¥ ø™ª˙“—◊≈
+1195   1      
+1196   1      	// p1 ¥”…œµΩœ¬ ∞¥¡–≈≈¡–
+1197   1      	if (g2DIP_ShowBuffer[7] & 0x01) gDIP_Buffer[5]  |= 0x04;
+1198   1      	if (g2DIP_ShowBuffer[7] & 0x02) gDIP_Buffer[12] |= 0x04;
+1199   1      	if (g2DIP_ShowBuffer[7] & 0x04) gDIP_Buffer[13] |= 0x04;
+1200   1      	if (g2DIP_ShowBuffer[7] & 0x08) gDIP_Buffer[6]  |= 0x04;
+1201   1      
+1202   1      	if (g2DIP_ShowBuffer[8] & 0x01) gDIP_Buffer[1]  |= 0x80;
+1203   1        	if (g2DIP_ShowBuffer[8] & 0x02) gDIP_Buffer[5]  |= 0x80;
+1204   1        	if (g2DIP_ShowBuffer[8] & 0x04) gDIP_Buffer[12] |= 0x80;
+1205   1        	if (g2DIP_ShowBuffer[8] & 0x08) gDIP_Buffer[13] |= 0x80;
+1206   1        	if (g2DIP_ShowBuffer[8] & 0x10) gDIP_Buffer[6]  |= 0x80;
+1207   1      
+1208   1      	//p11
+1209   1        	if (g2DIP_ShowBuffer[9] & 0x01) gDIP_Buffer[5]  |= 0x02;
+1210   1        	if (g2DIP_ShowBuffer[9] & 0x02) gDIP_Buffer[12] |= 0x02;
+1211   1        	if (g2DIP_ShowBuffer[9] & 0x04) gDIP_Buffer[13] |= 0x02;
+1212   1        	if (g2DIP_ShowBuffer[9] & 0x08) gDIP_Buffer[6]  |= 0x02;
+1213   1      
+1214   1      	// p16
+1215   1        	if (g2DIP_ShowBuffer[10] & 0x01) gDIP_Buffer[11] |= 0x40;
+1216   1      	if (g2DIP_ShowBuffer[10] & 0x02) gDIP_Buffer[3]  |= 0x40;
+1217   1      	if (g2DIP_ShowBuffer[10] & 0x04) gDIP_Buffer[0]  |= 0x40;
+1218   1      	if (g2DIP_ShowBuffer[10] & 0x08) gDIP_Buffer[7]  |= 0x40;
+1219   1      	if (g2DIP_ShowBuffer[10] & 0x10) gDIP_Buffer[14] |= 0x40;
+1220   1      
+1221   1      	// p21
+1222   1      	if (g2DIP_ShowBuffer[11] & 0x01) gDIP_Buffer[13] |= 0x40;
+1223   1      	if (g2DIP_ShowBuffer[11] & 0x02) gDIP_Buffer[6]  |= 0x40;
+1224   1        	if (g2DIP_ShowBuffer[11] & 0x04) gDIP_Buffer[9]  |= 0x40;
+C51 COMPILER V6.14  DISPLAY                                                                06/09/2020 11:19:53 PAGE 21  
+
+1225   1        	if (g2DIP_ShowBuffer[11] & 0x08) gDIP_Buffer[15] |= 0x40;
+1226   1      
+1227   1      	// p26
+1228   1        	if (g2DIP_ShowBuffer[12] & 0x01) gDIP_Buffer[8]  |= 0x40;
+1229   1        	if (g2DIP_ShowBuffer[12] & 0x02) gDIP_Buffer[2]  |= 0x40;
+1230   1        	if (g2DIP_ShowBuffer[12] & 0x04) gDIP_Buffer[1]  |= 0x40;
+1231   1        	if (g2DIP_ShowBuffer[12] & 0x08) gDIP_Buffer[5]  |= 0x40;
+1232   1        	if (g2DIP_ShowBuffer[12] & 0x10) gDIP_Buffer[12] |= 0x40;
+1233   1      
+1234   1          HAL_DIP_STB(0);
+1235   1          MUSDELAY(1);
+1236   1      	MDIP_WriteByte(0x40);		  // ≥ı ºªØ	…œµÁ ±£¨µÿ÷∑…ËŒ™00H(00H-0DH) //  …œµÁ ±£¨ƒ¨»œ…Ë÷√Œ™¬ˆ≥ÂøÌ∂»Œ™1/16£¨œ‘ 
+             -æπÿ£¨µÿ÷∑µ›‘ˆº”1
+1237   1          MUSDELAY(1);
+1238   1          HAL_DIP_STB(1);    
+1239   1          MUSDELAY(1);
+1240   1          HAL_DIP_STB(0);
+1241   1          MUSDELAY(1);
+1242   1      	MDIP_WriteByte(0xc0);		  // ¥´ ‰µÿ÷∑ 
+1243   1      	gLocal_0 = 0;
+1244   1      
+1245   1      	do{
+1246   2      		MDIP_WriteByte(gDIP_Buffer[gLocal_0]);		  // ƒ⁄»›
+1247   2      	}while(++gLocal_0 < 16);	  // TA6932 “ª¥Œ◊Ó∂‡16∏ˆBYTEƒ⁄»›
+1248   1          HAL_DIP_STB(1);    
+1249   1          return;
+1250   1      }
+1251          
+1252          void MDIP_WriteByte(BYTE gLocal_1){
+1253   1          BYTE gLocal_0;
+1254   1      
+1255   1          gLocal_0 = 8;
+1256   1          do{
+1257   2              HAL_DIP_CLK(0);
+1258   2              HAL_DIP_DAT(gLocal_1 & 0x01);
+1259   2              gLocal_1 >>= 1;
+1260   2              HAL_DIP_CLK(1);
+1261   2          } while (--gLocal_0 > 0); 
+1262   1          return;
+1263   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   6211    ----
+   CONSTANT SIZE    =    573    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      57
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,193 @@
+C51 COMPILER V6.14  C51TINY                                                                06/09/2020 11:19:53 PAGE 1   
+
+
+C51 COMPILER V6.14, COMPILATION OF MODULE C51TINY
+OBJECT MODULE PLACED IN c51tiny.OBJ
+COMPILER INVOKED BY: D:\SDK\kc3xm51\Tools\C51.EXE c51tiny.c SMALL WL(1) 
+
+stmt level    source
+
+   1          
+   2          #include <stdarg.h>
+   3          #include "c51tiny.h"
+   4          
+   5          xdata char gLogBuffer[32];
+   6          
+   7          // 从8位的HEX转换到ASCII码
+   8          // lowercase 字母小写
+   9          // value 	输入的数据
+  10          static char Hex2Ascii(char lowercase, unsigned char value){	
+  11   1          value &= 0x0f;
+  12   1          if (value < 0x0a){
+  13   2          	return value += '0';
+  14   2      	}
+  15   1      	if (lowercase){
+  16   2      		return (value - 10) + 'a';
+  17   2      	}
+  18   1      	return (value - 10) + 'A';
+  19   1      }
+  20          
+  21          // 将数字格式化为字符串输出，返回字符串的长度
+  22          // mode 	'd'为有符号十进制，'u'为无符号十进制，'x'为16进制小写字母，'X'为16进制大写字母
+  23          // zeroPad 	不管前面是否非0，共需要显示的位数
+  24          // value 	输入的数据
+  25          // outData 	输出的串（定义缓冲区必需大于10）
+  26          static u8 formatValue(char mode, char zeroPad, u32 value, char* outData){
+  27   1          char FLocal_2;
+  28   1          unsigned char gLocal_2;
+  29   1          unsigned char gLocal_3;
+  30   1          unsigned char gLocal_4;
+  31   1          unsigned char gLocal_5;
+  32   1      	if (!zeroPad && !value){
+  33   2      		outData[0] = '0';
+  34   2      		outData[1] = 0x00;
+  35   2      	    return 1;
+  36   2      	}
+  37   1      
+  38   1          FLocal_2 = 0;
+  39   1      	gLocal_2 = 0;
+  40   1      	if (mode == 'd' || mode == 'u'){                        // 'd'为有符号十进制，'u'为无符号十进制
+  41   2      	    u32 g4Local_1 = 1000000000;
+  42   2      		if (mode == 'd' && value & 0x80000000){				// 负数
+  43   3      	        outData[gLocal_2++] = '-';
+  44   3      			value = 0x80000000 - (value & ~0x80000000);
+  45   3      		}
+  46   2      		gLocal_3 = 11;
+  47   2      	    do {
+  48   3      	        gLocal_4 = (unsigned char)(value / g4Local_1);
+  49   3      	        if ((--gLocal_3 == zeroPad) || gLocal_4){
+  50   4      	            FLocal_2 = 1;
+  51   4      	        }
+  52   3      	        if (FLocal_2){
+  53   4      	            outData[gLocal_2++] = Hex2Ascii(0, gLocal_4);
+  54   4      	        }
+  55   3      	        value %= g4Local_1;
+C51 COMPILER V6.14  C51TINY                                                                06/09/2020 11:19:53 PAGE 2   
+
+  56   3      	        g4Local_1 /= 10;
+  57   3      	    } while(g4Local_1 != 0);
+  58   2      	}
+  59   1      	else {                                                  // 'x'为16进制小写字母，'X'为16进制大写字母
+  60   2      		gLocal_3 = 32;
+  61   2      		gLocal_4 = 9;
+  62   2      		do {
+  63   3      			gLocal_3 -= 4;
+  64   3      			gLocal_5 = (unsigned char)(value >> gLocal_3);
+  65   3      			if ((--gLocal_4 == zeroPad) || gLocal_5){
+  66   4      	            FLocal_2 = 1;
+  67   4      			}
+  68   3      	        if (FLocal_2){
+  69   4      				outData[gLocal_2++] = Hex2Ascii((mode == 'X') ? 1 : 0, gLocal_5);
+  70   4      			}
+  71   3      		} while (gLocal_3 != 0);
+  72   2      	}
+  73   1      	outData[gLocal_2] = 0x00;
+  74   1          return gLocal_2;
+  75   1      }
+  76          u8 VsPrintf(char* outData, const char* fmt, va_list args){
+  77   1      	char inCoun = 0;
+  78   1      	char outCoun = 0;
+  79   1      	char strCoun;
+  80   1      	char* strData;
+  81   1      	char nowStr;
+  82   1      	char zeroPad;
+  83   1      	u32 value;
+  84   1      	while (1){
+  85   2      		if (fmt[inCoun] != '%') {
+  86   3      			if (outCoun > 30){
+  87   4      //OWN_LOG("return A %d %d\r\n",inCoun, outCoun);							
+  88   4      				return outCoun;
+  89   4      			}
+  90   3      			outData[outCoun++] = fmt[inCoun++];
+  91   3      			if (!fmt[inCoun]){
+  92   4      //OWN_LOG("return B %d %d\r\n",inCoun, outCoun);											
+  93   4      				return outCoun;
+  94   4      			}
+  95   3      			continue;
+  96   3      		}
+  97   2      		nowStr = fmt[inCoun+1];
+  98   2      //OWN_LOG("nowStr %02x %02x\r\n", inCoun+1, nowStr);		
+  99   2      		if (nowStr == 's'){									// 字符串
+ 100   3      			strData = va_arg(args, char*);
+ 101   3      			inCoun += 2;
+ 102   3      			strCoun = 0;
+ 103   3      //OWN_LOG("EE %d %d\r\n",inCoun, outCoun);			
+ 104   3      			while (strData[strCoun] && outCoun < 30){
+ 105   4      				outData[outCoun++] = strData[strCoun++];
+ 106   4      			}
+ 107   3      //OWN_LOG("FF %d %d %d\r\n",inCoun, outCoun, strCoun);
+ 108   3      			continue;
+ 109   3      		}
+ 110   2      		if (nowStr == '%'){									// 需要输出字符%
+ 111   3      			inCoun += 2;
+ 112   3      			outData[outCoun++] = '%';
+ 113   3      			continue;
+ 114   3      		}
+ 115   2      		if (nowStr == 'c'){									// 需要输出字符
+ 116   3      			inCoun += 2;
+ 117   3      			outData[outCoun++] = (char)va_arg(args,int);
+C51 COMPILER V6.14  C51TINY                                                                06/09/2020 11:19:53 PAGE 3   
+
+ 118   3      			continue;
+ 119   3      		}
+ 120   2      		zeroPad = 0;
+ 121   2      		for (strCoun = 0; strCoun < 3; strCoun++){
+ 122   3      			nowStr = fmt[(1 + inCoun + strCoun)];
+ 123   3      			if (nowStr >= '0' && nowStr <= '9'){
+ 124   4      				zeroPad = (zeroPad * 10) + (nowStr - '0');
+ 125   4      			}else {
+ 126   4      				break;
+ 127   4      			}
+ 128   3      		}
+ 129   2      
+ 130   2      //OWN_LOG("EE %d %d %02x %02x\r\n", zeroPad, strCoun, inCoun+1, outCoun);// 补零
+ 131   2      		strData = (char*)&fmt[(1 + inCoun + strCoun)];
+ 132   2      		inCoun = 1 + 1 + inCoun + strCoun;
+ 133   2      		switch (strData[0]){
+ 134   3      		case 'd':										// 有符号十进制
+ 135   3      		case 'u':										// 无符号十进制
+ 136   3      		case 'x': 										// 小写的十六进制
+ 137   3      		case 'X': 										// 大写的十六进制 
+ 138   3      			value = va_arg(args,char);
+ 139   3                  value <<= 8;
+ 140   3      			value |= va_arg(args,char);
+ 141   3                  value <<= 8;
+ 142   3      			value |= va_arg(args,char);
+ 143   3                  value <<= 8;
+ 144   3      			value |= va_arg(args,char);
+ 145   3      			outCoun += formatValue(strData[0], zeroPad, value, &outData[outCoun]);
+ 146   3      			break;
+ 147   3      		}
+ 148   2      	}
+ 149   1      //OWN_LOG("return C %d %d\r\n",inCoun, outCoun);								
+ 150   1      	return outCoun;
+ 151   1      }
+ 152          
+ 153          
+ 154          void MLOG(char *fmt, ...){
+ 155   1      	char counter;
+ 156   1      	char length;
+ 157   1      	va_list args; 
+ 158   1      	va_start(args, fmt);  
+ 159   1          length = VsPrintf(gLogBuffer, fmt, args);
+ 160   1      	va_end(args); 
+ 161   1          for (counter = 0; counter < length; counter++){
+ 162   2              TI = 0;
+ 163   2              SBUF = gLogBuffer[counter];
+ 164   2              while (!TI);
+ 165   2          }
+ 166   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1280    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     32    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      59
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,604 @@
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 1   
+
+
+C51 COMPILER V6.14, COMPILATION OF MODULE FUNCTION
+OBJECT MODULE PLACED IN function.OBJ
+COMPILER INVOKED BY: D:\SDK\kc3xm51\Tools\C51.EXE function.c SMALL WL(1) 
+
+stmt level    source
+
+   1          
+   2          // Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+   3          // SPDX-License-Identifier: Apache-2.0
+   4          // https://gitee.com/hsav20/kc3xm51.git
+   5          // https://github.com/hsav20/kc3xm51.git
+   6          // http://www,hsav.com/download/kc3xm51.zip
+   7          
+   8          
+   9          #include "main.h"           
+  10          
+  11          void MKCM_Initialize(){										// KCMÄ£¿é³õÊ¼»¯  	
+  12   1      	gDIP_Brightness = 0;
+  13   1      	MKCM_SetPowerOn();										// KCM¿ª»ú
+  14   1      }	  
+  15          void MKCM_SetPowerOn(){ 									// KCM¿ª»ú
+  16   1      	MKCM_WriteRegister(KCM_POWER_ON, 1);
+  17   1          MDIP_MenuSelect(cMenu_PowerOn, MENU_NORMAL);
+  18   1      	gDIP_MenuLock = 100;									// ÔÝÊ±Ëø¶¨ÏÔÊ¾10Ãë
+  19   1      	gAUD_SrcFormat = 0;
+  20   1          gAUD_BpsRate = 0;
+  21   1          g2SUB_SrcValid = 0;
+  22   1          gSUB_SrcAuto = INPUT_SWITCH_NONE;                       // ×Ô¶¯Ñ¡ÔñÊ§Ð§
+  23   1          MLOG("KCM_POWER_ON\r\n");
+  24   1      }	  
+  25          
+  26          
+  27          
+  28          void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
+  29   1          if (!HAL_KCM_I2C_INT()){                           		// detect KCM interrupt ¼ì²âµ½I2C´Ó»ú²úÉúÖÐ¶Ï,INT
+             -ÎªµÍ
+  30   2      	    BYTE gLocal_1;
+  31   2      	    BYTE gLocal_2;
+  32   2      
+  33   2      		gLocal_1 = MKCM_ReadRegister(KCM_READ_IRQ);				// Read interrupt ¶ÁÈ¡KCMÖÐ¶Ï
+  34   2      		MKCM_WriteRegister(KCM_CLEAR_IRQ, gLocal_1);  			// Clear interrupt Çå³ýÏàÓ¦µÄÖÐ¶Ï
+  35   2      		if (FKCM_I2C_Error){
+  36   3                  MLOG("KCM_READ_IRQ Error\r\n");
+  37   3      			return;
+  38   3      		}
+  39   2              MLOG("KCM_CLEAR_IRQ %02x\r\n", (u32)gLocal_1);
+  40   2      		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// Ä£Ê½³õÊ¼»¯Íê³ÉÖÐ¶Ï£¬ÐèÒªÐ´Èë"KCM_POWER_ON"¼Ä´æÆ÷£¬
+  41   3                  MKCM_RestoreMemory();
+  42   3      		}
+  43   2      		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // ÊýÂëÐÅºÅÊäÈë¸ñÊ½¸Ä±äÖÐ¶Ï£¬ÐèÒª¶ÁÈ¡"KCM_SRC_FORMAT
+             -"¼Ä´æÆ÷
+  44   3      			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
+  45   3                  gAUD_BpsRate = MKCM_ReadRegister(KCM_BPS_RATE);
+  46   3      			if (gDIP_MenuLock == 0){						// 
+  47   4      				if (!FSYS_TestTone){						// Ã»ÓÐ´ò¿ªÔëÒô²âÊÔ
+  48   5      					MDIP_MenuSelect(cMenu_SrcFormat, MENU_NORMAL);
+  49   5      				}
+  50   4      			}
+  51   3      			if (gAUD_SrcFormat == 0){
+  52   4      				MDIP_CleanSpectrum();
+  53   4      	    	}
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 2   
+
+  54   3      			MDIP_SrcFormatSymbol();
+  55   3                  MDIP_SurroundSymbol();
+  56   3              	if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+  57   4                      g2TimeLength = MKCM_Read2Byte(KCM_RD_FILE_TIME);
+  58   4                  }
+  59   3      		}
+  60   2      		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            // ÓÐÐ§µÄÒôÔ´ÊäÈë¸Ä±äÖÐ¶Ï£¬ÐèÒª¶ÁÈ¡"KCM_SRC_VALID"¼Ä
+             -´æÆ÷
+  61   3                  MKCM_ReadSrcValid();
+  62   3      		}
+  63   2      		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               // ÓÐÐ§µÄÒôÔ´ÊäÈë¸Ä±äÖÐ¶Ï£¬ÐèÒª¶ÁÈ¡"KCM_SRC_VALID"¼Ä
+             -´æÆ÷
+  64   3      			gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);     // ¶ÁÈ¡µ±Ç°ÒôÁ¿Öµ
+  65   3      			if (gDIP_MenuSelect == cMenu_MasterVolume){
+  66   4      				MDIP_MenuSelect(cMenu_MasterVolume, 0);
+  67   4      			}
+  68   3      		}
+  69   2              if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             // ¹Ì¼þ¸üÐÂ£¬ÐèÒª¶ÁÈ¡"KCM_RD_INFO"¼Ä´æÆ÷
+  70   3                  MDIP_MenuSelect(cMenu_Fireware, MENU_NORMAL);
+  71   3              }
+  72   2              if ((gLocal_1 & KCM_IRQ_MEDIA_TIME) > 0){           // ¶àÃ½Ìå²¥·ÅÊ±¼ä¸Ä±ä
+  73   3                  g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
+  74   3                  if (g2PlayTime){                                // ²¥·ÅÊ±¼ä¸Ä±ä 
+  75   4                      MDIP_MenuSelect(cMenu_PlayTime, MENU_NORMAL);
+  76   4                  }else {                                         // ²¥·ÅÍê³ÉÁË
+  77   4                      WORD g2Local_1 = (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty;
+  78   4                      if (++g2PlayIndex >= g2Local_1){
+  79   5                          g2PlayIndex = 0;
+  80   5                      }
+  81   4                      MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // ²¥·Åg2PlayIndex
+  82   4                      MDIP_MenuSelect(cMenu_PlayTrack, MENU_NORMAL);
+  83   4                  }
+  84   3              }
+  85   2      		if ((gLocal_1 & KCM_IRQ_WIFI_RCV) > 0){
+  86   3      		    WORD g2Local_1 = MKCM_Read2Byte(KCM_COMMAND_RCV);
+  87   3      			MKCM_WifiCommand(g2Local_1, g2Local_1 >> 8);
+  88   3      			gSYS_WifiCommand = 7;
+  89   3      		}
+  90   2      		if ((gLocal_1 & KCM_IRQ_WIFI_STATUS) > 0){
+  91   3      			MDIP_WifiSymbol(0xff);	    	 
+  92   3      		}
+  93   2          }
+  94   1          return;
+  95   1      }
+  96          	  
+  97          
+  98          
+  99          
+ 100          
+ 101                 
+ 102          CONST_CHAR TabEqSetup[5] = {                                // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ
+ 103              0x03, 0xc0 | 5, 0, 8,                                   // Ç°ÖÃÍ¨µÀÊ¹ÓÃEQ£¬5¶Î¼°HSF&LSF£¬MICÃ»ÓÐÒôÐ§£¬
+             -Ö÷ÉùµÀQÖµ8
+ 104          };     
+ 105          CONST_CHAR TabEqFreq[9] = {                                 // ¶àÂ·¶Î¾ùºâEQÒôÐ§´¦ÀíÆµÂÊ
+ 106              0x00|6,  0x20|3,  0,                                    // 50Hz(50-20/5=6),             350Hz(300-150/
+             -50=3)
+ 107              0x20|17, 0x40|18, 0,                                    // 1000Hz(1000-150/50=17),      3300Hz(3300-15
+             -00/100=18)
+ 108              0x60|21, 0,       0,                                    // 15000Hz(15000-4500/500=21)
+ 109              
+ 110          };     
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 3   
+
+ 111          
+ 112          CONST_CHAR TabEqLevel[4][9] = {                             // ¶àÂ·¶Î¾ùºâEQÒôÐ§´¦ÀíµçÆ½
+ 113          {   
+ 114              0x00, 0x80, 15|(2<<4),                                  // +15dB, -2dB
+ 115              0x80, 0x00, 12|(5<<4),                                  // -12dB, +5dB,
+ 116              0x00, 0x00, 15,                                         // +15dB,
+ 117          },{
+ 118              0x80, 0x00, 12|(2<<4),                                  // -12dB, +2dB
+ 119              0x00, 0x80, 10|(5<<4),                                  // +10dB, -5dB,
+ 120              0x80, 0x00, 8,                                          // -8dB,
+ 121          },{
+ 122              0x00, 0x00, 8|(5<<4),                                   // +8dB, +5dB
+ 123              0x80, 0x00, 2|(3<<4),                                   // -2dB,  +3dB,
+ 124              0x00, 0x00, 6,                                          // +6dB,
+ 125          },{
+ 126              0x00, 0x80, 5|(2<<4),                                   // +5dB, -2dB
+ 127              0x80, 0x00, 4|(11<<4),                                  // -4dB, +11dB,
+ 128              0x00, 0x00, 13,                                         // +13dB,
+ 129          },
+ 130          };
+ 131          CONST_CHAR TabSpectrum[] = {
+ 132              0x01,                                                   // ×Ö½Ú0Ñ¡ÔñÆµÆ×·½Ê½£¬1ÎªÆµÂÊµçÆ½·½Ê½
+ 133              5, 8, 0,                                                // ×Ö½Ú1ÖÁ×Ö½Ú3Îª×é³ÉÁ½¸ö12Î»µÄÏÔÊ¾»º³å¿í¶È¼°¸
+             -ß¶ÈÏñËØ
+ 134              100 & 0xff,   (100 >> 8) & 0xff,                        // 100Hz
+ 135              350 & 0xff,   (350 >> 8) & 0xff,                        // 350Hz
+ 136              1000 & 0xff,  (1000 >> 8) & 0xff,                       // 1000Hz
+ 137              3300 & 0xff,  (3300 >> 8) & 0xff,                       // 3300Hz
+ 138              10000 & 0xff, (10000 >> 8) & 0xff,                      // 10000Hz
+ 139          };
+ 140          
+ 141          
+ 142          void MKCM_RestoreMemory(){ 									// ¿ª»ú£¬´ÓKCMÖ®ÖÐ»Ö¸´¼ÇÒä
+ 143   1          BYTE counter;
+ 144   1          BYTE select;
+ 145   1      	BYTE value;
+ 146   1      	BYTE gLocal_1;
+ 147   1          BYTE temp[10];
+ 148   1      
+ 149   1      	// ÊäÈë¶Ë¿ÚÑ¡Ôñ£ºÊ¹ÓÃKCM_INPUT¼Ä´æÆ÷µÄ¼ÇÒäÖµ
+ 150   1      	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// ¼ÇÒäµÄÊäÈë¶Ë¿ÚÑ¡Ôñ
+ 151   1      	if (FKCM_I2C_Error){									// ¶ÁÈ¡KCM³ö´í
+ 152   2      		MDIP_MenuSelect(cMenu_Restore, 0);
+ 153   2      		return;
+ 154   2      	}
+ 155   1      	gSYS_ModelType = MKCM_ReadRegister(KCM_RD_INFO);
+ 156   1      	mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// Í¨¹ý¼Ä´æÆ÷·´Ïò½«Ñ¡ÔñµÄÊýÖµ»Ö¸´
+ 157   1      //MDEBUG(0xf8);MDEBUG(value);MDEBUG(mINPUT_SWITCH);
+ 158   1      	// ÒôÁ¿£ºÊ¹ÓÃKCM_VOLUME¼Ä´æÆ÷µÄ¼ÇÒäÖµ
+ 159   1      	gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);	// ¼ÇÒäµÄÒôÁ¿Öµ
+ 160   1      	// ÒôÐ§´¦ÀíÍ¨µÀ£ºÊ¹ÓÃKCM_EQ_SELECT¼°¸÷×ÔµÄ¼Ä´æÆ÷µÄ¼ÇÒäÖµ
+ 161   1      	gDIP_SoundEffect = MKCM_ReadRegister(KCM_EQ_SELECT);			// ¼ÇÒäµÄÒôÐ§´¦ÀíÍ¨µÀÑ¡Ôñ
+ 162   1      
+ 163   1      	for (counter = 0; counter < sizeof(gDIP_TrimCtrl); counter++){ // ÉùµÀÎ¢µ÷£ºÊ¹ÓÃKCM_FL_TRIMµÈ¼Ä´æÆ÷µÄ¼ÇÒä
+             -Öµ
+ 164   2      		gLocal_1 = MKCM_FromRegister(KCM_TEST_TONE, counter);	// ²âÊÔÔëÒôµÄË³Ðò
+ 165   2      		value = MKCM_ReadRegister(KCM_FL_TRIM + gLocal_1);	// ¼ÇÒäÎ¢µ÷Öµ
+ 166   2      		gDIP_TrimCtrl[gLocal_1] = MKCM_FromRegister(KCM_FL_TRIM, value);	// Î¢µ÷ ¼Ä´æÆ÷->µ÷½ÚÖµ
+ 167   2      //MDEBUG(0xf9);MDEBUG(gLocal_1);MDEBUG(gDIP_TrimCtrl[gLocal_1]);
+ 168   2      	};
+ 169   1      
+ 170   1      	value = MKCM_ReadRegister(KCM_MIC_VOLUME);	            // »°Í²1¼°»°Í²2ÒôÁ¿±ÈÀý
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 4   
+
+ 171   1      	gDIP_MicCtrl[0] = MKCM_FromRegister(KCM_MIC_VOLUME, value & 0x0f);  // 0-15×ª»»µ½0-9
+ 172   1      	gDIP_MicCtrl[1] = MKCM_FromRegister(KCM_MIC_VOLUME, (value >> 4) & 0x0f);
+ 173   1      
+ 174   1      	value = MKCM_ReadRegister(KCM_MIC_ECHO_EQ);	            // »°Í²»ØÉù¼°»°Í²¶à¶ÎEQ¾ùºâÒôÐ§´¦ÀíÑ¡Ôñ±ÈÀý
+ 175   1      	gDIP_MicCtrl[2] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15×ª»»µ½0-9
+ 176   1      	
+ 177   1      	value = MKCM_ReadRegister(KCM_MIC_REPEAT);	            // »°Í²ÖØ¸´¼°»°Í²Ö±´ïÉù±ÈÀý
+ 178   1      	gDIP_MicCtrl[3] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15×ª»»µ½0-9
+ 179   1      	
+ 180   1      	value = MKCM_ReadRegister(KCM_MIC_DELAY);	            // »°Í²ÑÓ³ÙÊ±¼ä ¼ÇÒäµ÷ÕûÖµ
+ 181   1      	gDIP_MicCtrl[4] = MKCM_FromRegister(KCM_MIC_DELAY, value);	// 255²½×ª»»µ½0-9
+ 182   1      	
+ 183   1      	value = MKCM_ReadRegister(KCM_MIC_REVERB);	            // »°Í²»ìÏì±ÈÀý ¼ÇÒäµ÷ÕûÖµ
+ 184   1      	gDIP_MicCtrl[5] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15×ª»»µ½0-9
+ 185   1      
+ 186   1      //MDEBUG(0xf6);MDEBUG(gDIP_MicCtrl[0]);MDEBUG(gDIP_MicCtrl[1]);
+ 187   1      
+ 188   1      
+ 189   1      	// À®°ÈÉèÖÃÑ¡Ôñ£ºÊ¹ÓÃKCM_SPK_CONFIGµÄ¼ÇÒäÖµ
+ 190   1      	gLocal_1 = MKCM_ReadRegister(KCM_SPK_CONFIG);			// ¼ÇÒäµÄÀ®°ÈÉèÖÃ
+ 191   1      	MKCM_FromRegister(KCM_SPK_CONFIG, gLocal_1);
+ 192   1      
+ 193   1      	// KCMÀ©Õ¹¼ÇÒä£ºÊ¹ÓÃKCM_MEMORYRD¼Ä´æÆ÷µÄ¼ÇÒäÖµ
+ 194   1      	MKCM_ReadXByte(KCM_EXTR_MEMORY, 4, temp);               // ÓÃ»§¼ÇÒä
+ 195   1      	gDIP_Surround[0] = temp[MEM_SURROUND_2CH];              // »·ÈÆÉùÄ£Ê½Á¢ÌåÉù
+ 196   1      	gDIP_Surround[1] = temp[MEM_SURROUND_8CH];              // »·ÈÆÉùÄ£Ê½¶àÉùµÀ
+ 197   1      	gDIP_Select2Ch = temp[MEM_SELECT_2CH];                  // Ñ¡ÔñÎªÁ¢ÌåÉù
+ 198   1      	gDIP_Brightness = temp[MEM_BRIGHTNESS];                 // ÏÔÊ¾ÆÁÁÁ¶È
+ 199   1          MDIP_Brightness(0, gDIP_Brightness);
+ 200   1      //MDEBUG(0xf9);MDEBUG(gDIP_Surround[0]);MDEBUG(gDIP_Surround[1]);MDEBUG(gDIP_Select2Ch);
+ 201   1      
+ 202   1      	MKCM_WriteRegister(KCM_VOLUME_MAX, 80);                 // 80 ÉèÖÃÒôÁ¿×î´óÖµ
+ 203   1      	MKCM_WriteRegister(KCM_LPF_FREQ, 70);                   // 70Hz ³¬µÍÒôÍ¨µÀLPFµÍÍ¨ÂË²¨Æ÷ÆµÂÊ
+ 204   1      	MKCM_WriteRegister(KCM_HPF_FREQ, 70);                   // 70Hz Ö÷ÉùµÀÐ¡À®°ÈHPF¸ßÍ¨ÂË²¨Æ÷ÆµÂÊ
+ 205   1      //KCM_DYN_COMPRES           KCM_DYN_COMPRES
+ 206   1      //KCM_LIP_SYNC_SET  ³ÝÒôÍ¬²½ÑÓ³ÙÊ±¼ä
+ 207   1      
+ 208   1          temp[0] = (BYTE)(CUSTOM_CODE >> 24);
+ 209   1          temp[1] = (BYTE)(CUSTOM_CODE >> 16);
+ 210   1          temp[2] = (BYTE)(CUSTOM_CODE >> 8);
+ 211   1          temp[3] = (BYTE)(CUSTOM_CODE >> 0);
+ 212   1          MKCM_WriteXByte(KCM_CUSTOM_CODE, 4, temp);              // ÉèÖÃÓÃ»§×Ô¶¨Òå¹¦ÄÜ´úÂë¼°Éý¼¶Ä£¿é¹Ì¼þ¼Ä´æÆ÷
+ 213   1                            
+ 214   1          for (select = 0; select < 4; select++){
+ 215   2              // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ£¬Ò»°ãÐ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
+ 216   2              for (counter = 0; counter < sizeof(TabEqSetup); counter++){ 
+ 217   3                  temp[counter + 1] = TabEqSetup[counter];
+ 218   3              }
+ 219   2              temp[0] = select + 1;
+ 220   2              MKCM_WriteXByte(KCM_EQ_SETUP, 1 + sizeof(TabEqSetup), temp);   // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ
+ 221   2      
+ 222   2              // ¶àÂ·¾ùºâEQÒôÐ§ÆµÂÊ£¬Ò»°ãÐ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
+ 223   2              for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // Ð´ÈëEQÆµÂÊ
+ 224   3                  temp[counter + 1] = TabEqFreq[counter];
+ 225   3              }
+ 226   2              for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // Ð´ÈëEQÆµÂÊµçÆ½
+ 227   3                  temp[counter + 1] |= TabEqLevel[select][counter];
+ 228   3              }
+ 229   2              temp[0] = select + 1;
+ 230   2              MKCM_WriteXByte(KCM_EQ_VALUE, 1 + sizeof(TabEqFreq), temp);   // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ
+ 231   2          }
+ 232   1          MKCM_WriteXByte(KCM_WR_SPECTRUM, sizeof(TabSpectrum), TabSpectrum);   // ÉèÖÃÆµÆ×Ä£Ê½
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 5   
+
+ 233   1      
+ 234   1          g2SUB_SrcValid = 0;                                     // ÖØÐÂ¿ªÊ¼¼ì²â
+ 235   1      	FSYS_Standby = 0;
+ 236   1      	FSYS_TestTone = 0;
+ 237   1      	FSYS_MuteEnable = 0;
+ 238   1          MDIP_MenuSelect(cMenu_PowerOn, 0);
+ 239   1      	gDIP_MenuLock = 10;										// ¿ÉÒÔÍË³öÔÝÊ±Ëø¶¨ÏÔÊ¾ÁË
+ 240   1          MDIP_SurroundSymbol();
+ 241   1          MDIP_SrcFormatSymbol();
+ 242   1      	MDIP_WifiSymbol(0xff);	    	 
+ 243   1          return;
+ 244   1      }
+ 245          
+ 246          void MKCM_FactorySet(){										// ³ö³§ÉèÖÃ
+ 247   1      	BYTE gLocal_1;
+ 248   1      	BYTE gLocal_2;
+ 249   1      	BYTE gLocal_Buffer[4];
+ 250   1      
+ 251   1      	MDIP_WriteString("SET ");
+ 252   1      	gLocal_1 = 0;
+ 253   1      	do {
+ 254   2      		MDIP_Write2Digit(4, gLocal_1);
+ 255   2      		MDIP_ScreenUpdata();
+ 256   2      		MUSDELAY(255);
+ 257   2      		MUSDELAY(255);
+ 258   2      	} while (++gLocal_1 < 100);
+ 259   1      
+ 260   1      	// KCMÀ©Õ¹¼ÇÒä£ºÊ¹ÓÃKCM_MEMORYRD¼Ä´æÆ÷µÄ¼ÇÒäÖµ
+ 261   1      	gLocal_Buffer[MEM_SURROUND_2CH] = 0;                    // »·ÈÆÉùÄ£Ê½Á¢ÌåÉù
+ 262   1      	gLocal_Buffer[MEM_SURROUND_8CH] = 0;                    // »·ÈÆÉùÄ£Ê½¶àÉùµÀ
+ 263   1      	gLocal_Buffer[MEM_SELECT_2CH] = 0;                      // Ñ¡ÔñÎªÁ¢ÌåÉù
+ 264   1      	gLocal_Buffer[MEM_BRIGHTNESS] = 2;                      // ÏÔÊ¾ÆÁÁÁ¶È
+ 265   1      	MKCM_WriteXByte(KCM_EXTR_MEMORY, 4, gLocal_Buffer);
+ 266   1      
+ 267   1      	MKCM_WriteRegister(KCM_VOLUME_CTRL, 39); 				// ÒôÁ¿Öµ
+ 268   1      
+ 269   1      	// ÉùµÀÎ¢µ÷£ºÊ¹ÓÃKCM_FL_TRIMµÈ¼Ä´æÆ÷µÄ¼ÇÒäÖµ
+ 270   1      	gLocal_1 = 0;
+ 271   1      	do {
+ 272   2      		MKCM_WriteRegister(KCM_FL_TRIM + gLocal_1, 0);
+ 273   2      	} while (++gLocal_1 < 8);
+ 274   1      
+ 275   1      	MKCM_WriteRegister(KCM_SPK_CONFIG, 0xab);				// ºóÖÃ´ó¡¢»·ÈÆ´ó¡¢ÖÐÖÃ´ó¡¢Ç°ÖÃ´ó¡¢ÓÐ³¬µÍÒô
+ 276   1      	MKCM_WriteRegister(KCM_POWER_ON, 1);
+ 277   1          MDIP_MenuSelect(cMenu_PowerOn, 0);
+ 278   1      	gDIP_MenuLock = 30;										// ÔÝÊ±Ëø¶¨ÏÔÊ¾3Ãë
+ 279   1          return;
+ 280   1      }
+ 281          
+ 282          char MKCM_HdmiInsert(WORD flag, WORD g2Local_1){            // ¼ì²éHDMI²åÈë£¬ÓÐ²åÈë·µ»Ø1
+ 283   1          if (g2Local_1 & flag){                                  // ±¾´ÎÓÐ±¾´ÎµÄHDMI
+ 284   2              if (!(g2SUB_SrcValid & flag)){                      // ÉÏ´ÎÃ»ÓÐ±¾´ÎµÄHDMI
+ 285   3                  if (mINPUT_SWITCH < INPUT_SWITCH_HDMI1 && mINPUT_SWITCH > INPUT_SWITCH_H_ARC){ // Èç¹ûÔ­À´²»ÊÇ
+             -Ñ¡ÔñHDMI
+ 286   4                      if (mINPUT_SWITCH != INPUT_SWITCH_SD && mINPUT_SWITCH != INPUT_SWITCH_UDISK){ // Èç¹ûÔ­À´²
+             -»ÊÇÑ¡ÔñSD/UÅÌ
+ 287   5                          gSUB_SrcAuto = mINPUT_SWITCH;           // ±£´æÔ­À´µÄÑ¡Ôñ
+ 288   5                      }
+ 289   4                  }
+ 290   3                  if (flag == KCM_SRC_VALID_HDMI1){
+ 291   4                      mINPUT_SWITCH = INPUT_SWITCH_HDMI1;         // ×Ô¶¯»»µ½HDMI1
+ 292   4                  }else if (flag == KCM_SRC_VALID_HDMI2){
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 6   
+
+ 293   4                      mINPUT_SWITCH = INPUT_SWITCH_HDMI2;         // ×Ô¶¯»»µ½HDMI2
+ 294   4                  }else {
+ 295   4                      mINPUT_SWITCH = INPUT_SWITCH_HDMI3;         // ×Ô¶¯»»µ½HDMI3
+ 296   4                  }
+ 297   3                  //MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));  
+ 298   3      			gDIP_MenuSelect = cMenu_Restore;				// ²»¹Ü²Ëµ¥ÔÚÄÄÀï£¬¶¼ÐèÒªÂíÉÏ¶¯×÷
+ 299   3                  MAUD_MixInputSource(mINPUT_SWITCH);
+ 300   3      //            MLOG("HdmiInsertB:%d %02x\r\n", (u32)mINPUT_SWITCH, (u32)MKCM_ToRegister(KCM_INPUT_SOURCE, m
+             -INPUT_SWITCH));
+ 301   3                  return 1;
+ 302   3              }
+ 303   2          }
+ 304   1          return 0;
+ 305   1      }
+ 306          char MKCM_HdmiRemove(WORD flag, WORD g2Local_1){            // ¼ì²éHDMI°Î³ö£¬ÓÐ°Î³ö·µ»Ø1
+ 307   1          if (!(g2Local_1 & flag)){                               // ±¾´ÎÃ»ÓÐHDMI
+ 308   2              if (g2SUB_SrcValid & flag){                         // ÉÏ´ÎÓÐHDMI
+ 309   3                  if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // ²»ÊÇ×Ô¶¯Ñ¡ÔñÊ§Ð§
+ 310   4                      MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  //
+             - »Ö¸´Ô­À´µÄÊäÈë
+ 311   4                      MLOG("MKCM_HdmiRemove:%d\r\n", gSUB_SrcAuto);
+ 312   4                  }
+ 313   3                  return 1;
+ 314   3              }
+ 315   2          }
+ 316   1          return 0;
+ 317   1      }
+ 318          
+ 319          char MKCM_SdUdiskInsert(WORD flag, WORD g2Local_1){         // ¼ì²éSD/UÅÌ²åÈë£¬ÓÐ²åÈë·µ»Ø1
+ 320   1          if (g2Local_1 & flag){                                  // ±¾´ÎÓÐSD/UÅÌ
+ 321   2              if (!(g2SUB_SrcValid & flag)){                      // ÉÏ´ÎÃ»ÓÐSD/UÅÌ
+ 322   3                  WORD track = MKCM_Read2Byte((flag == KCM_SRC_VALID_SD) ? KCM_RD_SD_QTY : KCM_RD_UDISK_QTY);
+ 323   3          //MDEBUG(0xe8);MDEBUG(total);
+ 324   3                  if (track){                                     // ÕÒµ½ÎÄ¼þ
+ 325   4                      if (mINPUT_SWITCH != INPUT_SWITCH_SD && mINPUT_SWITCH != INPUT_SWITCH_UDISK){ // Èç¹ûÔ­À´²
+             -»ÊÇÑ¡ÔñSD/UÅÌ
+ 326   5                          gSUB_SrcAuto = mINPUT_SWITCH;           // ±£´æÔ­À´µÄÑ¡Ôñ
+ 327   5                      }
+ 328   4                      if (flag == KCM_SRC_VALID_SD){
+ 329   5                          mINPUT_SWITCH = INPUT_SWITCH_SD;
+ 330   5                          g2SdQty = track;
+ 331   5                      }else {
+ 332   5                          mINPUT_SWITCH = INPUT_SWITCH_UDISK;
+ 333   5                          g2UDiskQty = track;
+ 334   5                      }
+ 335   4                      MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
+ 336   4                      g2PlayIndex = 0;
+ 337   4                      MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // ²¥·ÅµÚ0Ê×
+ 338   4                  }else {
+ 339   4                      MDIP_MenuSelect((flag == KCM_SRC_VALID_SD) ? cMenu_SdInsert : cMenu_UDiskInsert, 0);     /
+             -/ ÏÔÊ¾SD/UÅÌ²åÈë
+ 340   4                  }
+ 341   3                  return 1;
+ 342   3              }
+ 343   2          }
+ 344   1          return 0;
+ 345   1      }
+ 346          char MKCM_SdUdiskRemove(WORD flag, WORD g2Local_1){         // ¼ì²éSD/UÅÌ°Î³ö£¬ÓÐ°Î³ö·µ»Ø1
+ 347   1          if (!(g2Local_1 & flag)){                               // ±¾´ÎÃ»ÓÐSD/UÅÌ
+ 348   2              if (g2SUB_SrcValid & flag){                         // ÉÏ´ÎÓÐSD/UÅÌ
+ 349   3                  if (flag == KCM_SRC_VALID_SD){
+ 350   4                      g2SdQty = 0;
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 7   
+
+ 351   4                  }else {
+ 352   4                      g2UDiskQty = 0;
+ 353   4                  }
+ 354   3                  if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // ²»ÊÇ×Ô¶¯Ñ¡ÔñÊ§Ð§
+ 355   4                      MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  //
+             - »Ö¸´Ô­À´µÄÊäÈë
+ 356   4                  }else {
+ 357   4                      MDIP_MenuSelect((flag == KCM_SRC_VALID_SD) ? cMenu_UDiskRemove : cMenu_UDiskRemove, 0);   
+             -      // ÏÔÊ¾SD/UÅÌ²å³ö
+ 358   4                  }
+ 359   3                  return 1;
+ 360   3              }
+ 361   2          }
+ 362   1          return 0;
+ 363   1      }
+ 364          void MKCM_ReadSrcValid(){
+ 365   1      	WORD g2Local_1 = MKCM_Read2Byte(KCM_SRC_VALID);         // ±¾´ÎµÄÓÐÐ§ÒôÔ´
+ 366   1      //if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
+ 367   1          if (g2SUB_SrcValid != g2Local_1){                       // ±¾´ÎÓëÉÏ´ÎµÄÓÐÐ§ÒôÔ´¸Ä±ä
+ 368   2              MLOG("KCM_SRC_VALID:%04x Last:%04x\r\n", (u32)g2Local_1, (u32)g2SUB_SrcValid);
+ 369   2              if (!MKCM_HdmiInsert(KCM_SRC_VALID_HDMI1, g2Local_1)){         // ¼ì²éHDMI1²åÈë£¬Ã»ÓÐ²Å¼ì²éHDMI2²å
+             -Èë
+ 370   3                  if (!MKCM_HdmiInsert(KCM_SRC_VALID_HDMI2, g2Local_1)){     // ¼ì²éHDMI2²åÈë£¬Ã»ÓÐ²Å¼ì²éHDMI3²å
+             -Èë
+ 371   4                      MKCM_HdmiInsert(KCM_SRC_VALID_HDMI3, g2Local_1);       // ¼ì²éHDMI3²åÈë
+ 372   4                  }
+ 373   3              }
+ 374   2              MKCM_HdmiRemove(KCM_SRC_VALID_HDMI1, g2Local_1);
+ 375   2              MKCM_HdmiRemove(KCM_SRC_VALID_HDMI2, g2Local_1);
+ 376   2              MKCM_HdmiRemove(KCM_SRC_VALID_HDMI3, g2Local_1);
+ 377   2      
+ 378   2              if (!MKCM_SdUdiskInsert(KCM_SRC_VALID_UDISK, g2Local_1)){   // ¼ì²éUÅÌ²åÈë£¬Ã»ÓÐ²Å¼ì²éSD²åÈë
+ 379   3                  MKCM_SdUdiskInsert(KCM_SRC_VALID_SD, g2Local_1);    // ¼ì²éSD²åÈë
+ 380   3              }
+ 381   2              MKCM_SdUdiskRemove(KCM_SRC_VALID_SD, g2Local_1);
+ 382   2              MKCM_SdUdiskRemove(KCM_SRC_VALID_UDISK, g2Local_1);
+ 383   2              g2SUB_SrcValid = g2Local_1;
+ 384   2          }else {
+ 385   2              MLOG("KCM_SRC_VALID = Last:%04x\r\n", (u32)g2Local_1);
+ 386   2          }
+ 387   1      }
+ 388          
+ 389          void MKCM_WifiCommand(BYTE regNumber, BYTE value){		// ÊÕµ½Ô¶³ÌAPPµÄÖ¸Áî
+ 390   1      //MDEBUG(0xa9);MDEBUG(regNumber);MDEBUG(value);
+ 391   1      	switch (regNumber){
+ 392   2      	case KCM_VOLUME_MUTE:									// ÒôÆµ¾²Òô¼°ÒôÁ¿¼Ó¼õ¿ØÖÆ
+ 393   2      		if (FSYS_MuteEnable != (value & 0x01)){				// MUTE¸Ä±ä
+ 394   3      			MKEY_AudioMute();
+ 395   3      		}
+ 396   2      		else if (value & 0x04){								// ÒôÁ¿¼Ó»ò¼õ
+ 397   3      			gDIP_MenuSelect = cMenu_MasterVolume;
+ 398   3      			MKCM_WriteRegister(KCM_VOLUME_MUTE, value);
+ 399   3      		}
+ 400   2      		break;
+ 401   2      	case KCM_INPUT_SOURCE:										// ÊäÈëÒôÔ´Ñ¡Ôñ
+ 402   2      		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// Í¨¹ý¼Ä´æÆ÷·´Ïò½«Ñ¡ÔñµÄÊýÖµ»Ö¸´
+ 403   2      		MAUD_AutoCanclMute();
+ 404   2      		MAUD_AutoCanclTestTone();
+ 405   2      		MDIP_MenuSelect(cMenu_Restore, 0);
+ 406   2      		break;
+ 407   2      	}
+ 408   1      }
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 8   
+
+ 409          
+ 410          
+ 411          // //////////////////////////////////////////////////
+ 412          // KCM¼Ä´æÆ÷µÄÖµÓë±¾»úµ÷½ÚµÄÖµÏà»¥×ª»»
+ 413          // //////////////////////////////////////////////////
+ 414          CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE
+ 415          	KCM_INPUT_ANALOG,                                       // 0=Ä£ÄâÊäÈë
+ 416          	KCM_INPUT_DIGITAL | 0,                                  // 1=ÊýÂë1
+ 417              KCM_INPUT_DIGITAL | 1,                                  // 2=ÊýÂë2
+ 418              KCM_INPUT_DIGITAL | 2, 			                        // 3=ÊýÂë3
+ 419              KCM_INPUT_MEDIA | 0,                                    // 4=SD
+ 420              KCM_INPUT_MEDIA | 1,		                            // 5=UDISK
+ 421              KCM_INPUT_HDMI | 0,				                        // 6=HDMI1
+ 422              KCM_INPUT_HDMI | 1,                                     // 7=HDMI2
+ 423              KCM_INPUT_HDMI | 2,                                     // 8=HDMI3
+ 424              KCM_INPUT_HDMI | 4,	                                    // 9=HDMI-ARC 
+ 425          };  						 
+ 426          
+ 427          CONST_CHAR Tab_SurroundMode[] = {
+ 428          	0x00, 0x01, 0x10, 0x11, 0x12, 0x13,
+ 429          };  						 
+ 430          CONST_CHAR Tab_TestToneChannel[] = {
+ 431          // ¹æ·¶µÄÍ¨µÀË³Ðò£ºFL FR CN SW SL SR BL BR
+ 432          // ²âÊÔÔëÒôµÄË³Ðò£ºFL CN SW FR SR BR BL SL 					// ÊôÓÚÉùÒô´ÓÀ®°È·Ö²¼µÄË³Ê±Õë
+ 433          	0,2,3,1, 5,7, 6,4,
+ 434          };
+ 435          
+ 436          CONST_CHAR Tab_ChannelTrim[] = {
+ 437          	0x10 | 9, 0x10 | 8, 0x10 | 7, 0x10 | 6, 0x10 | 5,       // -9 -8 -7 -6 -5 dB     
+ 438          	0x10 | 4, 0x10 | 3, 0x10 | 2, 0x10 | 1, 0x00,		    // -4 -3 -2 -1 0  dB
+ 439          	1,2,3,4,5,6,7,8,9, 								        // +1 ~ +9 dB
+ 440          };  						 
+ 441          CONST_CHAR Tab_MicDelay[] = {                               // 0-255×ª»»µ½0-9
+ 442              60/20,80/20,100/20,120/20,      160/20,200/20,300/20,500/20,    1000/20,2000/20,    // µ¥Î»ºÁÃë    
+ 443          };
+ 444          CONST_CHAR Tab_Mic16To10[] = {                              // 0-15×ª»»µ½0-9
+ 445              0,2,4,6,     8,10,12,13,    14,15,         
+ 446          };
+ 447          
+ 448          BYTE MKCM_ToRegister(BYTE index, BYTE counter){				// ´Ó±¾»ú´¦ÀíµÄÖµ£¬×ª»»µ½KCM¼Ä´æÆ÷µÄÖµ
+ 449   1      	switch (index){
+ 450   2      	case KCM_INPUT_SOURCE :									// ÊäÈë¶Ë¿ÚÑ¡Ôñ
+ 451   2          	return Tab_InputSwitch[counter];
+ 452   2      	case KCM_LISTEN_MODE :									// »·ÈÆÉùÄ£Ê½
+ 453   2          	return Tab_SurroundMode[counter];
+ 454   2      	case KCM_TEST_TONE :									// ÔëÒô²âÊÔ
+ 455   2          	return Tab_TestToneChannel[counter];
+ 456   2      	case KCM_FL_TRIM :										// ÉùµÀÎ¢µ÷
+ 457   2      	    return Tab_ChannelTrim[counter];
+ 458   2      	case KCM_SPK_CONFIG :									// À®°ÈÉèÖÃ
+ 459   2      		// B7-B6ºóÖÃB5-B4»·ÈÆB3-B2ÖÐÖÃ(0=Ã»ÓÐ°²×° 1=Ð¡À®°È 2=´óÀ®°È)B1Ç°ÖÃ(0=Ð¡À®°È)B0³¬µÍÒô(0=Ã»ÓÐ°²×°)
+ 460   2      		// 0Ç°ÖÃ 1ÖÐÖÃ 2³¬µÍÒô 3»·ÈÆ 4ºóÖÃ
+ 461   2      		if (1){
+ 462   3      			BYTE gLocal_1 = 0;
+ 463   3      			if (gDIP_SpeakSetup[2] > 0){					// ³¬µÍÒô
+ 464   4      				gLocal_1 |= 0x01;
+ 465   4      			}
+ 466   3      			if (gDIP_SpeakSetup[0] > 0){					// Ç°ÖÃ´óÀ®°È
+ 467   4      				gLocal_1 |= 0x02;
+ 468   4      			}
+ 469   3      			gLocal_1 |= gDIP_SpeakSetup[1] << 2;			// ÖÐÖÃ
+ 470   3      			gLocal_1 |= gDIP_SpeakSetup[3] << 4;			// »·ÈÆ
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 9   
+
+ 471   3      			gLocal_1 |= gDIP_SpeakSetup[4] << 6;			// ºóÖÃ
+ 472   3      			return gLocal_1;
+ 473   3      		}
+ 474   2      	case KCM_MIC_VOLUME :									// »°Í²±ÈÀý
+ 475   2      	    return Tab_Mic16To10[counter];
+ 476   2      	case KCM_MIC_DELAY :				                    // »°Í²ÑÓ³ÙÊ±¼ä
+ 477   2      	    return Tab_MicDelay[counter];
+ 478   2      	}
+ 479   1      	return 0;
+ 480   1      }
+ 481          BYTE MKCM_FromRegister(BYTE index, BYTE value){				// ´ÓKCMÀ´µÄ¼Ä´æÆ÷£¬×ª»»µ½±¾»ú´¦ÀíµÄÖµ
+ 482   1      	BYTE gLocal_1 = 0;
+ 483   1      	switch (index){
+ 484   2      	case KCM_INPUT_SOURCE :									// ÊäÈë¶Ë¿ÚÑ¡Ôñ
+ 485   2      		do {
+ 486   3      			if (Tab_InputSwitch[gLocal_1] == value){
+ 487   4      				return gLocal_1;
+ 488   4      			}
+ 489   3      		} while (++gLocal_1 < sizeof(Tab_InputSwitch));
+ 490   2      		return INPUT_SWITCH_AUX;								// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµAUX
+ 491   2      	case KCM_LISTEN_MODE :									// »·ÈÆÉùÄ£Ê½
+ 492   2      		do {
+ 493   3      			if (Tab_SurroundMode[gLocal_1] == value){
+ 494   4      				return gLocal_1;
+ 495   4      			}
+ 496   3      		} while (++gLocal_1 < sizeof(Tab_SurroundMode));
+ 497   2      		return 0x01;										// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµ
+ 498   2      	case KCM_TEST_TONE :									// ÔëÒô²âÊÔ
+ 499   2      		do {
+ 500   3      			if (Tab_TestToneChannel[gLocal_1] == value){
+ 501   4      				return gLocal_1;
+ 502   4      			}
+ 503   3      		} while (++gLocal_1 < sizeof(Tab_TestToneChannel));
+ 504   2      		return 0;											// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµ0
+ 505   2      	case KCM_FL_TRIM :										// ÉùµÀÎ¢µ÷
+ 506   2      		do {
+ 507   3      			if (Tab_ChannelTrim[gLocal_1] == value){
+ 508   4      				return gLocal_1;
+ 509   4      			}
+ 510   3      		} while (++gLocal_1 < sizeof(Tab_ChannelTrim));
+ 511   2      		return 0;											// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµ0dB
+ 512   2          case KCM_SPK_CONFIG :								// À®°ÈÉèÖÃ
+ 513   2      		// B7:6ºóÖÃB5:4»·ÈÆB3:2ÖÐÖÃB1Ç°ÖÃB0³¬µÍÒô ³¬µÍÒô£º0=Ã»ÓÐ°²×°£»Ç°ÖÃ£º0=Ð¡À®°È£¬ÆäËû£º0=Ã»ÓÐ°²×° 1=Ð¡À®°È 
+             -2=´óÀ®°È
+ 514   2      		// 0Ç°ÖÃ 1ÖÐÖÃ 2³¬µÍÒô 3»·ÈÆ 4ºóÖÃ
+ 515   2      		gDIP_SpeakSetup[0] = (value & 0x02) ? 1 : 0;		// Ç°ÖÃ£ºÐ¡(0)´ó(1)Ñ¡Ôñ
+ 516   2      		gDIP_SpeakSetup[1] = (value >> 2) & 0x03;
+ 517   2      		gDIP_SpeakSetup[2] = (value & 0x01) ? 1 : 0;		// ³¬µÍÒô£ºÃ»ÓÐ°²×°(0)/°²×°(1)
+ 518   2      	    gDIP_SpeakSetup[3] = (value >> 4) & 0x03;
+ 519   2      	    gDIP_SpeakSetup[4] = (value >> 6) & 0x03;
+ 520   2      		break;
+ 521   2      	case KCM_MIC_VOLUME :								    // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´
+ 522   2      		do {
+ 523   3      			if (Tab_Mic16To10[gLocal_1] == value){          // 0-15×ª»»µ½0-9
+ 524   4      				return gLocal_1;
+ 525   4      			}
+ 526   3      		} while (++gLocal_1 < sizeof(Tab_Mic16To10));
+ 527   2      	    return 0;
+ 528   2          case KCM_MIC_DELAY:                                     // »°Í²ÑÓ³ÙÊ±¼ä
+ 529   2      		do {
+ 530   3      			if (Tab_MicDelay[gLocal_1] == value){
+ 531   4      				return gLocal_1;
+C51 COMPILER V6.14  FUNCTION                                                               06/09/2020 11:19:52 PAGE 10  
+
+ 532   4      			}
+ 533   3      		} while (++gLocal_1 < sizeof(Tab_MicDelay));
+ 534   2              return 0;
+ 535   2      	}
+ 536   1      	return 0;												// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµ0dB
+ 537   1      }
+ 538          void MAPI_COPY_BUFF8(BYTE length, BYTE* in_data, BYTE* out_data){
+ 539   1      	for (; length != 0; length--){
+ 540   2              *out_data++ = *in_data++;
+ 541   2          };
+ 542   1          return;
+ 543   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2197    ----
+   CONSTANT SIZE    =    269    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      42
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

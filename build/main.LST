@@ -1,0 +1,166 @@
+C51 COMPILER V6.14  MAIN                                                                   06/09/2020 11:19:53 PAGE 1   
+
+
+C51 COMPILER V6.14, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\SDK\kc3xm51\Tools\C51.EXE main.c SMALL WL(1) 
+
+stmt level    source
+
+   1          
+   2          // Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+   3          // SPDX-License-Identifier: Apache-2.0
+   4          // https://gitee.com/hsav20/kc3xm51.git
+   5          // https://github.com/hsav20/kc3xm51.git
+   6          // http://www,hsav.com/download/kc3xm51.zip
+   7          
+   8          #define ROOT     		  
+   9          #include "main.h"    
+  10          
+  11          void main(){
+  12   1      	MSYS_Initialize(); 										// CPU基本部件初始化
+  13   1      	MDIP_Initialize();										// 显示模块初始化
+  14   1      	MKEY_Initialize();       								// 按键模块初始化
+  15   1      	MAUD_Initialize();       								// 音频模块初始化
+  16   1          MKCM_Initialize();                                      // KCM模块初始化
+  17   1          while (1){ 						   
+  18   2              if ((gTBascTimer & 0x01) > 0){						// 10ms
+  19   3      	        MKCM_10msTimer(gTBascTimer);                	// 子处理模块10ms时间处理 		
+  20   3      			MKEY_10msTimer(gTBascTimer);					// 按键模块10ms时间处理
+  21   3                  MDIP_10msTimer(gTBascTimer);  					// 显示模块10ms时间处理
+  22   3                  MAUD_10msTimer(gTBascTimer);                	// 音频模块10ms时间处理
+  23   3      			gTBascTimer = 0;
+  24   3      		}
+  25   2          }
+  26   1      } 
+  27          
+  28          void MSYS_Initialize(){
+  29   1          TMOD = 0x21; 											// 8bit Auto Timer1 / 16bit Timer0
+  30   1          TCON = 0x40 | 0x10 | 0x01;								// TR1 + TR0 + EX0下降沿触发
+  31   1          SCON = 0x50;											// 8bit UART
+  32   1      	TH1 = 0xff;												// 115200bps UART使用115200bps通讯
+  33   1      	PCON  |= 0x80;											// UART倍速
+  34   1          IE = 0x80 | 0x02 | 0x01;								// EA + ET0 + EX0
+  35   1      }
+  36          void MDEBUG(BYTE gLocal_1){									// 调试输出
+  37   1      //	TI = 0;
+  38   1      //	SBUF = gLocal_1;
+  39   1      //	while (!TI);
+  40   1      	return;
+  41   1      } 
+  42          void MUSDELAY(BYTE gLocal_1){      
+  43   1          if (gLocal_1 > 3){
+  44   2              while (--gLocal_1 != 0);
+  45   2          }
+  46   1          return;
+  47   1      }
+  48          void TBascTimer(void) interrupt 1 {
+  49   1          TL0 = (BYTE)(cSYS_TIMER0);                              // 100us
+  50   1          TH0 = (BYTE)(cSYS_TIMER0 >> 8);
+  51   1      
+  52   1      //P34=~P34;
+  53   1      	if ((++g10msTimer % 10) == 0){							// 1ms
+  54   2      		MKEY_CheckJop();
+  55   2      		if ((g10msTimer % 100) == 0){						// 10ms
+C51 COMPILER V6.14  MAIN                                                                   06/09/2020 11:19:53 PAGE 2   
+
+  56   3      			g10msTimer = 0;
+  57   3      		    gTBascTimer = 0x01;
+  58   3      			if ((++g1000msTimer % 10) == 0){				// 100ms
+  59   4      				gTBascTimer |= 0x02;
+  60   4      				if ((g1000msTimer % 50) == 0){				// 500ms
+  61   5      					gTBascTimer |= 0x04;
+  62   5      					if ((g1000msTimer % 100) == 0){			// 1000ms
+  63   6      						g1000msTimer = 0;	
+  64   6      						gTBascTimer |= 0x08;
+  65   6      					}
+  66   5      				}
+  67   4      			}
+  68   3      		}
+  69   2      		if (FDIP_FreqSymbol){
+  70   3      			if (++gBrightnessTimer > 19){
+  71   4      				gBrightnessTimer = 0;
+  72   4      				HAL_DIP_LED(1);
+  73   4      			}
+  74   3      			else {
+  75   4      				if ((gDIP_Brightness == 0) && (gBrightnessTimer == 1)){
+  76   5      					HAL_DIP_LED(0);
+  77   5      				}
+  78   4      				else if ((gDIP_Brightness == 1) && (gBrightnessTimer == 4)){
+  79   5      					HAL_DIP_LED(0);
+  80   5      				}
+  81   4      				if ((gDIP_Brightness == 2) && (gBrightnessTimer == 8)){
+  82   5      					HAL_DIP_LED(0);
+  83   5      				}
+  84   4      			}
+  85   3      		}
+  86   2      	}
+  87   1      
+  88   1          if (gRmTimer != 0 && ++gRmTimer > 159){
+  89   2              if(!FRmError && (gRmStatus == 2) && (gRmKeyContinCanclTm != 0)){
+  90   3                  if (gRmKeyContinSpeed < 8){
+  91   4      				if ((gRmKeyContinSpeed & 3) == 3){
+  92   5      					FRmDecodDone = 1;
+  93   5      				}
+  94   4      				++gRmKeyContinSpeed;
+  95   4      			}
+  96   3      			else {
+  97   4      	            FRmDecodDone = 1;
+  98   4      			}
+  99   3              } 
+ 100   2              gRmStatus = 0;
+ 101   2              FRmError = 0; 
+ 102   2              gRmTimer = 0;
+ 103   2          }
+ 104   1          return;
+ 105   1      }
+ 106          
+ 107          // ----------------------------------------------------------------
+ 108          void EX0_int (void) interrupt 0 {		  
+ 109   1          if (!FRmError){
+ 110   2              ++gRmStatus;                                    
+ 111   2              if (gRmStatus == 2){    
+ 112   3                  if (gRmTimer > 145) FRmError = 1; 
+ 113   3              }
+ 114   2              else{
+ 115   3                  gRmBuffer >>= 1;
+ 116   3                  if (gRmTimer > 16) gRmBuffer |= 0x80;   
+ 117   3                  if ((gRmStatus == 2+8) || (gRmStatus == 2+24)){ 
+C51 COMPILER V6.14  MAIN                                                                   06/09/2020 11:19:53 PAGE 3   
+
+ 118   4                       GRmCodeData = gRmBuffer;
+ 119   4                  }
+ 120   3                  else if (gRmStatus == 2+16){
+ 121   4      	            if ((gRmBuffer != cRmNCustom) || (GRmCodeData != cRmCustom)){
+ 122   5                          gRmKeyContinCanclTm = 0;
+ 123   5                          FRmError = 1;
+ 124   5                      } 
+ 125   4                  }
+ 126   3                  else if (gRmStatus == 2+32){ 
+ 127   4                      FRmDecodDone = 1;
+ 128   4      				gRmKeyContinSpeed = 0;
+ 129   4                      if ((gRmBuffer ^ 0xff) != GRmCodeData){
+ 130   5                          FRmDecodDone = 0; 
+ 131   5                          FRmError = 1;
+ 132   5                      }
+ 133   4                  }
+ 134   3              }
+ 135   2          }
+ 136   1          gRmTimer = 1; 
+ 137   1          return;
+ 138   1      }		 
+ 139          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    494    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    142    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =     14    ----
+   BIT SIZE         =     28    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
