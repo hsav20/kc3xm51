@@ -1,0 +1,163 @@
+#title=C/C++
+#t=#define
+#g=def
+\#define ${1:identifier} ${2:replacement}
+$0
+#t=#define (Macro)
+#g=macro
+\#define ${1:macroName}(${2:arguments}) (${3:replacement})
+$0
+#t=#if block
+#g=iff
+\#if ${1:constant_expression}
+$2
+\#endif
+$0
+#t=#ifdef block
+#g=ifdef
+\#ifdef ${1:symbol}
+$2
+\#endif
+$0
+#t=#ifndef (Guard)
+#g=once
+\#ifndef __${1:FILENAME_HPP}__
+\#define __$1__
+
+$0
+
+\#endif
+#t=#ifndef block
+#g=ifndef
+\#ifndef ${1:symbol}
+$2
+\#endif
+$0
+#t=#include (File)
+#g=inc
+\#include "${1:filename.h}"
+$0
+#t=#include (Library)
+#g=inc
+\#include <${1:library}>
+$0
+#t=const_cast
+#g=ccast
+const_cast<${1:type}>(${2:expression})$0
+#t=Do...while loop
+#g=do
+do {
+	$0
+} while (${1:condition});
+#t=Do...while loop (iterators)
+#g=doi
+do {
+	$0
+} while (${1:iterator} != ${2:container}.end());
+#t=dynamic_cast
+#g=dcast
+dynamic_cast<${1:type}*>(${2:expression})$0
+#t=Enumeration
+#g=enum
+enum ${1:name} {
+	$0
+};
+#t=For loop
+#g=for
+for (${1:unsigned int} ${2:i} = ${3:0}; $2 ${4:<} ${5:count}; $2${6:++}) {
+	$0
+}
+#t=For loop (iterators)
+#g=fori
+for (${1:iterator} = ${2:container}.begin(); $1 != $2.end(); $1++) {
+	$0
+}
+#t=Function declaration
+#g=func
+${1:int} ${2:functionName}(${3:parameters}) {
+	$0
+}
+#t=If conditional
+#g=if
+if (${1:condition}) {
+	$0
+}
+#t=Main() function
+#g=main
+int main(int argc, char *argv[]) {
+	$0
+	return 0;
+}
+#t=Namespace
+#g=ns
+namespace ${1:name} {
+
+$0
+
+}
+#t=Overload operator
+#g=overload
+${1:returnType} ${2:className}::operator${3:+}(${4:parameters}) {
+	$0
+}
+#t=reinterpret_cast
+#g=rcast
+reinterpret_cast<${1:type}>(${2:expression})$0
+#t=Specialized class
+#g=sclass
+template <>
+class ${1:className} <${2:typeName}> {
+	$0
+};
+#t=Specialized method
+#g=smethod
+template <>
+${1:int} ${2:className}<${3:typeName}>::${4:methodName}(${5:parameters}) {
+	$0
+}
+#t=static_cast
+#g=scast
+static_cast<${1:type}>(${2:expression})$0
+#t=Struct declaration
+#g=struct
+struct ${1:name} {
+	$0
+};
+#t=Switch statement
+#g=switch
+switch (${1:statement}) {
+${2:default:}
+	$0
+	break;
+}
+#t=Template line
+#g=template
+template <typename ${1:T}>
+$0
+#t=Try
+#g=try
+try {
+	$0
+}
+#t=Typedef
+#g=tdef
+typedef ${1:type} ${2:alias};
+$0
+#t=Using
+#g=using
+using ${1:std}::${2:name};
+$0
+#t=Using namespace
+#g=usens
+using namespace ${1:std};
+$0
+#t=While loop
+#g=while
+while (${1:condition}) {
+	$0
+}
+#t=While loop (iterators)
+#g=whilei
+while (${1:iterator} != ${2:container}.end()) {
+	$0
+}

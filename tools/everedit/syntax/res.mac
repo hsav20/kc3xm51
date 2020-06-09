@@ -1,0 +1,60 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Resource File
+' Maintainer:  www.everedit.net  
+' History:
+'  2013/04/19 Created
+'  2014/07/15 Added outline support
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set res=CreateParser()
+
+'comment
+Set rLineComment=res.CreateRegion( COLOR_COMMENT1, "+//+", "$", True )
+Set rBlockComment=res.CreateRegion( COLOR_COMMENT2, "+/*+", "+*/+", True )
+res.AddRegion( rLineComment )
+res.AddRegion( rBlockComment )
+
+'string
+Set rString1=res.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+res.AddRegion( rString1 )
+
+Set rString2=res.CreateStringRegion( COLOR_STRING2, """", "\", False )
+res.AddRegion( rString2 )
+
+'words
+Set iWord1=res.CreateWord(COLOR_WORD1, "LANGUAGE ACCELERATORS TEXTINCLUDE TOOLBAR BITMAP STRINGTABLE MENU", False )
+iWord1.AutoCase=True
+res.AddWord iWord1
+
+Set iWord2=res.CreateWord(COLOR_WORD2, "BEGIN END BUTTON SEPARATOR POPUP MENUITEM ICON", False )
+iWord2.AutoCase=True
+res.AddWord iWord2
+
+Set iWord3=res.CreateWord(COLOR_WORD3, "STYLE DS_MODALFRAME CAPTION FONT", False )
+iWord3.AutoCase=True 
+res.AddWord iWord3
+
+'macro
+res.AddItem( res.CreateItem(COLOR_MACRO, "#\s*if\s+!?defined",False ) )
+res.AddItem( res.CreateItem(COLOR_MACRO, "#\s*(if|pragma|else|elif|error|ifndef|define|endif|undef|ifdef)\b", True ) )
+
+Set iInclude1=res.CreateItem( COLOR_MACRO, "#\s*include\s*(<.*?>)", True )
+iInclude1.Capture 1, COLOR_STRING2
+Set iInclude2=res.CreateItem( COLOR_MACRO, "#\s*include\s*(?="")", True )
+iInclude2.Capture 1, COLOR_STRING2
+
+res.AddItem( iInclude1 )
+res.AddItem( iInclude2 )
+
+'number
+res.AddItem( res.CreateItem(COLOR_NUMBER, "\b([0-9]+\.?[0-9]*|0x[0-9a-fA-F]+)\b", False) )
+
+'folding
+res.FoldText "\bBEGIN$", False, "\bEND$", False
+res.IndentText "\bBEGIN\s*$", False, "\bEND$", False
+res.SetPairs "[]{}()""""''"
+res.CommentLine "//"
+res.CommentBlock "/*", "*/"
+

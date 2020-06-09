@@ -1,0 +1,103 @@
+#title=NSIS
+#t=!ifndef..!define
+#g=!ifndef
+!ifndef ${1:symbol}
+	!define ${1:symbol} ${2:value}
+!endif
+$0
+#t=!macro..
+#g=!macro
+!macro ${1:macro_name} ${2:parm..}
+	$3
+!macroend
+$0
+#t=Do..LoopUntil..
+#g=do
+${Do}
+	$2
+	;${Continue}
+	;${ExitDo}
+${LoopUntil} ${1:expression}
+$0
+#t=FindWindow
+#g=findw
+FindWindow $$${1:0} "${2:#32770}" "$3" $$${4:HWNDPARENT}
+$0
+#t=For..Next
+#g=for
+${For} $$${1:var} ${2:value1} ${3:value2}
+	$4
+	;${Continue}
+	;${Break}
+${Next}
+$0
+#t=ForEach..Next
+#g=foreach
+${ForEach} $$${1:var} ${2:value1} ${3:value2} ${4:-|+} ${5:step_size}
+	$6
+	;${Continue}
+	;${Break}
+${Next}
+$0
+#t=Function..
+#g=function
+Function ${1:func}
+	$0
+FunctionEnd
+#t=If..Else..
+#g=if
+${If} $1
+	$2
+${Else}
+	$3
+${EndIf}
+$0
+#t=IfThen..|..|
+#g=ifthen
+${IfThen} ${1:expression} ${|} ${2:statement} ${|}
+$0
+#t=MessageBox
+#g=mess
+MessageBox MB_ICONINFORMATION|MB_OK "$1"
+$0
+#t=Section..
+#g=section
+Section	${1:section_name} ${2:index_output} 
+	$0
+SectionEnd
+#t=SectionGroup..
+#g=sectiongroup
+SectionGroup /e ${1:section_group_name} ${2:index_output}
+	$0
+SectionGroupEnd
+#t=Select..Case..
+#g=select
+${Select} ${1:value}
+	${Case} ${2:value1}
+		$3
+	${Case2} ${4:value2} ${5:value3}
+		$6
+	${CaseElse}
+		$7
+${EndSelect}
+$0
+#t=Switch..Case..
+#g=switch
+${Switch} ${1:value}
+	${Case} ${2:value1}
+		$3
+		${Break}
+	${Case} ${4:value2}
+		$5
+	${Default}
+		$6
+${EndSwitch}
+$0
+#t=While..
+#g=while
+${While} ${1:expression}
+	$2
+	;${Continue}
+	;${Break}
+${EndWhile}
+$0

@@ -1,0 +1,21 @@
+[Syntax]
+File=php.mac
+Ext=php;volt;phtml
+Mode=HTML
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=0
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=PHP
+ParseMax=2000
+ToolGroupEx=
+OutlineMax=10000
+RegexGroup=1
+OutlineMethod=5
+OutlineRegex=^[ \t]*[a-z| ]*(function[ \t].*\([^;]*)$
+OutlineScript=

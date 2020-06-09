@@ -1,0 +1,52 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:   MySQL
+' Maintainer:  www.everedit.net  
+' History:
+'   2014/06/27 First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set mysql=CreateParser()
+
+Set rLineComment=mysql.CreateRegion(COLOR_COMMENT1, "--\W", "$", True )
+Set rLineCommentSharp=mysql.CreateRegion(COLOR_COMMENT1, "+#+", "$", True )
+Set rBlockComment=mysql.CreateRegion(COLOR_COMMENT1, "+/*+", "*/", True )
+Set rString2=mysql.CreateStringRegion( COLOR_MACRO, """", "", True )
+Set rString1=mysql.CreateStringRegion( COLOR_STRING2, "'", "", True )
+Set rString3=mysql.CreateStringRegion( COLOR_STRING2, "`", "", True )
+
+mysql.AddRegion( rLineComment )
+mysql.AddRegion( rLineCommentSharp )
+mysql.AddRegion( rBlockComment )
+mysql.AddRegion( rString2 )
+mysql.AddRegion( rString1 )
+mysql.AddRegion( rString3 )
+
+'num
+Set iWordNum=mysql.CreateItem(COLOR_MACRO, "\b\d+\b", False)
+'$xxxx$
+Set iWordDollar=mysql.CreateItem(COLOR_MACRO, "\$.+\$", False)
+'User-Defined Variables
+Set iWordUserVar=mysql.CreateItem(COLOR_VAR, "@[\w_]+", False)
+
+'word
+Set wWord1=mysql.CreateWord(COLOR_WORD1, "accessible add all alter analyze and as asc asensitive before begin between binary both by call cascade case change check close collate column condition constraint contains continue convert create cross current_date current_time current_timestamp current_user cursor data database databases day_hour day_microsecond day_minute day_second declare default delayed delete delimiter desc describe deterministic distinct distinctrow div drop dual each else elseif enclosed end escaped exists exit explain false fetch for force foreign from fulltext function grant group handler having high_priority hour_microsecond hour_minute hour_second if ignore in in index infile inner inout insensitive insert interval into is is null iterate join key keys kill leading leave left like like limit linear lines load localtime localtimestamp lock loop low_priority master_ssl_verify_server_cert match minute_microsecond minute_second mod modifies natural no_write_to_binlog not null null on open optimize option optionally or order out outer outfile precision primary procedure purge range read read_only read_write reads references regexp release rename repeat replace require restrict return returns revoke right rlike schema schemas second_microsecond select sensitive separator set show sounds spatial specific sql sql_big_result sql_calc_found_rows sql_small_result sqlexception sqlstate sqlwarning ssl starting straight_join table terminated then to trailing trigger true undo union unique unlock unsigned until update usage use using utc_date utc_time utc_timestamp values view when where while with write x509 xor year_month zerofill", False)
+
+'functions
+Set iWord2=mysql.CreateWord(COLOR_WORD3, "abs acos adddate addtime aes_decrypt aes_encrypt ascii asin atan atan2 avg benchmark bin bit_and bit_count bit_length bit_or bit_xor cast ceil ceiling char char_length character_length charset coalesce coercibility collation compress concat concat_ws connection_id conv convert_tz cos cot count crc32 curdate current_date current_time current_timestamp current_user curtime database date date_add date_format date_sub datediff day dayname dayofmonth dayofweek dayofyear decode default degrees des_decrypt des_encrypt elt encode encrypt exp export_set extract field find_in_set floor format found_rows from_days from_unixtime get_format get_lock greatest group_concat hex hour if ifnull inet_aton inet_ntoa instr interval is_free_lock is_used_lock isnull last_day last_insert_id lcase least left length ln load_file localtime localtimestamp locate log log10 log2 lower lpad ltrim make_set makedate maketime master_pos_wait max md5 microsecond mid min minute mod month monthname name_const now nullif oct octet_length old_password ord password period_add period_diff pi position pow power procedure analyse quarter quote radians rand release_lock repeat replace reverse right round row_count rpad rtrim schema sec_to_time second session_user sha sha1 sign sin sleep soundex space sqrt std stddev stddev_pop stddev_samp str_to_date strcmp subdate substr substring substring_index subtime sum sysdate system_user tan time time_format time_to_sec timediff timestamp timestampadd timestampdiff to_days trim truncate ucase uncompress uncompressed_length unhex unix_timestamp upper user utc_date utc_time utc_timestamp uuid values var_pop var_samp variance week weekday weekofyear year yearweek", False)
+
+'Data Types
+Set wWord3=mysql.CreateWord(COLOR_WORD2, "bigint binary bit blob bool boolean char character date datetime dec decimal double enum float float4 float8 int int1 int2 int3 int4 int8 integer long longblob longtext mediumblob mediumint mediumtext middleint numeric real smallint spatial text time timestamp tinyblob tinyint tinytext varbinary varchar varcharacter varying", False)
+
+
+mysql.AddItem( iWordNum )
+mysql.AddItem( iWordDollar )
+mysql.AddWord( wWord1 )
+mysql.AddItem( iWord2 )
+mysql.AddWord( wWord3 )
+mysql.AddItem( iWordUserVar )
+
+Call mysql.SetPairs( "[]{}()""""''" )
+Call mysql.CommentLine("-- ")
+Call mysql.CommentBlock("/*", "*/")

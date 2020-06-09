@@ -1,0 +1,62 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Velocity
+' Maintainer:  www.everedit.net
+' History:
+'   2014/07/16	First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set vel=CreateParser()
+
+Set rString1=vel.CreateStringRegion( COLOR_STRING2, "'", "", False )
+Set rString2=vel.CreateStringRegion( COLOR_STRING2, """", "", False )
+Set iVar1=vel.CreateItem(COLOR_WORD2, "\$\w+", False)
+Set iVar2=vel.CreateItem(COLOR_WORD3, "\$\{\w+\}", False)
+Set iVar3=vel.CreateItem(COLOR_WORD4, "\$\!\w+", False)
+Set iNumber=vel.CreateItem(COLOR_NUMBER, "\b\d+\b", False)
+Set iKeyWord1=vel.CreateItem(COLOR_WORD1, "#(else|end|foreach|if|include|info|macro|parse|set)\b", False)
+Set iKeyWord2=vel.CreateItem(COLOR_WORD2, "#\w+", False)
+Set rComment1=vel.CreateRegion(COLOR_COMMENT1, "##", "$", False)
+Set rComment2=vel.CreateRegion(COLOR_COMMENT2, "#\*", "\*#", False)
+Set iMethod=vel.CreateItem(COLOR_FUNCTION, "(?<=\w+\.)\w+", False)
+
+vel.AddRegion rComment1
+vel.AddRegion rComment2
+vel.AddRegion rString1
+vel.AddRegion rString2
+
+vel.AddItem( iVar1 )
+vel.AddItem( iVar2 )
+vel.AddItem( iVar3 )
+vel.AddItem( iNumber )
+vel.AddItem( iKeyWord2 )
+vel.AddItem( iKeyWord1 )
+vel.AddItem( iMethod )
+
+Set rString2InString1=vel.CreateStringRegion( COLOR_COMMENT2, """", "", False )
+Set rString1InString2=vel.CreateStringRegion( COLOR_COMMENT2, "'", "", False )
+
+rString1.AddRegion rString2InString1
+rString2.AddRegion rString1InString2
+
+Set iVar1_1=vel.CreateItem(COLOR_WORD2, "\$\w+", False)
+Set iVar2_2=vel.CreateItem(COLOR_WORD3, "\$\{\w+\}", False)
+Set iVar3_3=vel.CreateItem(COLOR_WORD4, "\$\!\w+", False)
+
+rString1.AddItem iVar1_1
+rString1.AddItem iVar2_2
+rString1.AddItem iVar3_3
+
+Set iVar1_4=vel.CreateItem(COLOR_WORD2, "\$\w+", False)
+Set iVar2_5=vel.CreateItem(COLOR_WORD3, "\$\{\w+\}", False)
+Set iVar3_6=vel.CreateItem(COLOR_WORD4, "\$\!\w+", False)
+
+rString2.AddItem iVar1_4
+rString2.AddItem iVar2_5
+rString2.AddItem iVar3_6
+
+vel.FoldText "#(if|foreach|macro)", False, "#end", False
+vel.CommentLine("## ")
+vel.CommentBlock "#*", "*#"
+vel.SetPairs( "[]{}()""""''" )

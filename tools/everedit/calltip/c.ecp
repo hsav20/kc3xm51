@@ -1,0 +1,143 @@
+abs(int x):int\nReturns the absolute value of x
+div(int numer, int denom):div_t\nDivides numer (numerator) by denom (denominator)
+labs(long int x):long int\nReturns the absolute value of x
+ldiv(long int numer, long int denom):ldiv_t\nDivides numer (numerator) by denom (denominator)
+rand(void):int\nReturns a pseudo-random number in the range of 0 to RAND_MAX
+srand(unsigned int seed):void\nThis function seeds the random number generator used by the function rand
+acos(double x):double\nReturns the arc cosine of x in radians
+asin(double x):double\nReturns the arc sine of x in radians
+atan(double x):double\nReturns the arc tangent of x in radians
+atan2(doubly y, double x):double\nReturns the arc tangent in radians of y/x based on signs of both values
+cos(double x):double\nReturns the cosine of a radian angle x
+cosh(double x):double\nReturns the hyperbolic cosine of x
+sin(double x):double\nReturns the sine of a radian angle x
+sinh(double x):double\nReturns the hyperbolic sine of x
+tan(double x):double\nReturns the tangent of a radian angle x
+tanh(double x):double\nReturns the hyperbolic tangent of x
+exp(double x):double\nReturns the value of e raised to the xth power
+frexp(double x, int *exponent):double\nThe floating-point number x is broken up into a mantissa and exponent
+ldexp(double x, int exponent):double\nReturns x multiplied by 2 raised to the power of exponent
+log(double x):double\nReturns the natural logarithm (base-e logarithm) of x
+log10(double x):double\nReturns the common logarithm (base-10 logarithm) of x
+modf(double x, double *integer):double\nBreaks the floating-point number x into integer and fraction components
+pow(double x, double y):double\nReturns x raised to the power of y
+sqrt(double x):double\nReturns the square root of x
+ceil(double x):double\nReturns the smallest integer value greater than or equal to x
+fabs(double x):double\nReturns the absolute value of x
+floor(double x):double\nReturns the largest integer value less than or equal to x
+fmod(double x, double y):double\nReturns the remainder of x divided by y
+calloc(size_t nitems, size_t size):void *\nAllocates the requested memory and returns a pointer to it
+free(void *ptr):void\nDeallocates the memory previously allocated by a call to calloc, malloc, or realloc
+malloc(size_t size):void *\nAllocates the requested memory and returns a pointer to it
+realloc(void *ptr, size_t size):void *\nAttempts to resize the memory block pointed to by ptr that was previously allocated
+memchr(const void *str, int c, size_t n):void *\nSearches for the first occurrence of the character c (an unsigned char) in the first n bytes of the string pointed to by the argument str
+memcmp(const void *str1, const void *str2, size_t n):int\nCompares the first n bytes of str1 and str2
+memcpy(void *str1, const void *str2, size_t n):void *\nCopies n characters from str2 to str1
+memmove(void *str1, const void *str2, size_t n):void *\nCopies n characters from str2 to str1
+memset(void *str, int c, size_t n):void *\nCopies the character c (an unsigned char) to the first n characters of the string pointed to by the argument str
+atof(const char *str):double\nThe string pointed to by the argument str is converted to a floating-point number (type double)
+atoi(const char *str):int\nThe string pointed to by the argument str is converted to an integer (type int)
+atol(const char *str):long int\nThe string pointed to by the argument str is converted to a long integer (type long int)
+strtod(const char *str, char **endptr):double\nThe string pointed to by the argument str is converted to a floating-point number (type double)
+strtol(const char *str, char **endptr, int base):long int\nThe string pointed to by the argument str is converted to a long integer (type long int)
+strtoul(const char *str, char **endptr, int base):unsigned long int\nThe string pointed to by the argument str is converted to an unsigned long integer (type unsigned long int)
+strcat(char *str1, const char *str2):char *\nAppends the string pointed to by str2 to the end of the string pointed to by str1
+strncat(char *str1, const char *str2, size_t n):char *\nAppends the string pointed to by str2 to the end of the string pointed to by str1 up to n characters long
+strchr(const char *str, int c):char *\nSearches for the first occurrence of the character c (an unsigned char) in the string pointed to by the argument str
+strcmp(const char *str1, const char *str2):int\nCompares the string pointed to by str1 to the string pointed to by str2
+strncmp(const char *str1, const char *str2, size_t n):int\nCompares at most the first n bytes of str1 and str2
+strcoll(const char *str1, const char *str2):int\nCompares string str1 to str2
+strcpy(char *str1, const char *str2):char *\nCopies the string pointed to by str2 to str1
+strncpy(char *str1, const char *str2, size_t n):char *\nCopies up to n characters from the string pointed to by str2 to str1
+strcspn(const char *str1, const char *str2):size_t\nFinds the first sequence of characters in the string str1 that does not contain any character specified in str2
+strerror(int errnum):char *\nSearches an internal array for the error number errnum and returns a pointer to an error message string
+strlen(const char *str):size_t\nComputes the length of the string str up to but not including the terminating null character
+strpbrk(const char *str1, const char *str2):char *\nFinds the first character in the string str1 that matches any character specified in str2
+strrchr(const char *str, int c):char *\nSearches for the last occurrence of the character c (an unsigned char) in the string pointed to by the argument str
+strspn(const char *str1, const char *str2):size_t\nFinds the first sequence of characters in the string str1 that contains any character specified in str2
+strstr(const char *str1, const char *str2):char *\nFinds the first occurrence of the entire string str2 (not including the terminating null character) which appears in the string str1
+strtok(char *str1, const char *str2):char *\nBreaks string str1 into a series of tokens
+strxfrm(char *str1, const char *str2, size_t n):size_t\nTransforms the string str2 and places the result into str1
+isalnum(int character):int\nA letter (A to Z or a to z) or a digit (0 to 9)
+isalpha(int character):int\nA letter (A to Z or a to z)
+iscntrl(int character):int\nAny control character (0x00 to 0x1F or 0x7F)
+isdigit(int character):int\nA digit (0 to 9)
+isgraph(int character):int\nAny printing character except for the space character (0x21 to 0x7E)
+islower(int character):int\nA lowercase letter (a to z)
+isprint(int character):int\nAny printing character (0x20 to 0x7E)
+ispunct(int character):int\nAny punctuation character (any printing character except for space character or isalnum)
+isspace(int character):int\nA whitespace character (space, tab, carriage return, new line, vertical tab, or formfeed)
+isupper(int character):int\nAn uppercase letter (A to Z)
+isxdigit(int character):int\nA hexadecimal digit (0 to 9, A to F, or a to f)
+tolower(int character):int\nIf the character is an uppercase character (A to Z), then it is converted to lowercase (a to z)
+toupper(int character):int\nIf the character is a lowercase character (a to z), then it is converted to uppercase (A to Z)
+mblen(const char *str, size_t n):int\nReturns the length of a multibyte character pointed to by the argument str
+mbstowcs(schar_t *pwcs, const char *str, size_t n):size_t\nConverts the string of multibyte characters pointed to by the argument str to the array pointed to by pwcs
+mbtowc(whcar_t *pwc, const char *str, size_t n):int\nExamines the multibyte character pointed to by the argument str
+wcstombs(char *str, const wchar_t *pwcs, size_t n):size_t\nConverts the codes stored in the array pwcs to multibyte characters and stores them in the string str
+wctomb(char *str, wchar_t wchar):int\nExamines the code which corresponds to a multibyte character given by the argument wchar
+printf(const char *format, ...):int\nSends formatted output to stdout
+sprintf(char *str, const char *format, ...):int\nSends formatted output to a string
+vprintf(const char *format, va_list arg):int\nSends formatted output to stdout using an argument list
+vsprintf(char *str, const char *format, va_list arg):int\nSends formatted output to a string using an argument list
+scanf(const char *format, ...):int\nRead formatted input
+sscanf(const char *str, const char *format, ...):int\nReads formatted input from a string
+getchar(void):int\nGets a character (an unsigned char) from stdin
+gets(char *str):char *\nReads a line from stdin and stores it into the string pointed to by str
+putchar(int char):int\nWrites a character (an unsigned char) specified by the argument char to stdout
+puts(const char *str):int\nWrites a string to stdout up to but not including the null character
+perror(const char *str):void\nPrints a descriptive error message to stderr
+clearerr(FILE *stream):void\nClears the end-of-file and error indicators for the given stream
+fclose(FILE *stream):int\nCloses the stream
+feof(FILE *stream):int\nTests the end-of-file indicator for the given stream
+ferror(FILE *stream):int\nTests the error indicator for the given stream
+fflush(FILE *stream):int\nFlushes the output buffer of a stream
+fgetpos(FILE *stream, fpos_t *pos):int\nGets the current file position of the stream and writes it to pos
+fopen(const char *filename, const char *mode):FILE *\nOpens the filename pointed to by filename
+fread(void *ptr, size_t size, size_t nmemb, FILE *stream):size_t\nReads data from the given stream into the array pointed to by ptr
+freopen(const char *filename, const char *mode, FILE *stream):FILE *\nAssociates a new filename with the given open stream
+fseek(FILE *stream, long int offset, int whence):int\nSets the file position of the stream to the given offset
+fsetpos(FILE *stream, const fpos_t *pos):int\nSets the file position of the given stream to the given position
+ftell(FILE *stream):long int\nReturns the current file position of the given stream
+fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream):size_t\nWrites data from the array pointed to by ptr to the given stream
+remove(const char *filename):int\nDeletes the given filename so that it is no longer accessible (unlinks the file)
+rename(const char *old_filename, const char *new_filename):int\nCauses the filename referred to by old_filename to be changed to new_filename
+rewind(FILE *stream):void\nSets the file position to the beginning of the file of the given stream
+setbuf(FILE *stream, char *buffer):void\nDefines how a stream should be buffered
+setvbuf(FILE *stream, char *buffer, int mode, size_t size):int\nDefines how a stream should be buffered
+tmpfile(void):FILE *\nCreates a temporary file in binary update mode (wb+)
+tmpnam(char *str):char *\nGenerates and returns a valid temporary filename which does not exist
+fgetc(FILE *stream):int\nGets the next character (an unsigned char) from the specified stream and advances the position indicator for the stream
+fgets(char *str, int n, FILE *stream):char *\nReads a line from the specified stream and stores it into the string pointed to by str
+fputc(int char, FILE *stream):int\nWrites a character (an unsigned char) specified by the argument char to the specified stream and advances the position indicator for the stream
+fputs(const char *str, FILE *stream):int\nWrites a string to the specified stream up to but not including the null character
+fprintf(FILE *stream, const char *format, ...):int\nSee printf
+fscanf(FILE *stream, const char *format, ...):int\nSee scanf
+vfprintf(FILE *stream, const char *format, va_list arg):int\nSends formatted output to a stream using an argument list
+getc(FILE *stream):int\nGets the next character (an unsigned char) from the specified stream and advances the position indicator for the stream
+putc(int char, FILE *stream):int\nWrites an unsigned char specified by the argument char to the specified stream and advances the position indicator for the stream
+ungetc(int char, FILE *stream):int\nPushes the character char (an unsigned char) onto the specified stream so that the this is the next character read
+assert(int expression):void\nThe assert macro allows diagnostic information to be written to the standard error file
+setjmp(jmp_buf environment):int\nSaves the environment into the variable environment
+longjmp(jmp_buf environment, int value):void\nCauses the environment to be restored from a setjmp call where the environment variable had been saved
+raise(int sig):int\nCauses signal sig to be generated
+abort(void):void\nCauses an abnormal program termination
+atexit(void (*func)(void)):int\nCauses the specified function to be called when the program terminates normally
+exit(int status):void\nCauses the program to terminate normally
+getenv(const char *name):char *\nSearches for the environment string pointed to by name and returns the associated value to the string
+system(const char *string):int\nThe command specified by string is passed to the host environment to be executed by the command processor
+asctime(const struct tm *timeptr):char *\nReturns a pointer to a string which represents the day and time of the structure timeptr
+clock(void):clock_t\nReturns the processor clock time used since the beginning of an implementation-defined era (normally the beginning of the program)
+ctime(const time_t *timer):char *\nReturns a string representing the localtime based on the argument timer
+difftime(time_t time1, time_t time2):double\nCalculates the difference of seconds between time1 and time2 (time1-time2)
+gmtime(const time_t *timer):struct tm *\nThe value of timer is broken up into the structure tm and expressed in (UTC)
+localtime(const time_t *timer):struct tm *\nThe value of timer is broken up into the structure tm and expressed in the local time zone
+mktime(struct tm *timeptr):time_t\nConverts the structure pointed to by timeptr into a time_t value according to the local time zone
+strftime(char *str, size_t maxsize, const char *format, const struct tm *timeptr):size_t\nFormats the time represented in the structure timeptr according to the formatting rules
+time(time_t *timer):time_t\nCalculates the current calender time and encodes it into time_t format
+bsearch(const void *key, const void *base, size_t nitems, size_t size, int(*compar)(const void *, const void *)):void *\nPerforms a binary search
+qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, constvoid*)):void\nSorts an array
+va_arg(va_list ap, type):type\nExpands to the next argument in the paramater list of the function with type type
+va_end(va_list ap):void\nAllows a function with variable arguments which used the va_start macro to return
+setlocale(int category, const char *locale):char *\nSets or reads location dependent information
+localeconv(void):struct lconv*\nGets lconv representing the current location settings

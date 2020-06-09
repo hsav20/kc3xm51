@@ -1,0 +1,47 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    EverEdit Macro
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/02/15 First Version
+'   2013/05/01 Added some new words
+'   2013/09/13 Updated for EE 3.0
+'	2014/06/19 Updated some key words
+'	2014/07/15 Added outline key words
+'*******************************************************************************
+Include( ".\vbs.mac" )
+
+'Functions
+Set wWordMacro=vbs.CreateWord( COLOR_WORD1, "AddSel Append Clear ClearJumpPattern ClearSel close CommentBlock CommentLine CreateMenu Delete FindAll FindNext GetHwnd GetLineLength GetLineText GetSize GetText GetWord GetWrapCount HasSel Hide Include IndentInsert Insert InsertAt InsertBinary InsertChar InsertSnippet InsertText MoveCaret NewDoc Offset2Pos OpenDoc OutputLine OutputText Popup Pos2Offset Refresh ReplaceAll SendCommand SendCommandEx SetCaretPos SetJumpPattern SetOutlineMethod SetOutlineScript SetOutlineSymbol SetParseMax SetSel SetSyntax Show ShowHtmlHelp ShowInputBox ShowMsgBox Sleep Terminate WebOutput WebPreview write writeln", False)
+wWordMacro.AutoCase=True
+
+'Objects in macro
+Set wWordObject=vbs.CreateWord( COLOR_WORD2, "App Document Help HexDoc Menu OutputWindow Pos", False )
+wWordObject.AutoCase=True
+
+'Get/Set of Objects
+Set wWordProperty=vbs.CreateWord( COLOR_WORD3, "ActiveDoc ActiveHex AppPath CaretCol CaretLine CaretPos Codepage Col CommandBox Dirty document EndOfLine Line LineCount OutputWindow PathName Scope SelEndPos SelStartPos SelText SoftTab Syntax TabStop Text CaretPos Codepage Col GroupUndo Line SelText SoftTab Syntax TabStop Text", False )
+wWordProperty.AutoCase=True
+
+'Functions in syntax
+Set wWordSyntax=vbs.CreateWord( COLOR_WORD1, "AddCallTip AddItem AddRegion AddSnippet  AddWord Capture CommentBlock CommentLine CopyRegion CreateItem  CreateParser CreateRegion  CreateStringRegion CreateWord  FoldAnyText FoldText  IndentText  SetPairs SetTheme UnfoldText UnindentText", False )
+wWordSyntax.AutoCase=True
+
+'Prop of syntax
+Set wWordSyntaxProp=vbs.CreateWord( COLOR_WORD3, "AutoCase DefaultRegion FoldingMethod Name WordChars AutoCase FoldingMethod Name TransRegion WordChars", False )
+wWordSyntaxProp.AutoCase=True
+
+Set wWordEEConst=vbs.CreateWord( COLOR_WORD4, "COLOR_DEFAULT COLOR_COMMENT1 COLOR_COMMENT2 COLOR_STRING1 COLOR_STRING2 COLOR_TAG COLOR_MACRO COLOR_URL COLOR_EMAIL COLOR_NUMBER COLOR_FOUND COLOR_WORD1 COLOR_WORD2 COLOR_WORD3 COLOR_WORD4 COLOR_PAIR COLOR_FUNCTION COLOR_VAR COLOR_SUBLAN COLOR_OPERATOR COLOR_HIGHLIGHT1 COLOR_HIGHLIGHT2 COLOR_HIGHLIGHT3 COLOR_HIGHLIGHT4 COLOR_HIGHLIGHT5 COLOR_HIGHLIGHT6 COLOR_HIGHLIGHT7 COLOR_HIGHLIGHT8 COLOR_IGNORE COLOR_CONCEAL SCRIPT_PATH SCRIPT_NAME", False )
+wWordEEConst.AutoCase=True
+
+Set wWordOutline=vbs.CreateWord( COLOR_WORD4, "OUTLINE_NULL OUTLINE_DEFAULT OUTLINE_TILETAG OUTLINE_GROUPTAG_BYTYPE OUTLINE_GROUPTAG_BYTYRELEATION OUTLINE_FROM_SYNTAXSYMBOL OUTLINE_FROM_SCRIPT ", False )
+wWordOutline.AutoCase=True
+
+
+vbs.AddWord( wWordMacro )
+vbs.AddWord( wWordObject )
+vbs.AddWord( wWordEEConst )
+vbs.AddWord( wWordProperty )
+vbs.AddWord( wWordSyntax )
+vbs.AddWord( wWordSyntaxProp )
+vbs.AddWord( wWordOutline )

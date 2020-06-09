@@ -1,0 +1,64 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Windows Batch
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/08/07 First Version
+'   2012/04/10 Add label match
+'   2012/04/29 Add :: comment
+'   2014/05/23 Update some keywords
+'   2014/06/08 Improve echo match
+'   2014/08/07 Add some keywords, numbers, operators, and vars
+'*******************************************************************************
+Include( ".\const.mac")
+
+Set bat = CreateParser()
+
+Set rComment1 = bat.CreateRegion(COLOR_COMMENT1, "\brem\b", "$", False)
+Set rComment2 = bat.CreateRegion(COLOR_COMMENT1, "^\s*::", "$", False)
+
+Set rString1 = bat.CreateStringRegion(COLOR_STRING1, "'", "", False)
+Set rString2 = bat.CreateStringRegion(COLOR_STRING1, """", "", False)
+
+Set iNumber = bat.CreateItem(COLOR_NUMBER, "\b\d+\b", False)
+
+Set iOperator = bat.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\/=%&\^!~\|<>?,:\.;@\[\]]", False)
+
+Set wWord1 = bat.CreateWord(COLOR_WORD1, "ASSOC AT ATTRIB BEGIN BREAK CACLS CALL CD CHCP CHDIR CHKDSK CHOICE CLS CMD COLOR COMP COMPACT CONVERT COPY DATE DEFINED DEL DIR DISKCOMP DISKCOPY DO DOSKEY ECHO ELSE END ENDLOCAL ERASE ERRORLEVEL EXIST EXIT FC FIND FINDSTR FOR FORMAT FTYPE GOTO GRAFTABL HELP IF IN KEYB LABEL MD MKDIR MODE MORE MOVE NOT NUL OFF ON PATH PAUSE POPD PRINT PROMPT PUSHD RD RECOVER REN RENAME REPLACE RESTORE RETURN RMDIR SET SETLOCAL SHIFT SORT START SUBST TIME TREE TYPE VER VERIFY VOL XCOPY", False)
+wWord1.AutoCase = True
+
+Set wWord2=bat.CreateWord(COLOR_OPERATOR, "EQU GEQ GTR LEQ LSS NEQ", False)
+wWord2.AutoCase = True
+
+Set wWord3=bat.CreateWord(COLOR_COMMENT1, "REM", False)
+wWord3.AutoCase = True
+
+Set iLabel = bat.CreateItem(COLOR_WORD2, "^\s*:[^\n]+", False)
+
+Set iUserVar = bat.CreateItem(COLOR_VAR, "([%!])\w+\1", False)
+
+Set rEchoRegion = bat.CreateRegion(COLOR_COMMENT2, "^\s*echo\b", "$", False)
+bat.AddRegion(rEchoRegion)
+
+Set wWordEcho = bat.CreateWord(COLOR_WORD1, "ECHO", False)
+wWordEcho.AutoCase = True
+rEchoRegion.AddWord(wWordEcho)
+
+bat.AddRegion(rComment1)
+bat.AddRegion(rComment2)
+bat.AddRegion(rString1)
+bat.AddRegion(rString2)
+
+bat.AddItem(iNumber)
+bat.AddItem(iOperator)
+bat.AddWord(wWord1)
+bat.AddWord(wWord2)
+bat.AddItem(iLabel)
+bat.AddItem(iUserVar)
+
+rComment1.AddWord(wWord3)
+
+bat.SetPairs("[]{}()""""''")
+bat.CommentLine("REM ")
+bat.AddCallTip "bat.ecp", False, "%", " ", " ", ""
+bat.AddSnippet "bat.snippet"

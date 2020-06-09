@@ -1,0 +1,285 @@
+#title=CSS
+#t=!important CSS
+#g=imp
+${1:!important}
+#t=background: color image repeat attachment position
+#g=background
+background: #${1:DDD} url($2) ${3:repeat} ${4:scroll} ${5:top};$0
+#t=background-attachment: scroll/fixed
+#g=background
+background-attachment: ${1:scroll/fixed};$0
+#t=background-color: hex
+#g=background
+background-color: #${1:DDD};$0
+#t=background-color: name
+#g=background
+background-color: ${1:red};$0
+#t=background-color: rgb
+#g=background
+background-color: rgb(${1:255},${2:255},${3:255});$0
+#t=background-color: transparent
+#g=background
+background-color: transparent;$0
+#t=background-image: none
+#g=background
+background-image: none;$0
+#t=background-image: url
+#g=background
+background-image: url($1);$0
+#t=background-position: position
+#g=background
+background-position: ${1:top};$0
+#t=background-repeat: r/r-x/r-y/n-r
+#g=background
+background-repeat: ${1:repeat/repeat-x/repeat-y/no-repeat};$0
+#t=border: size style color
+#g=border
+border: ${1:1px} ${2:solid} #${3:999};$0
+#t=border-bottom: size style color
+#g=border
+border-bottom: ${1:1}px ${2:solid} #${3:999};$0
+#t=border-bottom-color: color
+#g=border
+border-bottom-color: #${1:999};$0
+#t=border-bottom-style: style
+#g=border
+border-bottom-style: ${1:solid};$0
+#t=border-bottom-width: size
+#g=border
+border-bottom-width: ${1:1}px ${2:solid} #${3:999};$0
+#t=border-color: color
+#g=border
+border-color: ${1:999};$0
+#t=border-left: size style color
+#g=border
+border-left: ${1:1}px ${2:solid} #${3:999};$0
+#t=border-left-color: color
+#g=border
+border-right-color: #${1:999};$0
+#t=border-left-style: style
+#g=border
+border-left-style: ${1:solid};$0
+#t=border-left-width: size
+#g=border
+border-left-width: ${1:1}px;
+#t=border-right: size style color
+#g=border
+border-right: ${1:1}px ${2:solid} #${3:999};$0
+#t=border-right-color: color
+#g=border
+border-right-color: #${1:999};$0
+#t=border-right-style: style
+#g=border
+border-right-style: ${1:none};$0
+#t=border-right-width: size
+#g=border
+border-right-width: ${1:1}px;
+#t=border-style: style
+#g=border
+border-style: ${1:none};$0
+#t=border-top: size style color
+#g=border
+border-top: ${1:1}px ${2:solid} #${3:999};$0
+#t=border-top-color: color
+#g=border
+border-top-color: #${1:999};$0
+#t=border-top-style: style
+#g=border
+border-top-style: ${1:none};$0
+#t=border-top-width: size
+#g=border
+border-top-width: ${1:1}px;
+#t=border-width: size
+#g=border
+border-width: ${1:1px};$0
+#t=clear: value
+#g=clear
+clear: ${1:left/right/both/none};$0
+#t=color: hex
+#g=color
+color: #${1:DDD};$0
+#t=color: name
+#g=color
+color: ${1:red};$0
+#t=color: rgb
+#g=color
+color: rgb(${1:255},${2:255},${3:255});$0
+#t=cursor: type
+#g=cursor
+cursor: ${1:default/auto/crosshair/pointer/move/resize/text/wait/help};$0
+#t=cursor: url
+#g=cursor
+cursor: url($1);$0
+#t=direction: ltr/rtl
+#g=direction
+direction: ${1:ltr|rtl};$0
+#t=display: block
+#g=display
+display: block;$0
+#t=display: common-types
+#g=display
+display: ${1:none/inline/block/list-item/run-in/compact/marker};$0
+#t=display: inline
+#g=display
+display: inline;$0
+#t=display: table-types
+#g=display
+display: ${1:table};$0
+#t=filter: AlphaImageLoader [for IE PNGs]
+#g=background
+${3:background-image: none;}filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='${1:images/transparent.png}', sizingMethod='${2:image/scale/crop}');
+#t=float: left/right/none
+#g=float
+float: ${1:left/right/none};$0
+#t=font: size font
+#g=font
+font: ${1:75%} ${2:"Lucida Grande", "Trebuchet MS", Verdana,} ${3:sans-}serif;$0
+#t=font: style variant weight size/line-height font-family
+#g=font
+font: ${1:normal/italic/oblique} ${2:normal/small-caps} ${3:normal/bold} ${4:1em/1.5em} ${5:Arial}, ${6:sans-}serif;$0
+#t=font-family: family
+#g=font
+font-family: ${1:Arial, "MS Trebuchet"}, ${2:sans-}serif;$0
+#t=font-size: size
+#g=font
+font-size: ${1:100%};$0
+#t=font-style: normal/italic/oblique
+#g=font
+font-style: ${1:normal/italic/oblique};$0
+#t=font-variant: normal/small-caps
+#g=font
+font-variant: ${1:normal/small-caps};$0
+#t=font-weight: weight
+#g=font
+font-weight: ${1:normal/bold};$0
+#t=letter-spacing: em
+#g=letter
+letter-spacing: $1em;$0
+#t=letter-spacing: px
+#g=letter
+letter-spacing: $1px;$0
+#t=list-style: type position image
+#g=list
+list-style: ${1:none/disc/circle/square/decimal/zero} ${2:inside/outside} url($3);$0
+#t=list-style-image: url
+#g=list
+list-style-image: url($1);$0
+#t=list-style-position: pos
+#g=list
+list-style-position: ${1:inside/outside};$0
+#t=list-style-type: asian
+#g=list
+list-style-type: ${1:cjk-ideographic/hiragana/katakana/hiragana-iroha/katakana-iroha};$0
+#t=list-style-type: marker
+#g=list
+list-style-type: ${1:none/disc/circle/square};$0
+#t=list-style-type: numeric
+#g=list
+list-style-type: ${1:decimal/decimal-leading-zero/zero};$0
+#t=list-style-type: other
+#g=list
+list-style-type: ${1:hebrew/armenian/georgian};$0
+#t=list-style-type: roman-alpha-greek
+#g=list
+list-style-type: ${1:lower-roman/uppert-roman/lower-alpha/upper-alpha/lower-greek/lower-latin/upper-latin};$0
+#t=margin: all
+#g=margin
+margin: ${1:20px};$0
+#t=margin: T R B L
+#g=margin
+margin: ${1:20px} ${2:0px} ${3:40px} ${4:0px};$0
+#t=margin: V H
+#g=margin
+margin: ${1:20px} ${2:0px};$0
+#t=margin-bottom: length
+#g=margin
+margin-bottom: ${1:20px};$0
+#t=margin-left: length
+#g=margin
+margin-left: ${1:20px};$0
+#t=margin-right: length
+#g=margin
+margin-right: ${1:20px};$0
+#t=margin-top: length
+#g=margin
+margin-top: ${1:20px};$0
+#t=marker-offset: auto
+#g=marker
+marker-offset: auto;$0
+#t=marker-offset: length
+#g=marker
+marker-offset: ${1:10px};$0
+#t=opacity: [for Safari, FF & IE]
+#g=opacity
+opacity: ${1:0.5};
+-moz-opacity: $1;
+filter:alpha(opacity=${2:50});$0
+#t=overflow: type
+#g=overflow
+overflow: ${1:visible/hidden/scroll/auto};$0
+#t=padding: all
+#g=padding
+padding: ${1:20px};$0
+#t=padding: T R B L
+#g=padding
+padding: ${1:20px} ${2:0px} ${3:40px} ${4:0px};$0
+#t=padding: V H
+#g=padding
+padding: ${1:20px} ${2:0px};$0
+#t=padding-bottom: length
+#g=padding
+padding-bottom: ${1:20px};$0
+#t=padding-left: length
+#g=padding
+padding-left: ${1:20px};$0
+#t=padding-right: length
+#g=padding
+padding-right: ${1:20px};$0
+#t=padding-top: length
+#g=padding
+padding-top: ${1:20px};$0
+#t=position: type
+#g=position
+position: ${1:static/relative/absolute/fixed};$0
+#t=text-align: left/center/right
+#g=text
+text-align: ${1:left/right/center/justify};$0
+#t=text-decoration: none/underline/overline/line-through/blink
+#g=text
+text-decoration: ${1:none/underline/overline/line-through/blink};$0
+#t=text-indent: length
+#g=text
+text-indent: ${1:10p}x;$0
+#t=text-shadow: color-hex x y blur
+#g=text
+text-shadow: #${1:DDD} ${2:10px} ${3:10px} ${4:2px};$0
+#t=text-shadow: color-rgb x y blur
+#g=text
+text-shadow: rgb(${1:255},${2:255},${3:255}) ${4:10px} ${5:10px} ${6:2px};$0
+#t=text-shadow: none
+#g=text
+text-shadow: none;$0
+#t=text-transform: capitalize/upper/lower
+#g=text
+text-transform: ${1:capitalize/uppercase/lowercase};$0
+#t=text-transform: none
+#g=text
+text-transform: none;$0
+#t=vertical-align: type
+#g=vertical
+vertical-align: ${1:baseline/sub/super/top/text-top/middle/bottom/text-bottom/length/%};$0
+#t=visibility: type
+#g=visibility
+visibility: ${1:visible/hidden/collapse};$0
+#t=white-space: normal/pre/nowrap
+#g=white
+white-space: ${1:normal/pre/nowrap};$0
+#t=word-spacing: length
+#g=word
+word-spacing: ${1:10px};$0
+#t=word-spacing: normal
+#g=word
+word-spacing: normal;$0
+#t=z-index: index
+#g=z
+z-index: $1;$0

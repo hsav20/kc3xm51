@@ -1,0 +1,27 @@
+try {
+	var key="Emmet:UseTab";
+	var useTab = App.GetValue(key);
+	if( useTab=="" ){
+		var ini = App.GetIniFile(APP_PATH+"\\mode\\html\\config.ini");
+		var cfg=ini.Get("Emmet", "UseTab");
+		if( cfg=="" )
+			useTab="N";
+		else
+			useTab=cfg;
+		App.SetValue(key, useTab);
+	}
+	
+	if( useTab=="Y" ){
+		var doc=App.ActiveDoc;
+		var scope = doc.Scope;
+		if( scope=="source.html" || scope=="source.css" || scope=="source.xml" ){
+			Include("..\\..\\emmet.ejs");
+			if( actions.run('expand_abbreviation', editor) ){
+				App.ReturnValue=1
+				App.QuitEvent=true;
+			}
+		}
+	}
+} catch(err) {
+} finally {
+}

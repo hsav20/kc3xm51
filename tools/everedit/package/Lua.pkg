@@ -1,0 +1,15 @@
+[Syntax]
+File=lua.mac
+Ext=lua
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=Lua
+ParseMax=0

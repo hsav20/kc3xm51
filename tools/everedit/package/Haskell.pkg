@@ -1,0 +1,15 @@
+[Syntax]
+File=haskell.mac
+Ext=hs
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=Y
+Title=Haskell
+ParseMax=0

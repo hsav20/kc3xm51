@@ -1,0 +1,89 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    C51
+' Maintainer:  Morler (based on C99 syntax file) ZLiang
+' History:
+'   2013/05/24 First Version
+'	2013/05/25 Modified by ZLiang
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set c51=CreateParser()
+c51.WordChars="_"
+
+'comment
+Set rLineComment=c51.CreateRegion( COLOR_COMMENT1, "+//+", "$", True )
+Set rBlockComment=c51.CreateRegion( COLOR_COMMENT2, "+/*+", "+*/+", True )
+c51.AddRegion( rLineComment )
+c51.AddRegion( rBlockComment )
+
+'add todo to comment
+Set iTodo=c51.CreateItem( COLOR_HIGHLIGHT2, "\b(TODO|FIX)\b", False )
+rLineComment.AddItem( iTodo )
+rBlockComment.AddItem( iTodo )
+
+'single quote string
+Set rString1=c51.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+c51.AddRegion( rString1 )
+
+Set rString2=c51.CreateStringRegion( COLOR_STRING1, """", "\", False )
+c51.AddRegion( rString2 )
+
+'function
+c51.AddItem( c51.CreateItem(COLOR_FUNCTION, "[\w_][\w\d_]+(?=\()", False) )
+
+'Reserved words
+c51.AddWord( c51.CreateWord(COLOR_WORD2, "const int long short char float double bool signed unsigned void typedef struct union enum static register auto volatile extern inline break continue case catch class default delete do else explicit for friend goto if namespace new operator private protected public return switch template this throw try virtual wchar_t while sizeof", True ) )
+
+'Directive
+c51.AddWord( c51.CreateWord(COLOR_WORD1, "CODE1 COND1 EJECT LISTINCLUDE NOCOND1 NOPRINT1 PAGELENGTH1  PAGEWIDTH1 PREPRINT1 PRINT1 SYMBOLS1 TABS1 WARNINGLEVEL1 AREGS BROWSE1 COMPACT1 DEBUG1 DISABLE FARWARNING FIXXC800 FLOATFUZZY INTERVAL1 INTPROMOTE1 INTVECTOR1 LARGE1 MAXARGS1 MOD517 MODA2 MODAB2 MODDA MODDP2 MODP2 NOAMAKE1 NOAREGS NOINTPROMOTE1 NOINTVECTOR1 NOMOD517 NOMODA2 NOMODAB2 NOMODDA NOMODDP2 NOOBJECT1 NOREGPARMS OBJECT1 OBJECTADVANCED1 OBJECTEXTEND1 OMF21 ONEREGBANK OPTIMIZE ORDER1 PSOC1 REGPARMS RESTORE RET_PSTK1 RET_XSTK1 ROM1 SAVE SMALL1 SRC1 STRING1 USERCLASS1 VARBANKING1 XCROM1 ASM DEFINE2 ENDASM INCDIR1 NOEXTEND1 __c51__ __cx51__ __date__ __date2__ __file__ __line__ __model__ __time__ __stdc__", True ) )
+
+' For AT89S52, AT89C52  
+c51.AddWord( c51.CreateWord(COLOR_TAG, "P0 SP DPL DPH PCON TCON TMOD TL0 TL1 TH0 TH1 P1 SCON SBUF P2 IE P3 IP T2CON T2MOD RCAP2L RCAP2H TL2 TH2 PSW ACC P0_0 P0_1 P0_2 P0_3 P0_4 P0_5 P0_6 P0_7 IDL_ STOP_ PD_ GF0_ GF1_ SMOD_ IT0 IE0 IT1 IE1 TR0 TF0 TR1 TF1 T0_M0_ T0_M1_ T0_CT_ T0_GATE_ T1_M0_ T1_M1_ T1_CT_ T1_GATE_ T1_MASK_ T0_MASK_ P1_0 P1_1 P1_2 P1_3 P1_4 P1_5 P1_6 P1_7 T2 T2EX RI TI RB8 TB8 REN SM2 SM1 SM0 P2_0 P2_1 P2_2 P2_3 P2_4 P2_5 P2_6 P2_7 EX0 ET0 EX1 ET1 ES ET2 EA P3_0 P3_1 P3_2 P3_3 P3_4 P3_5 P3_6 P3_7 RXD TXD INT0 INT1 T0 T1 WR RD PX0 PT0 PX1 PT1 PS PT2 CP_RL2 C_T2 TR2 EXEN2 TCLK RCLK EXF2 TF2 DCEN_ T2OE_ F1 OV RS0 RS1 F0 AC CY IE0_VECTOR TF0_VECTOR IE1_VECTOR TF1_VECTOR SIO_VECTOR TF2_VECTOR EX2_VECTOR", True ) )
+
+c51.AddWord( c51.CreateWord(COLOR_VAR, "_at_ alien bdata bit code compact data far idata interrupt large pdata _priority_ reentrant sbit sfr sfr16 small _task_ using xdata noaregs noregparms optimize size objectadvanced asm int8_t uint8_t int16_t uint16_t int32_t uint32_t int64_t uint64_t", True ) )
+
+'operators
+c51.AddItem( c51.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.,:;\/\[\]]",False ) )
+Set rError=c51.CreateRegion( COLOR_COMMENT1, "#\s*error\b", "$", True )
+c51.AddRegion( rError )
+
+'include
+Set iInclude1=c51.CreateItem( COLOR_MACRO, "#\s*include\s*(<.*?>)", False )
+iInclude1.Capture 1, COLOR_STRING2
+Set iInclude2=c51.CreateItem( COLOR_MACRO, "#\s*include\s*(?="")", False )
+iInclude2.Capture 1, COLOR_STRING2
+
+c51.AddItem( iInclude1 )
+c51.AddItem( iInclude2 )
+
+'macro
+'c51.AddItem( c51.CreateItem(COLOR_MACRO, "#\s*if\s+!?defined",False ) )
+'c51.AddItem( c51.CreateItem(COLOR_MACRO, "#\s*(if|pragma|else|elif|error|ifndef|define|endif|undef|ifdef)\b", False ) )
+'number
+'c51.AddItem( c51.CreateItem(COLOR_NUMBER, "\b([0-9]+\.?[0-9]*|0x[0-9a-fA-F]+)\b", False) )
+
+'macro
+c51.AddItem( c51.CreateItem(COLOR_MACRO, "#\s*if\s+!?defined",False ) )
+
+Set macro_token=c51.CreateItem( COLOR_MACRO, "#\s*((if|pragma|elif|error|ifndef|define|undef|ifdef)\s+([A-Za-z0-9_]+)\s*|(else|endif))", False )
+macro_token.Capture 3, COLOR_WORD1
+
+c51.AddItem( macro_token )
+
+'number
+c51.AddItem( c51.CreateItem(COLOR_NUMBER, "\b([0-9]+\.?[0-9]*|0x[0-9a-fA-F]+|0[b][01]+)\b", False) )
+
+c51.AddSnippet "c51.snippet"
+
+'folding
+Call c51.FoldText( "\{", False )
+Call c51.UnfoldText( "\}", False )
+
+Call c51.IndentText( "(\[|{|\w+:)\s*$", False )
+Call c51.UnindentText( "^\s*}|\]$", False )
+
+Call c51.SetPairs( "[]{}()""""''" )
+
+Call c51.CommentLine("//")
+Call c51.CommentBlock("/*", "*/")

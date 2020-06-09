@@ -1,0 +1,191 @@
+#title=VBScript
+#t=Array 1
+#g=arr
+' define an array contains 3 elements:
+Dim ${1:MyArray}(2)
+$1(0) = ${2:var1}
+$1(1) = ${3:var2}
+$1(2) = ${4:var3}
+
+#t=Array 2
+#g=arr
+Dim ${1:MyArray}
+$1 = Array(${2:var1},${3:var2},${4:...})
+
+#t=Array Redim Preserve
+#g=redim
+Redim Preserve ${1:MyArray}(${2:size})
+
+#t=Call
+#g=call
+Call ${1:name}(${2:argumentlist})
+
+#t=Class
+#g=class
+Class ${1:name}
+	$0
+End Class
+
+#t=Constant
+#g=constant
+Const ${1:constname} = ${2:expression}
+
+#t=Constant Private
+#g=constp
+Private Const ${1:constname} = ${2:expression}
+
+#t=Do Loop Until
+#g=do
+Do
+	$1
+Loop Until ${2:condition}
+
+#t=Do While Loop
+#g=do
+Do While ${1:condition}
+	$2
+Loop
+
+#t=Erase
+#g=erase
+Erase ${1:MyArray}
+
+#t=Execute
+#g=exec
+Execute ${1:statement}
+
+#t=ExecuteGlobal
+#g=execg
+ExecuteGlobal ${1:statement}
+
+#t=Exit Do
+#g=exit
+Exit Do
+
+#t=Exit For
+#g=exit
+Exit For
+
+#t=Exit Function
+#g=exit
+Exit Function
+
+#t=Exit Property
+#g=exit
+Exit Property
+
+#t=Exit Sub
+#g=exit
+Exit Sub
+
+#t=For Each
+#g=for each
+For Each ${1:item} In ${2:collection}
+	$3
+Next
+
+#t=For Next
+#g=for
+For ${1:counter} = ${2:start} To ${3:end}
+	$4
+Next
+
+#t=Function
+#g=function
+Function ${1:name}(${2:arguments})
+	$3
+End Function
+
+#t=If Then
+#g=if
+If ${1:condition} Then
+	$2
+End If
+
+#t=If Then Else
+#g=if
+If ${1:condition} Then
+	$2
+Else
+	$3
+End If
+
+#t=On Error
+#g=err
+On Error Resume Next
+	$0
+On Error Goto 0
+
+#t=Option Explicit
+#g=option
+Option Explicit
+
+#t=Private Var
+#g=private
+Private ${1:varname}
+
+#t=Property Get
+#g=propg
+[Public [Default] | Private] Property Get name [(arglist)]
+   [statements]
+   [[Set] name = expression]
+   [Exit Property]
+   [statements]
+   [[Set] name = expression]
+End Property
+
+#t=Property Let
+#g=propl
+[Public | Private] Property Let name ([arglist,] value)
+   [statements]
+   [Exit Property]
+   [statements]
+End Property
+
+#t=Property Set
+#g=props
+[Public | Private] Property Set name([arglist,] reference)
+   [statements]
+   [Exit Property]
+   [statements]
+End Property
+
+#t=Public
+#g=pub
+Public ${1:varname}
+
+#t=Randomize
+#g=rand
+Randomize ${1:[number]}
+
+#t=Select Case
+#g=select
+Select Case ${1:testexpression}
+	Case ${2:expression1}	${3:statements1}
+	Case ${4:expression1}	${5:statements2}
+	Case Else	${6:statements}
+End Select
+
+#t=Set
+#g=set
+Set objectvar = {objectexpression | New classname | Nothing}
+' or
+Set object.eventname = GetRef(procname)
+
+#t=Sub
+#g=sub
+Sub ${1:name}(${2:arguments})
+	$0
+End Sub
+
+#t=While Wend
+#g=while
+While ${1:condition}
+	${2:statements}
+Wend
+
+#t=With
+#g=with
+With ${1:object}
+   ${2:statements}
+End With

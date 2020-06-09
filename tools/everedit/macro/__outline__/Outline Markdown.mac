@@ -1,0 +1,50 @@
+Function CountSharp(line_text)
+	sharp_count=0
+	For col=1 To Len(line_text)
+		If Mid(line_text, col, 1)="#" Then
+			sharp_count=sharp_count+1
+		Else
+			Exit For
+		End If
+	Next
+	CountSharp=sharp_count
+End Function
+
+Function SaveTextAsUTF8(filetext, filepath)
+	Set file=CreateObject("Adodb.Stream")
+	file.Type=2
+	file.Mode=3
+	file.Charset = "utf-8"
+	file.Open
+	file.WriteText filetext
+	file.SaveToFile filepath, 2
+	file.close
+	Set file=Nothing
+End Function
+
+Set doc=App.ActiveDoc
+Const MAX_PARSE=10000
+count=doc.LineCount
+If count>MAX_PARSE Then
+	count=MAX_PARSE
+End If
+
+all_text=""
+
+For idx=0 To count-1
+	line_text=doc.GetLineText(idx)
+	sharp_count=CountSharp( line_text )
+	If sharp_count>0 Then
+		For tab=1 To sharp_count
+			all_text = all_text & Chr(9)
+		Next
+		all_text=all_text & CStr(idx) & ":0#" & Mid(line_text, sharp_count+1, 128) & vbCrLf
+	End If
+Next
+
+If Len(all_text) Then
+	path=App.CreateTempFile(False)
+	SaveTextAsUTF8 all_text, path
+	doc.OpenOutlineFile path
+	App.RemoveFile path
+End If

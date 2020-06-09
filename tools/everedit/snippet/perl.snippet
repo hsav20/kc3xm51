@@ -1,0 +1,102 @@
+#title=Perl
+#t=Conditional
+#g=unless
+unless ($1) {
+	${2:# body...}
+}
+
+#t=Conditional
+#g=if
+if ($1) {
+	${2:# body...}
+}
+
+#t=Conditional if..else
+#g=ife
+if ($1) {
+	${2:# body...}
+} else {
+	${3:# else...}
+}
+
+#t=Conditional if..elsif..else
+#g=ifee
+if ($1) {
+	${2:# body...}
+} elsif ($3) {
+	${4:# elsif...}
+} else {
+	${5:# else...}
+}
+
+#t=Conditional One-line
+#g=xif
+${1:expression} if ${2:condition};
+
+#t=Conditional One-line
+#g=xunless
+${1:expression} unless ${2:condition};
+
+#t=Function
+#g=sub
+sub ${1:function_name} {
+	${2:# body...}
+}
+
+#t=Loop
+#g=fore
+foreach ${1:my} $$${2:x} (@${3:array}) {
+	${4:# body...}
+}
+
+#t=Loop
+#g=while
+while ($1) {
+	${2:# body...}
+}
+
+#t=Loop
+#g=for
+for (my $$${1:var} = 0; $$$1 < ${2:expression}; $$$1++) {
+	${3:# body...}
+}
+
+#t=Loop One-line
+#g=xwhile
+${1:expression} while ${2:condition};
+
+#t=Loop One-line
+#g=xfore
+${1:expression} foreach @${2:array};
+
+#t=Package
+#g=class
+package ${1:ClassName};
+
+${2:use base qw:ParentClass};
+
+}sub new {
+	my $class = shift;
+	$class = ref $class if ref $class;
+	my $self = bless {}, $class;
+	$self;
+}
+
+#t=Test
+#g=test
+\#!/usr/bin/perl -w
+
+use strict;
+use Test::More tests => ${1:1};
+use ${2:ModuleName};
+
+ok(${3:assertion});
+
+#t=Try/Except
+#g=eval
+eval {
+	${1:# do something risky...}
+};
+if ($2) {
+	${3:# handle failure...}
+}

@@ -1,0 +1,24 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Conf
+' Maintainer:  www.everedit.net
+' History:
+'   2015/06/24 First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set conf=CreateParser()
+
+Set rComment=conf.CreateRegion(COLOR_COMMENT1, "^\s*#", "$", True )
+
+Set rString2=conf.CreateStringRegion( COLOR_STRING2, """", "\", False, "\" )
+conf.AddRegion( rString2 )
+
+conf.AddItem( conf.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+conf.AddItem( conf.CreateItem(COLOR_WORD1, "^\w+\b", False) )
+conf.AddItem( conf.CreateItem(COLOR_WORD3, "^\s+\S+\b", False) )
+
+conf.AddRegion( rComment )
+conf.SetPairs( "[]''""""{}()" )
+
+conf.CommentLine "#"

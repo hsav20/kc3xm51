@@ -1,0 +1,16 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    HTML
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/02/15 First Version
+'   2015/09/02 Added wordchars
+'*******************************************************************************
+Include( ".\html_base.mac" )
+
+html.WordChars = "-"
+
+html.AddRegion( rScript )
+html.AddRegion( rCss )
+html.AddRegion( rHtmlBlockComment )
+html.AddRegion( rHtmlTag )

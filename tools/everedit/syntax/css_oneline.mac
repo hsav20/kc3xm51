@@ -1,0 +1,43 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    CSS One Line <tag style="">
+' Maintainer:  www.everedit.net
+' History:
+'   2014/07/23 First Version
+'*******************************************************************************
+
+'css comment
+Set rCssBlockComment=css_creator.CreateRegion( COLOR_COMMENT1, "+/*+", "+*/+", False )
+rCssRegion.AddRegion( rCssBlockComment )
+
+'operators
+rCssRegion.AddItem( css_creator.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=&\^!~\|<>?\.,:;@\[\]]",False ) )
+
+'Properties
+rCssRegion.AddWord( css_creator.CreateWord(COLOR_WORD1, "alignment-baseline alt animation appearance background background-attachment background-clip background-color background-image background-origin background-position background-repeat background-size baseline-shift border border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width border-collapse border-color border-image border-image-outset border-image-repeat border-image-slice border-image-source border-image-width border-left border-left-color border-left-style border-left-width border-radius border-right border-right-color border-right-style border-right-width border-spacing border-style border-top border-top-color border-top-left-radius border-top-right-radius border-top-style border-top-width border-width bottom box-align box-direction box-flex box-flex-group box-lines box-ordinal-group box-orient box-pack box-reflect box-shadow box-sizing caption-side cellmargin cellspacing clear clip clip-path clip-rule color color-interpolation color-interpolation-filters color-rendering compat content cursor direction display dominant-baseline empty-cells ext fill fill-opacity fill-rule filter float flood-color flood-opacity font font-family font-size font-style font-variant font-weight glyph-orientation-horizontal glyph-orientation-vertical height image-rendering kerning left letter-spacing lighting-color line-height linear-gradient list-style list-style-image list-style-position list-style-type margin margin-bottom margin-left margin-right margin-top marker marker-end marker-mid marker-start marquee mask max-height max-width min-height min-width opacity orphans outline outline-color outline-offset outline-style outline-width overflow overflow-x overflow-y padding padding-bottom padding-left padding-right padding-top page-break-after page-break-before page-break-inside pointer-events position resize right shape-rendering size speak src stop-color stop-opacity stroke stroke-dasharray stroke-dashoffset stroke-linecap stroke-linejoin stroke-miterlimit stroke-opacity stroke-width table-layout text-align text-anchor text-decoration text-indent text-overflow text-rendering text-shadow text-transform top transform transition unicode-bidi vector-effect vertical-align visibility white-space widows width word-break word-spacing word-wrap writing-mode z-index zoom -khtml-border-radius -webkit-border-radius -webkit-border-bottom-left-radius -webkit-border-top-left-radius -webkit-min-device-pixel-ratio -webkit-box-shadow -moz-border-radius -moz-box-shadow -moz-border-radius-bottomleft -moz-border-radius-topleft -webkit-transition -moz-transition -ms-transition -o-transition -webkit-box-sizing -moz-box-sizing -o-box-sizing -ms-box-sizing type -webkit-animation-name -webkit-animation-duration -webkit-animation-iteration-count animation-name animation-duration animation-timing-function animation-iteration-count -webkit-animation-timing-function -moz-animation-name -moz-animation-duration -moz-animation-iteration-count -moz-animation-timing-function -ms-animation-name -ms-animation-duration -ms-animation-iteration-count -ms-animation-timing-function color-stop -webkit-transform -moz-transform -moz-padding-start -moz-margin-start href class id scrollbar-3d-light-color scrollbar-arrow-color scrollbar-base-color scrollbar-dark-shadow-color scrollbar-face-color scrollbar-highlight-color scrollbar-shadow-color -moz-outline-radius -moz-outline -moz-outline-offset voice-family dir _font-size _width _margin _height _bottom _margin-top _padding -o-font-family", False, "-") )
+
+'Predefined values
+rCssRegion.AddWord( css_creator.CreateWord(COLOR_WORD2, "absolute active aliceblue all-scroll antiquewhite aqua aquamarine arial attr auto azure baseline beige bidi-override bisque black blanchedalmond block blue blueviolet bold bolder both break-all break-word brown burlywood cadetblue capitalize caption center chartreuse chocolate circle col-resize collapse content-box coral cornflowerblue cornsilk counter crimson crosshair cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkturquoise darkviolet dashed decimal deeppink deepskyblue default dimgray disabled disc dodgerblue dotted double e-resize element ellipsis embed firebrick fixed floralwhite forestgreen fuchsia gainsboro geneva ghostwhite gold goldenrod gray green greenyellow grey groove hand help helvetica hidden honeydew hotpink hsl hsla icon important inactive indianred indigo inherit inline inline-block inset inside italic ivory keep-all khaki large larger lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lighter lightgoldenrodyellow lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray lightsteelblue lightyellow lime limegreen linear line-through linen lower-alpha lower-roman lowercase lr-tb ltr magenta maroon medium mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred menu message-box middle midnightblue mintcream mistyrose moccasin monospace move n-resize navajowhite navy ne-resize no-drop no-repeat none normal not-allowed nowrap nw-resize oblique oldlace olive olivedrab orange orangered orchid outset outside overline palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum pointer powderblue pre progress purple radial-gradient rect red relative repeat repeat-x repeat-y rgb rgba gba ridge rosybrown row-resize royalblue rtl s-resize saddlebrown salmon sandybrown sans-serif scroll se-resize seagreen seashell separate serif sienna silver simsun skyblue slateblue slategray small small-caps small-caption smaller snow solid springgreen square static status-bar steelblue sub super sw-resize tahoma tan tb-rl teal text text-bottom text-top thin thistle tomato translate3d transparent turquoise underline upper-alpha upper-roman uppercase verdana vertical-text violet visible w-resize wait wheat white whitesmoke x-large x-small xx-large xx-small yellow yellowgreen -webkit-gradient -webkit-linear-gradient -o-linear-gradient -ms-linear-gradient -moz-inline-box -moz-linear-gradient -webkit-focus-ring-color from to infinite buttonLight ease-in-out uri url format -moz-Dialog -moz-FieldText -moz-Field open-quote close-quote -o-language-string avoid justify always female pre-wrap", False, "-") )
+
+'HTML Tags
+rCssRegion.AddWord( css_creator.CreateWord(COLOR_WORD3, "A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO BASE BDO BLOCKQUOTE BODY BR BUTTON CANVAS CAPTION CITE CODE COL COLGROUP COMMAND DATALIST DD DEL DETAILS DFN DIV DL DT EM EMBED FIELDSET FIGCAPTION FIGURE FOOTER FORM H1 H2 H3 H4 H5 H6 HEAD HEADER HGROUP HR HTML I IFRAME IMG INPUT INS KEYGEN KBD LABEL LEGEND LI LINK MAP MARK MENU META METER NAV NOSCRIPT OBJECT OL OPTGROUP OPTION OUTPUT P PARAM PRE PROGRESS Q RP RT RUBY SAMP SCRIPT SECTION SELECT SMALL SOURCE SPAN STRONG STYLE SUB SUMMARY SUP TABLE TBODY TD TEXTAREA TFOOT TH THEAD TIME TITLE TR UL VAR VIDEO", False, "-") )
+
+'Class
+rCssRegion.AddItem( css_creator.CreateItem(COLOR_WORD2, "\.[\w-]+",False ) )
+
+'Id
+rCssRegion.AddItem( css_creator.CreateItem(COLOR_WORD3, "#[\w+-]+",False ) )
+
+'@
+rCssRegion.AddItem( css_creator.CreateItem(COLOR_WORD3, "@[\w+-]+",False ) )
+
+'number
+rCssRegion.AddItem( css_creator.CreateItem(COLOR_NUMBER, "\b([0-9]+(\.)?[0-9]*(em|px|mm|pt|deg|s|%)?)|#[a-fA-F0-9]+\b", False) )
+
+rCssRegion.AddSnippet "css.snippet"
+
+rCssRegion.SetPairs( "()[]{}""""''" )
+rCssRegion.CommentBlock "/*", "*/"
+rCssRegion.FoldText "\{", False, "\}", False
+rCssRegion.IndentText "\{\s*$", False, "^\s*}$", False
+

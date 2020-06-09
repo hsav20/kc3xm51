@@ -1,0 +1,354 @@
+#title=HTML
+#t=<?php...?>
+#g=php
+<?php
+	$0
+?>
+
+#t=Abbreviation
+#g=abbr
+<abbr title="${1:EverEdit}">$2</abbr>$0
+#t=Acronym
+#g=acronym
+<acronym title="${1:EverEdit}">$2</acronym>$0
+#t=Address
+#g=add
+<address>$1</address>$0
+#t=Base
+#g=base
+<base href="${1:http://everedit.net/}" target="${3:_blank}" />
+$0
+#t=Big Text
+#g=big
+<big>$1</big>$0
+#t=Blockquote
+#g=bq
+<blockquote cite="${1:http://www.example.com/}">
+	<${2:p}>$0</$2>
+</blockquote>
+#t=Body
+#g=body
+<body>
+	$0
+</body>
+#t=Boldface Text
+#g=b
+<b>$1</b>$0
+#t=Button
+#g=button
+<button name="${1:test}" type="${2:button}" value="${3:val}">${6:Button Text}</button>$0
+#t=Caption
+#g=caption
+<caption>$1</caption>$0
+#t=Citation
+#g=cite
+<cite>$1</cite>$0
+#t=Code
+#g=code
+<code>$1</code>$0
+#t=Definition
+#g=dfn
+<dfn>$1</dfn>$0
+#t=Definition Description
+#g=dd
+<dd>$1</dd>$0
+#t=Definition List
+#g=dl
+<dl>
+	$0
+</dl>
+#t=Definition Title
+#g=dt
+<dt>$1</dt>$0
+#t=Deleted Text
+#g=del
+<del cite="${2:example.htm}" datetime="${4:YYYYMMDD}">$5</del>$0
+#t=Div
+#g=div
+<div id="${1:test}" class=${2:"test"}>
+	$0
+</div>
+#t=Document Encoding (XML)
+#g=xmlenc
+<?xml version="1.0" encoding="${1:UTF-8}"?>$0
+#t=Dropdown List
+#g=select
+<select name="${1:test}">
+	$0
+</select>
+#t=Dropdown Option
+#g=option
+<option value="${1:val}" selected="${2:selected"}>$3</option>$0
+#t=Dropdown Option Chain
+#g=option
+</option>
+<option value="${1:val}" selected="${2:selected"}>$3</option>$0
+#t=Dropdown Option Group
+#g=optgroup
+<optgroup label="${1:Text Editors}">
+	$0
+</optgroup>
+#t=Emphasis
+#g=em
+<em>$1</em>$0
+#t=Fieldset
+#g=fieldset
+<fieldset>
+	$0
+</fieldset>
+#t=Form
+#g=form
+<form method="${1:post}" action="${2:testing.php}" id="${3:test"} name="$4">
+	$0
+</form>
+#t=Frame
+#g=frame
+<frame src="${1:example.htm}" id="${2:test"} name="$3" />
+#t=Frameset
+#g=frameset
+<frameset cols="${1:vals"} rows="${2:vals"}>
+	$0
+</frameset>
+#t=Head
+#g=head
+<head>
+	$0
+</head>
+#t=Heading
+#g=he
+<h${1:1}>$2</h$1>$0
+#t=Horizonal Rule
+#g=hr
+<hr />
+#t=HTML 4.0 Transitional
+#g=doctype
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+$0
+#t=HTML 4.01 Strict
+#g=doctype
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+$0
+#t=HTML Tag
+#g=html
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+$0
+</html>
+#t=Hyperlink
+#g=a
+<a href="${1:http://everedit.net/}" title="$2" target="${3:_blank"}>$4</a>$0
+#t=Image
+#g=img
+<img src="${1:images/testing.jpg}" width="$2" height="$4" alt="$5" />$0
+#t=Imagemap
+#g=map
+<map id="${1:test}" name="$2">
+	$0
+</map>
+#t=Imagemap Area
+#g=area
+<area shape="${1:rect}" coords="${2:0,0,10,10}" href="${3:example.htm}" target="${4:_blank}" alt="$6" />$0
+#t=Inline Frame
+#g=iframe
+<iframe src="${1:example.htm}" width="$2" height="$3" id="${4:test}" name="$5"></iframe>$0
+#t=Input
+#g=input
+<input type="${1:text}" name="${2:test}" value="$3" />$0
+#t=Inserted Text
+#g=ins
+<ins cite="$1" datetime="$2">$3</ins>$0
+#t=Italicized Text
+#g=i
+<i>$1</i>$0
+#t=Keyboard Text
+#g=kbd
+<kbd>$1</kbd>$0
+#t=Label
+#g=label
+<label for="${1:test}">$2</label>$0
+#t=Line Break
+#g=br
+<br />$0
+#t=Link
+#g=link
+<link rel="${1:stylesheet}" href="${2:print.css}" type="$3" media="$4"/>
+$0
+#t=List Item
+#g=li
+<li>$1</li>$0
+#t=List Item Chain
+#g=li
+<li>$1</li>$0
+#t=Mailto Link
+#g=email
+<a href="mailto:${1:test@example.com}">$2</a>$0
+#t=Meta (HTTP-Equiv)
+#g=meta
+<meta http-equiv="${1:Content-type}" content="${2:text/html}; charset=${3:UTF-8}" />
+$0
+#t=Meta (Name)
+#g=meta
+<meta name="${1:description}" content="${2:everedit}" />
+$0
+#t=Monospaced Text
+#g=tt
+<tt>$1</tt>$0
+#t=Named Anchor
+#g=anchor
+<a id="${1:test}" name="$1">$2</a>$0
+#t=No Frames
+#g=noframes
+<noframes>$1</noframes>$0
+#t=No Script
+#g=noscript
+<noscript>$1</noscript>$0
+#t=Object (Flash Movie)
+#g=objflash
+<object type="application/x-shockwave-flash" data="${1:c.swf?path=movie.swf}" width="${2:300}" height="${3:300}">
+	<param name="movie" value="$1" />
+</object>$0
+#t=Object (Quicktime Movie)
+#g=objqt
+<object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" width="${1:100}" height="${2:100}">
+	<param name="src" value="${3:test.mov}" />
+	<param name="controller" value="true" />
+	<object type="video/quicktime" data="$3" width="$1" height="$2" class="$4">
+		<param name="controller" value="true" />
+	</object>
+</object>$0
+#t=Ordered List
+#g=ol
+<ol>
+	$0
+</ol>
+#t=Paragraph
+#g=p
+<p>$0</p>
+#t=Parameter
+#g=param
+<param name="${1:test}" value="${2:val}" />$0
+#t=Preformatted Text
+#g=pre
+<pre>$1</pre>$0
+#t=Quotation
+#g=q
+<q>$1</q>$0
+#t=Sample Code
+#g=samp
+<samp>$1</samp>$0
+#t=Script
+#g=script
+<script type="${1:text/javascript}">
+	$0
+</script>
+#t=Script (External file)
+#g=scriptx
+<script type="${1:text/javascript}" src="${2:js/application.js}"></script>
+$0
+#t=Small Text
+#g=small
+<small>$1</small>$0
+#t=Span
+#g=span
+<span class="${1:test}">$2</span>$0
+#t=Strong Emphasis
+#g=strong
+<strong>$1</strong>$0
+#t=Style
+#g=style
+<style type="text/css" media="${1:screen}" id="${2:test}">
+	$0
+</style>
+#t=Style (External file)
+#g=stylex
+<style type="text/css" media="${1:screen}">@import url('${3:style.css}');</style>
+$0
+#t=Style (XML)
+#g=stylex
+<?xml-stylesheet href="${1:example.css}" type="text/css"?>
+$0
+#t=Subscript
+#g=sub
+<sub>$1</sub>$0
+#t=Superscript
+#g=sup
+<sup>$1</sup>$0
+#t=Table
+#g=table
+<table>
+	$0
+</table>
+#t=Table Body
+#g=tbody
+<tbody>
+	$0
+</tbody>
+#t=Table Cell
+#g=td
+<td>$1</td>$0
+#t=Table Column
+#g=col
+<col col="${1:20}">$2</col>$0
+#t=Table Column Group
+#g=colgroup
+<colgroup span="${1:2}">
+	$0
+</colgroup>
+#t=Table Footer
+#g=tfoot
+<tfoot>
+	$0
+</tfoot>
+#t=Table Header
+#g=thead
+<thead>
+	$0
+</thead>
+#t=Table Header Cell
+#g=th
+<th>$1</th>$0
+#t=Table Row
+#g=tr
+<tr>
+	$0
+</tr>
+#t=Text Direction
+#g=bdo
+<bdo dir="${1:rtl}">$0</bdo>
+#t=Textarea
+#g=textarea
+<textarea name="${1:test}" rows="${2:10}" cols="${3:10}">
+	$0
+</textarea>
+#t=Title
+#g=title
+<title>${1:Untitled Page}</title>
+$0
+#t=Unordered List
+#g=ul
+<ul>
+	$0
+</ul>
+#t=Variable
+#g=var
+<var>$1</var>$0
+#t=XHTML 1.0 Frameset
+#g=doctype
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+$0
+#t=XHTML 1.0 Strict
+#g=doctype
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+$0
+#t=XHTML 1.0 Transitional
+#g=doctype
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+$0
+#t=XHTML 1.1
+#g=doctype
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+ "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+$0

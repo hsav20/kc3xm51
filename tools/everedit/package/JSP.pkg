@@ -1,0 +1,15 @@
+[Syntax]
+File=jsp.mac
+Ext=jsp
+Mode=HTML
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=0
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=JSP
+ParseMax=0

@@ -1,0 +1,25 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Snippet
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/08/15 Create
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set sp=CreateParser()
+
+Set rComment=sp.CreateRegion(COLOR_COMMENT1, "^\s*;", "$", True )
+Set iKey=sp.CreateItem( COLOR_CONCEAL, "^\[(.+?)\]$", False )
+iKey.Capture 1, COLOR_WORD2
+
+Set iVar=sp.CreateItem( COLOR_WORD1, "\$\{\d:.*?\}", False )
+Set iRef=sp.CreateItem( COLOR_WORD3, "\$\d", False )
+
+sp.AddRegion( rComment )
+sp.AddItem( iKey )
+sp.AddItem( iVar )
+sp.AddItem( iRef )
+sp.SetPairs( "[]''""""{}()" )
+
+sp.CommentLine ";"

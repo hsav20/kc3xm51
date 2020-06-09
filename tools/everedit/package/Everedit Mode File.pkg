@@ -1,0 +1,15 @@
+[Syntax]
+File=ini.mac
+Ext=esm
+Mode=Everedit
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=0
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=Everedit Mode File
+ParseMax=0

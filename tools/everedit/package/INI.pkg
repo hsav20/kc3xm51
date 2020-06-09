@@ -1,0 +1,15 @@
+[Syntax]
+File=ini.mac
+Ext=ini;lng
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=INI
+ParseMax=0
