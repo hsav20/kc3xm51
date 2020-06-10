@@ -11,7 +11,8 @@ typedef enum {
 	KCM_BPS_RATE = 0x07,				// 采样频率及码流率指示
 	KCM_VOLUME_MUTE = 0x08,				// 音频静音及音量加减控制
 	KCM_TEST_TONE = 0x09,				// 噪音测试
-	KCM_WIFI_STATUS = 0x0e,				// WIFI状态指示
+	KCM_WIFI_STATUS = 0x0d,				// WIFI状态指示
+	KCM_PLAY_STATUS	= 0x0e,				// 多媒体文件播放状态指示
 	KCM_PLAY_OPERATE = 0x0f,			// 控制多媒体文件播放模式
 	KCM_PLAY_INDEX = 0x10,				// 控制多媒体文件播放编号，16位寄存器
 	KCM_PLAY_TIME = 0x12,				// 读取多媒体文件正在播放的时间，16位寄存器
@@ -75,7 +76,8 @@ typedef enum {
 	KCM_IRQ_SRC_VALID = 0x0008,        	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
 
 	KCM_IRQ_FIRMWARE = 0x0010,        	// 固件更新，需要读取"KCM_RD_INFO"寄存器
-	KCM_IRQ_MEDIA_TIME = 0x0020,        // 多媒体播放时间改变，需要读取"KCM_PLAY_TIME"寄存器
+	KCM_IRQ_PLAY_STATUS = 0x0020,       // 多媒体文件播放状态改变，需要读取"KCM_PLAY_STATUS	"寄存器
+	KCM_IRQ_PLAY_TIME = 0x0040,        	// 多媒体播放时间改变，需要读取"KCM_PLAY_TIME"寄存器
 
 	KCM_IRQ_WIFI_RCV = 0x0100,          // 接收到WIFI指令中断，需要读取"KCM_COMMAND_RCV"寄存器获取更新的音量值
 	KCM_IRQ_WIFI_STATUS = 0x0200,		// WIFI状态指示变化扩展中断，需要读取"KCM_WIFI_STATUS"寄存器

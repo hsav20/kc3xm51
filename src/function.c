@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
-// http://www,hsav.com/download/kc3xm51.zip
+// http://www.hsav.com/download/kc3xm51.zip
 
 
 #include "main.h"           
@@ -57,23 +57,23 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
                 g2TimeLength = MKCM_Read2Byte(KCM_RD_FILE_TIME);
             }
 		}
-		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            // 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
+		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
             MKCM_ReadSrcValid();
 		}
-		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               // 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
+		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
 			gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);     // 读取当前音量值
 			if (gDIP_MenuSelect == cMenu_MasterVolume){
 				MDIP_MenuSelect(cMenu_MasterVolume, 0);
 			}
 		}
-        if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             // 固件更新，需要读取"KCM_RD_INFO"寄存器
+        if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             	// 固件更新，需要读取"KCM_RD_INFO"寄存器
             MDIP_MenuSelect(cMenu_Fireware, MENU_NORMAL);
         }
-        if ((gLocal_1 & KCM_IRQ_MEDIA_TIME) > 0){           // 多媒体播放时间改变
+        if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           		// 多媒体播放时间改变
             g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
-            if (g2PlayTime){                                // 播放时间改变 
+            if (g2PlayTime){                                	// 播放时间改变 
                 MDIP_MenuSelect(cMenu_PlayTime, MENU_NORMAL);
-            }else {                                         // 播放完成了
+            }else {                                         	// 播放完成了
                 WORD g2Local_1 = (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty;
                 if (++g2PlayIndex >= g2Local_1){
                     g2PlayIndex = 0;
@@ -81,6 +81,10 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
                 MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放g2PlayIndex
                 MDIP_MenuSelect(cMenu_PlayTrack, MENU_NORMAL);
             }
+        }
+        if ((gLocal_1 & KCM_IRQ_PLAY_STATUS) > 0){           // 多媒体文件播放状态改变
+        	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATUS);     // 读取多媒体文件播放状态
+        	MLOG("KCM_PLAY_STATUS %02x\r\n", (u32)gLocal_1);
         }
 		if ((gLocal_1 & KCM_IRQ_WIFI_RCV) > 0){
 		    WORD g2Local_1 = MKCM_Read2Byte(KCM_COMMAND_RCV);

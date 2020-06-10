@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
-// http://www,hsav.com/download/kc3xm51.zip
+// http://www.hsav.com/download/kc3xm51.zip
 
 
 
