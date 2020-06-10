@@ -603,73 +603,6 @@ void MDIP_SurroundMode(BYTE index, MENU_MODE mode){
     }
 	MDIP_SurroundSymbol();
 }
-void MDIP_SurroundSymbol(){
-    BYTE surround = gDIP_Select2Ch ? gDIP_Surround[0] : (2 + gDIP_Surround[1]);
-	//g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);	
-    DIP_SURROUND_OFF();
-	switch (surround){
-	case cDIP_SURR_STEREO :
-	case cDIP_SURR_ST_SW :
-		g2DIP_ShowBuffer[6] |= 0x0001;	
-		break;
-	case cDIP_SURR_MODE1 :
-		g2DIP_ShowBuffer[6] |= 0x0002;	
-		break;
-	case cDIP_SURR_MODE2 :
-		g2DIP_ShowBuffer[6] |= 0x0080;	
-		break;
-	case cDIP_SURR_MODE3 :
-		g2DIP_ShowBuffer[6] |= 0x0040;	
-		break;
-	case cDIP_SURR_MODE4 :
-		g2DIP_ShowBuffer[6] |= 0x0010;	
-		break;
-	}
-	FDIP_ScreenUpdata = 1;
-}
-void MDIP_SrcFormatSymbol(){
-	DIP_SRC_FORMAT_OFF();
-	//g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);	
-	// 新[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:云  B4:DSP B3:ATMOS B2:DD  B1:AUTO B0:ST
-	// 旧[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:云   B9:PAUSE B8:PLAY B7:RPALL    B6:RP1   B5:DTS B4:DD  B3:AUTO  B2:DSP B1:PLII B0:ST
-	
-//MDEBUG(0xa9);MDEBUG(gSYS_ModelType);MDEBUG(gAUD_SrcFormat);
-	switch (gAUD_SrcFormat & 0x0f){
-	case KCM_SRC_PCM :
-		if (gSYS_ModelType != KCM_MODEL_35H && gSYS_ModelType != KCM_MODEL_36H){
-			g2DIP_ShowBuffer[6] |= 0x0400;	
-		}
-		break;
-	case KCM_SRC_AC3 :                                      // 输入AC-3信号
-	case KCM_SRC_E_AC3 :                                    // 输入Enhanced AC-3信号
-	case KCM_SRC_AC3_HD :                                   // 输入杜比TRUE HD信号    
-		g2DIP_ShowBuffer[6] |= 0x0004;	
-		break;
-	case KCM_SRC_DTS :                                      // 输入DTS信号
-    case KCM_SRC_DTS_CD:				                    // 输入DTS CD信号
-    case KCM_SRC_DTS_ES:				                    // 输入DTS Extended Surround信号
-    case KCM_SRC_DTS_HRA:				                    // 输入DTS HD High Resolution Audio信号
-    case KCM_SRC_DTS_MA:				                    // 输入DTS HD Master Audio信号
-		g2DIP_ShowBuffer[6] |= 0x0100;	
-		break;
-	case KCM_SRC_LPCM :
-		g2DIP_ShowBuffer[6] |= 0x0400;	
-		break;
-	}
-	FDIP_ScreenUpdata = 1;
-}
-void MDIP_WifiSymbol(BYTE turnOn){
-	if (turnOn == 0xff){
-		turnOn = (MKCM_ReadRegister(KCM_WIFI_STATUS) & 0x80) ? 1 : 0;
-	}
-	if (turnOn){
-		g2DIP_ShowBuffer[6] |= 0x0800;	
-	}
-	else {
-		g2DIP_ShowBuffer[6] &= ~0x0800;	
-	}
-	FDIP_ScreenUpdata = 1;
-}
 
 CONST_CHAR Tab_DIP_SRC_CH[] = {
 	"2/01/02/03/02/13/12/23/23/33/42/32/4"
@@ -744,14 +677,14 @@ void MDIP_SoundEffect(BYTE mode){
 }
 void MDIP_NightMode(){
 	BYTE gLocal_1 = MKCM_ReadRegister(KCM_DYN_COMPRES);
-MDEBUG(0xd1);MDEBUG(gLocal_1);
+
 	if (gDIP_MenuSelect == cMenu_NightMode){	
 		if (gLocal_1 < 50){                                 
             gLocal_1 = 50;                                  // 50%
         }else {
 			gLocal_1 = 0;                                   // 0%
 		}
-MDEBUG(0xd2);MDEBUG(gLocal_1);
+
 		MKCM_WriteRegister(KCM_DYN_COMPRES, gLocal_1); 
 	}
 	if (gLocal_1){
@@ -859,6 +792,77 @@ void MDIP_AdjDelayTime(BYTE index, BYTE mode){				// 0=LINSYNC 1前置 2中置 3环绕
 		}
 	}
 //MDEBUG(0xc7);MDEBUG(index);MDEBUG(gDIP_DelayTime[index]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MDIP_SurroundSymbol(){
+    BYTE surround = gDIP_Select2Ch ? gDIP_Surround[0] : (2 + gDIP_Surround[1]);
+	//g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);	
+    DIP_SURROUND_OFF();
+	switch (surround){
+	case cDIP_SURR_STEREO :
+	case cDIP_SURR_ST_SW :
+		g2DIP_ShowBuffer[6] |= 0x0001;	
+		break;
+	case cDIP_SURR_MODE1 :
+		g2DIP_ShowBuffer[6] |= 0x0002;	
+		break;
+	case cDIP_SURR_MODE2 :
+		g2DIP_ShowBuffer[6] |= 0x0080;	
+		break;
+	case cDIP_SURR_MODE3 :
+		g2DIP_ShowBuffer[6] |= 0x0040;	
+		break;
+	case cDIP_SURR_MODE4 :
+		g2DIP_ShowBuffer[6] |= 0x0010;	
+		break;
+	}
+	FDIP_ScreenUpdata = 1;
+}
+void MDIP_SrcFormatSymbol(){
+	DIP_SRC_FORMAT_OFF();
+	//g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);	
+	// 新[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:云  B4:DSP B3:ATMOS B2:DD  B1:AUTO B0:ST
+	// 旧[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:云   B9:PAUSE B8:PLAY B7:RPALL    B6:RP1   B5:DTS B4:DD  B3:AUTO  B2:DSP B1:PLII B0:ST
+	
+//MDEBUG(0xa9);MDEBUG(gSYS_ModelType);MDEBUG(gAUD_SrcFormat);
+	switch (gAUD_SrcFormat & 0x0f){
+	case KCM_SRC_PCM :
+		if (gSYS_ModelType != KCM_MODEL_35H && gSYS_ModelType != KCM_MODEL_36H){
+			g2DIP_ShowBuffer[6] |= 0x0400;	
+		}
+		break;
+	case KCM_SRC_AC3 :                                      // 输入AC-3信号
+	case KCM_SRC_E_AC3 :                                    // 输入Enhanced AC-3信号
+	case KCM_SRC_AC3_HD :                                   // 输入杜比TRUE HD信号    
+		g2DIP_ShowBuffer[6] |= 0x0004;	
+		break;
+	case KCM_SRC_DTS :                                      // 输入DTS信号
+    case KCM_SRC_DTS_CD:				                    // 输入DTS CD信号
+    case KCM_SRC_DTS_ES:				                    // 输入DTS Extended Surround信号
+    case KCM_SRC_DTS_HRA:				                    // 输入DTS HD High Resolution Audio信号
+    case KCM_SRC_DTS_MA:				                    // 输入DTS HD Master Audio信号
+		g2DIP_ShowBuffer[6] |= 0x0100;	
+		break;
+	case KCM_SRC_LPCM :
+		g2DIP_ShowBuffer[6] |= 0x0400;	
+		break;
+	}
+	FDIP_ScreenUpdata = 1;
+}
+void MDIP_WifiSymbol(BYTE turnOn){
+	if (turnOn == 0xff){
+		turnOn = (MKCM_ReadRegister(KCM_WIFI_STATUS) & 0x80) ? 1 : 0;
+	}
+	if (turnOn){
+		g2DIP_ShowBuffer[6] |= 0x0800;	
+	}
+	else {
+		g2DIP_ShowBuffer[6] &= ~0x0800;	
+	}
+	FDIP_ScreenUpdata = 1;
 }
 
 void MDIP_WriteString(char* string){

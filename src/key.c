@@ -272,6 +272,8 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				MDIP_ScreenFill(0xff);	
 				MDIP_ScreenUpdata();
 			}else {
+				MDIP_SurroundSymbol();
+				MDIP_SrcFormatSymbol();
 				MDIP_MenuSelect(cMenu_Restore, 0);
 			}
 			break;
