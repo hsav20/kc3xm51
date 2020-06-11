@@ -1,9 +1,7 @@
-
 @echo off
 if not exist build md build
 if not exist release md release
 cd build
-
 
 copy ..\src\main.h > error.h
 copy ..\src\const.h > error.h
