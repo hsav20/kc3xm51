@@ -7,11 +7,12 @@
 
 
 
-#### 自带WINDOWS使用的实用开始工具
+#### 自带WINDOWS使用的实用开发工具
 
 1.  编译器，精简过的C51v6.14，只保留必要的a51、c51、bl51、oh51、库及c51tiny.h.c文件，其中MLOG为我们开源的微型打印函数，辅助快速显示需要的信息到电脑。
-2.  编辑器，阅读、编辑c文件时语法高亮，主题可以选择我们加入的Grey比较愉眼，推荐使用[EverEdit，专为国人设计的文本编辑器](http://www.everedit.cn/)
+2.  编辑器，阅读、编辑c文件时语法高亮，推荐使用[EverEdit，专为国人设计的文本编辑器](http://www.everedit.cn/)，可以选择我们加入的Grey主题，灰色相对比较悦眼的。
 3.  下载器，STC-ISP下载编程烧录软件，官方当前版本为[stc-isp-15xx-v6.87C.exe](http://www.stcmcudata.com/STCISP/stc-isp-15xx-v6.87C.zip)
+
 
 
 #### src文件简介
@@ -31,8 +32,9 @@
 
 1.  git托管 [开源软件 - 码云 Gitee.com](https://gitee.com/hsav20/kc3xm51.git)
 2.  git托管 [GitHub全球化面向开源及私有软件项目的托管平台](https://github.com/hsav20/kc3xm51.git)
-3.  zip下载 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
-4.  开发套件购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
-5.  KC35H购买 [深圳市酷唱科技有限公司淘宝店](http://www.hsav.com/download/kc3xm51.zip)
-6.  KC32C购买 [深圳市酷唱科技有限公司淘宝店](http://www.hsav.com/download/kc3xm51.zip)
+3.  [深圳市酷唱科技有限公司官网](http://www.hsav.com)
+4.  KC35H开发套件购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.14.10985eb77U6TnR&id=557018055656)
+5.  KC35H模块购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.14.10985eb77U6TnR&id=557018055656)
+4.  KC32C开发套件购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.17.10985eb77U6TnR&id=561816884208)
+6.  KC32C模块购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.23.10985eb77U6TnR&id=561815656501)
 
