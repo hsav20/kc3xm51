@@ -33,7 +33,7 @@
 1.  git托管 [开源软件 - 码云 Gitee.com](https://gitee.com/hsav20/kc3xm51.git)
 2.  git托管 [GitHub全球化面向开源及私有软件项目的托管平台](https://github.com/hsav20/kc3xm51.git)
 3.  [深圳市酷唱科技有限公司官网](http://www.hsav.com)
-4.  KC35H开发套件购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.14.10985eb77U6TnR&id=557018055656)
+4.  KC35H开发套件购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.11.10985eb77U6TnR&id=556783451230)
 5.  KC35H模块购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.14.10985eb77U6TnR&id=557018055656)
 4.  KC32C开发套件购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.17.10985eb77U6TnR&id=561816884208)
 6.  KC32C模块购买 [酷唱科技淘宝店](https://item.taobao.com/item.htm?spm=a1z10.5-c.w4002-2815925483.23.10985eb77U6TnR&id=561815656501)
