@@ -41,7 +41,6 @@ if errorlevel 1 goto ERR_COMP
 
 copy kc3xm51.hex ..\release > error.h
 
-echo 生成kc3xm51.hex成功！
 dir ..\Release\kc3xm51.hex
 goto ALL_DONE
 
