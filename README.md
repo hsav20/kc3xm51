@@ -33,6 +33,6 @@
 2.  git托管 [GitHub全球化面向开源及私有软件项目的托管平台](https://github.com/hsav20/kc3xm51.git)
 3.  zip下载 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
 4.  开发套件购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
-5.  KC35H购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
-6.  KC32C购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
+5.  KC35H购买 [深圳市酷唱科技有限公司淘宝店](http://www.hsav.com/download/kc3xm51.zip)
+6.  KC32C购买 [深圳市酷唱科技有限公司淘宝店](http://www.hsav.com/download/kc3xm51.zip)
 
