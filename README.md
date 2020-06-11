@@ -6,11 +6,13 @@
 开发包包含使用windows电脑全部开发工具，包括C51精简版编译器，可以运行批处理直接生成所需要的*.hex文件，用于下载程序的STC工具，可以下载及通过同一个串口直接打印调试的信息。还有一个国产非常实用的语言编辑工具EverEdit，专为国人设计的文本编辑器。
 
 
-#### WINDOSW使用的实用工具
+
+#### 自带WINDOWS使用的实用开始工具
 
 1.  编译器，精简过的C51v6.14，只保留必要的a51、c51、bl51、oh51、库及c51tiny.h.c文件，其中MLOG为我们开源的微型打印函数，辅助快速显示需要的信息到电脑。
 2.  编辑器，阅读、编辑c文件时语法高亮，主题可以选择我们加入的Grey比较愉眼，推荐使用[EverEdit，专为国人设计的文本编辑器](http://www.everedit.cn/)
 3.  下载器，STC-ISP下载编程烧录软件，官方当前版本为[stc-isp-15xx-v6.87C.exe](http://www.stcmcudata.com/STCISP/stc-isp-15xx-v6.87C.zip)
+
 
 #### src文件简介
 
@@ -23,9 +25,14 @@
 7.  主函数main.h及main.c
 8.  C51编译链接脚本文件main.lin
 
-#### 下载地址
 
-1.  [开源软件 - 码云 Gitee.com](https://gitee.com/hsav20/kc3xm51.git)
-2.  [GitHub全球化面向开源及私有软件项目的托管平台](https://github.com/hsav20/kc3xm51.git)
-3.  [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
+
+#### 下载及购买地址
+
+1.  git托管 [开源软件 - 码云 Gitee.com](https://gitee.com/hsav20/kc3xm51.git)
+2.  git托管 [GitHub全球化面向开源及私有软件项目的托管平台](https://github.com/hsav20/kc3xm51.git)
+3.  zip下载 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
+4.  开发套件购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
+5.  KC35H购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
+6.  KC32C购买 [深圳市酷唱科技有限公司官网](http://www.hsav.com/download/kc3xm51.zip)
 
