@@ -89,21 +89,17 @@ void MKCM_ReadXByte(										// Read buffer from DA32C. 读取多个字节
 					BYTE* out_data){      					// Buffer 数据缓冲
 	MI2C_Bus_Start();										// I2C Start
 	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
-//	if (!FKCM_I2C_Error){
-		MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
-	//	MI2C_Bus_Stop();										// I2C Stop
-	//	MUSDELAY(10);											// delay 10us
+	MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
 
-		MI2C_Bus_Start();									// I2C Start
-		MI2C_Bus_Write(cI2C_ADDRESS+1);						// KCM I2C read address
-		if (length > 1){									// 防止只有一次时g2Local_1变为0产生跨界错误
-			length = length - 1;							// Counter. 做少一次，最后的字节使用MI2C_Bus_Read(1);
-		}
-		do {													
-		    *out_data++ = MI2C_Bus_Read(0);					// Read 1 byte 
-		} while (--length != 0);
-	    *out_data = MI2C_Bus_Read(1);						// Read last byte 
-//	}
+	MI2C_Bus_Start();									// I2C Start
+	MI2C_Bus_Write(cI2C_ADDRESS+1);						// KCM I2C read address
+	if (length > 1){									// 防止只有一次时g2Local_1变为0产生跨界错误
+		length = length - 1;							// Counter. 做少一次，最后的字节使用MI2C_Bus_Read(1);
+	}
+	do {													
+	    *out_data++ = MI2C_Bus_Read(0);					// Read 1 byte 
+	} while (--length != 0);
+    *out_data = MI2C_Bus_Read(1);						// Read last byte 
 	MI2C_Bus_Stop();										// I2C Stop
 	return;
 }
@@ -131,7 +127,6 @@ void MI2C_Bus_Write(BYTE gLocal_1){      					// 往I2C总线写入一个字节，gLocal为
     MI2C_100K_DELAY();										// 按照100Kbps的标准延时，以确保状态稳定
     HAL_KCM_I2C_SCL(1);										// 置高I2C时钟线
     MI2C_100K_DELAY();										// 按照100Kbps的标准延时，以确保状态稳定
-	FKCM_I2C_Error = 0;                                     // ACK标志表示成功
     if ((HAL_KCM_I2C_IN_SDA())){							// 高为NAK
         FKCM_I2C_Error = 1;                                 // NAK标志表示从机没有应答，可能是硬件故障
     }
@@ -173,6 +168,10 @@ void MI2C_Bus_Start(){  									// I2C总线开始
     HAL_KCM_I2C_SDA(1);                   					// 置高数据线，数据线空闲
     HAL_KCM_I2C_SCL(1);                   					// 置高时钟线，时钟线空闲
     MI2C_100K_DELAY();										// 按照100Kbps的标准延时，以确保状态稳定
+	FKCM_I2C_Error = 0;                                     // 假定是正确的
+    if (!(HAL_KCM_I2C_IN_SDA())){							// 如果为低，可能硬件出了问题
+	    FKCM_I2C_Error = 1;                                 // 出错了
+    }
     HAL_KCM_I2C_SDA(0);										// 数据线在时钟为高电平时由高电平向低电平切换表示开始
     MI2C_100K_DELAY();										// 按照100Kbps的标准延时，以确保状态稳定
     HAL_KCM_I2C_SCL(0);										// 置低时钟线，准备接收或发送数据

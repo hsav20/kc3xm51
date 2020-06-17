@@ -16,10 +16,6 @@ void MKCM_SetPowerOn(){ 									// KCM¿ª»ú
 	MKCM_WriteRegister(KCM_POWER_ON, 1);
     MDIP_MenuSelect(cMenu_PowerOn, MENU_NORMAL);
 	gDIP_MenuLock = 100;									// ÔÝÊ±Ëø¶¨ÏÔÊ¾10Ãë
-	gAUD_SrcFormat = 0;
-    gAUD_BpsRate = 0;
-    g2SUB_SrcValid = 0;
-    gSUB_SrcAuto = INPUT_SWITCH_NONE;                       // ×Ô¶¯Ñ¡ÔñÊ§Ð§
     MLOG("KCM_POWER_ON\r\n");
 }	  
 
@@ -30,18 +26,21 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	    BYTE gLocal_1;
 	    BYTE gLocal_2;
 
-		gLocal_1 = MKCM_ReadRegister(KCM_READ_IRQ);				// Read interrupt ¶ÁÈ¡KCMÖÐ¶Ï
-		MKCM_WriteRegister(KCM_CLEAR_IRQ, gLocal_1);  			// Clear interrupt Çå³ýÏàÓ¦µÄÖÐ¶Ï
+		gLocal_1 = MKCM_ReadRegister(KCM_READ_IRQ);			// Read interrupt ¶ÁÈ¡KCMÖÐ¶Ï
+		MKCM_WriteRegister(KCM_CLEAR_IRQ, gLocal_1);  		// Clear interrupt Çå³ýÏàÓ¦µÄÖÐ¶Ï
 		if (FKCM_I2C_Error){
             MLOG("KCM_READ_IRQ Error\r\n");
 			return;
 		}
-        MLOG("KCM_CLEAR_IRQ %02x\r\n", (u32)gLocal_1);
+		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// ²»ÊÇ¶àÃ½Ìå²¥·ÅÊ±¼ä¸Ä±ä
+        	MLOG("KCM_READ_IRQ %02x\r\n", (u32)gLocal_1);
+		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// Ä£Ê½³õÊ¼»¯Íê³ÉÖÐ¶Ï£¬ÐèÒªÐ´Èë"KCM_POWER_ON"¼Ä´æÆ÷£¬
             MKCM_RestoreMemory();
 		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // ÊýÂëÐÅºÅÊäÈë¸ñÊ½¸Ä±äÖÐ¶Ï£¬ÐèÒª¶ÁÈ¡"KCM_SRC_FORMAT"¼Ä´æÆ÷
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
+			//MLOG("gAUD_SrcFormat %02x\r\n", (u32)gAUD_SrcFormat);
             gAUD_BpsRate = MKCM_ReadRegister(KCM_BPS_RATE);
 			if (gDIP_MenuLock == 0){						// 
 				if (!FSYS_TestTone){						// Ã»ÓÐ´ò¿ªÔëÒô²âÊÔ
@@ -72,19 +71,17 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
         if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           		// ¶àÃ½Ìå²¥·ÅÊ±¼ä¸Ä±ä
             g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
             if (g2PlayTime){                                	// ²¥·ÅÊ±¼ä¸Ä±ä 
-                MDIP_MenuSelect(cMenu_PlayTime, MENU_NORMAL);
+				if (gDIP_MenuSelect != cMenu_InputSource){
+	                MDIP_MenuSelect(cMenu_PlayTime, MENU_NORMAL);
+				}
             }else {                                         	// ²¥·ÅÍê³ÉÁË
-                WORD g2Local_1 = (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty;
-                if (++g2PlayIndex >= g2Local_1){
-                    g2PlayIndex = 0;
-                }
-                MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // ²¥·Åg2PlayIndex
                 MDIP_MenuSelect(cMenu_PlayTrack, MENU_NORMAL);
             }
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_STATUS) > 0){           // ¶àÃ½ÌåÎÄ¼þ²¥·Å×´Ì¬¸Ä±ä
         	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATUS);     // ¶ÁÈ¡¶àÃ½ÌåÎÄ¼þ²¥·Å×´Ì¬
-        	MLOG("KCM_PLAY_STATUS %02x\r\n", (u32)gLocal_1);
+			MLOG("KCM_IRQ_PLAY_STATUS %02x\r\n", (u32)gPlayStatus);
+        	MDIP_PlaySymbol(gPlayStatus);
         }
 		if ((gLocal_1 & KCM_IRQ_WIFI_RCV) > 0){
 		    WORD g2Local_1 = MKCM_Read2Byte(KCM_COMMAND_RCV);
@@ -153,7 +150,7 @@ void MKCM_RestoreMemory(){ 									// ¿ª»ú£¬´ÓKCMÖ®ÖÐ»Ö¸´¼ÇÒä
 	// ÊäÈë¶Ë¿ÚÑ¡Ôñ£ºÊ¹ÓÃKCM_INPUT¼Ä´æÆ÷µÄ¼ÇÒäÖµ
 	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// ¼ÇÒäµÄÊäÈë¶Ë¿ÚÑ¡Ôñ
 	if (FKCM_I2C_Error){									// ¶ÁÈ¡KCM³ö´í
-		MDIP_MenuSelect(cMenu_Restore, 0);
+		MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
 		return;
 	}
 	gSYS_ModelType = MKCM_ReadRegister(KCM_RD_INFO);
@@ -235,15 +232,23 @@ void MKCM_RestoreMemory(){ 									// ¿ª»ú£¬´ÓKCMÖ®ÖÐ»Ö¸´¼ÇÒä
     }
     MKCM_WriteXByte(KCM_WR_SPECTRUM, sizeof(TabSpectrum), TabSpectrum);   // ÉèÖÃÆµÆ×Ä£Ê½
 
+	// Çå³ýÒ»Ð©ÉÏµçÐèÒªÈ·¶¨ÖµµÄ±äÁ¿¼°±êÖ¾
+	gAUD_SrcFormat = 0;
+    gAUD_BpsRate = 0;
+    gPlayStatus = 0;
+    g2SUB_SrcValid = 0;
+    gSUB_SrcAuto = INPUT_SWITCH_NONE;                       // ×Ô¶¯Ñ¡ÔñÊ§Ð§
     g2SUB_SrcValid = 0;                                     // ÖØÐÂ¿ªÊ¼¼ì²â
 	FSYS_Standby = 0;
 	FSYS_TestTone = 0;
 	FSYS_MuteEnable = 0;
+
     MDIP_MenuSelect(cMenu_PowerOn, 0);
 	gDIP_MenuLock = 10;										// ¿ÉÒÔÍË³öÔÝÊ±Ëø¶¨ÏÔÊ¾ÁË
     MDIP_SurroundSymbol();
     MDIP_SrcFormatSymbol();
 	MDIP_WifiSymbol(0xff);	    	 
+	MDIP_PlaySymbol(gPlayStatus);
     return;
 }
 
@@ -338,6 +343,7 @@ char MKCM_SdUdiskInsert(WORD flag, WORD g2Local_1){         // ¼ì²éSD/UÅÌ²åÈë£¬Ó
                 }
                 MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
                 g2PlayIndex = 0;
+g2PlayIndex = 15;                
                 MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // ²¥·ÅµÚ0Ê×
             }else {
                 MDIP_MenuSelect((flag == KCM_SRC_VALID_SD) ? cMenu_SdInsert : cMenu_UDiskInsert, 0);     // ÏÔÊ¾SD/UÅÌ²åÈë
@@ -355,6 +361,7 @@ char MKCM_SdUdiskRemove(WORD flag, WORD g2Local_1){         // ¼ì²éSD/UÅÌ°Î³ö£¬Ó
             }else {
                 g2UDiskQty = 0;
             }
+            MDIP_PlaySymbol(0);
             if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // ²»ÊÇ×Ô¶¯Ñ¡ÔñÊ§Ð§
                 MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  // »Ö¸´Ô­À´µÄÊäÈë
             }else {
@@ -406,7 +413,7 @@ void MKCM_WifiCommand(BYTE regNumber, BYTE value){		// ÊÕµ½Ô¶³ÌAPPµÄÖ¸Áî
 		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// Í¨¹ý¼Ä´æÆ÷·´Ïò½«Ñ¡ÔñµÄÊýÖµ»Ö¸´
 		MAUD_AutoCanclMute();
 		MAUD_AutoCanclTestTone();
-		MDIP_MenuSelect(cMenu_Restore, 0);
+		MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
 		break;
 	}
 }

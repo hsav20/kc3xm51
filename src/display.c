@@ -39,6 +39,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
     	FDIP_ScreenUpdata = 0;
     	MDIP_ScreenUpdata();
 	}
+
 	if ((baseTimer & 0x02) > 0){ 							// 100ms
 		if (gSYS_WifiCommand){
 			if (--gSYS_WifiCommand == 0){
@@ -55,10 +56,10 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if (FSYS_MuteEnable && (gDIP_MenuTimer == 0)){
 			MDIP_MenuSelect(cMenu_AudioMute, 0);
 		}
-		if (!FSYS_Standby && gDIP_MenuTimer){
-			if (--gDIP_MenuTimer == 0) {
+		if (!FSYS_Standby && gDIP_MenuTimer){				// 100ms如果菜单打开
+			if (--gDIP_MenuTimer == 0) {					// 菜单计时	
             	if (!FSYS_TestTone){
-					MDIP_MenuSelect(cMenu_Restore, 0);
+					MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
 				}
 				else {                                      // 测试噪音打开之中
 					BYTE channel = MDIP_GetNextChannel(gDIP_MenuSelect - cMenu_TToneFL);
@@ -74,10 +75,11 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				}
 			}
         }
-		if (!FSYS_Standby && !FSYS_MuteEnable && !FSYS_TestTone && FDIP_FreqSymbol && gAUD_SrcFormat > KCM_SRC_NOS){
+		if (!FSYS_Standby && !FSYS_MuteEnable && !FSYS_TestTone && FDIP_FreqSymbol && ((gAUD_SrcFormat & 0x0f) >= KCM_SRC_NOS)){
             MDIP_ReadSpectrum();
+		}else {
+//		MLOG("FSYS_TestTone:%d %d\r\n", (u32)FSYS_TestTone, (u32)FSYS_TestTone);
 		}
-
 	}
     return;
 }
@@ -96,7 +98,11 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// 菜单选择
 	switch (index){
 	case cMenu_Restore:
 		if (!FKCM_I2C_Error){
-			MDIP_InputSource();
+			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+				MDIP_PlayTime();
+			}else {
+				MDIP_InputSource();
+			}
 		}
 		else {
 			MDIP_WriteString("KCM-NO");
@@ -164,8 +170,8 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// 菜单选择
         MDIP_PlayTrack();
 		break;
     case cMenu_PlayTime:                                   // 显示多媒体播放时间
-		gDIP_MenuTimer = 20;
         MDIP_PlayTime();
+        FDIP_FreqSymbol = 1;								// 需要这个标志才可以显示频谱
 		break;
 
 
@@ -743,7 +749,6 @@ void MDIP_PlayTime(){
             }
         }
     }
-    gDIP_MenuTimer = 10;
 	MDIP_WriteString("  ");
     MDIP_Write2Digit(2, g2PlayTime/60);
     MDIP_Write2Digit(4, g2PlayTime%60);
@@ -849,6 +854,24 @@ void MDIP_SrcFormatSymbol(){
 	case KCM_SRC_LPCM :
 		g2DIP_ShowBuffer[6] |= 0x0400;	
 		break;
+	}
+	FDIP_ScreenUpdata = 1;
+}
+void MDIP_PlaySymbol(BYTE status){
+	BYTE flag = status & 0x03;
+//	MLOG("MDIP_PlaySymbol %02x\r\n", (u32)status);
+	DIP_PLAY_OFF();
+	if (flag == KC3X_STATUS_PLAY_PAUSE){
+		g2DIP_ShowBuffer[7] |= 0x08;
+	}else if (status == KC3X_STATUS_PLAY_PLAY){
+		g2DIP_ShowBuffer[7] |= 0x04;
+	}
+	if (status & KC3X_STATUS_REPEAT_ALL){						// 设置了重复
+		if ((status & KC3X_STATUS_REPEAT_ALL) == KC3X_STATUS_REPEAT_ALL){	// 重复所有文件
+			g2DIP_ShowBuffer[7] |= 0x01;
+		}else {													// 重复当前文件/夹
+			g2DIP_ShowBuffer[7] |= 0x02;
+		}	
 	}
 	FDIP_ScreenUpdata = 1;
 }
@@ -1073,6 +1096,7 @@ void MDIP_ReadSpectrum(){
     g2DIP_ShowBuffer[8 + 3] = MDIP_GetLevel(outData[1]>>3);
     g2DIP_ShowBuffer[8 + 4] = MDIP_GetLevel(outData[2]);
     FDIP_ScreenUpdata = 1;
+//MLOG("S_");            
 }
 void MDIP_CleanSpectrum(){
 	BYTE gLocal_1;

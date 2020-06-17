@@ -21,7 +21,8 @@ void MAUD_MixInputSource(BYTE index){
     DIP_SRC_FORMAT_OFF();
 	MAUD_AutoCanclMute();
 	MAUD_AutoCanclTestTone();
-	if (gDIP_MenuSelect == cMenu_Restore){					// 只有菜单已经换到cMenu_Restore后，才可以改变当前的输入
+	
+	if (gDIP_MenuSelect == cMenu_Restore || gDIP_MenuSelect == cMenu_InputSource){	// 只有菜单已经换到cMenu_Restore后，才可以改变当前的输入
 		if (index == INPUT_SWITCH_NONE){                    // 循环方式
 			if (++mINPUT_SWITCH > INPUT_SWITCH_H_ARC){
 				mINPUT_SWITCH = INPUT_SWITCH_AUX;
@@ -36,7 +37,8 @@ void MAUD_MixInputSource(BYTE index){
 	}else {
 		MLOG("MixInputSourceB:%d R:%d\r\n", (u32)gDIP_MenuSelect, (u32)cMenu_Restore);
 	}
-	MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+	
+	MDIP_MenuSelect(cMenu_InputSource, MENU_NORMAL);
 }
 void MAUD_MixMasterVolume(BYTE directUp){
 	BYTE value;

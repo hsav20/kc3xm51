@@ -267,6 +267,7 @@ void MDIP_VideoSrc();
 void MDIP_SurroundMode(BYTE index, MENU_MODE mode);
 void MDIP_SurroundSymbol();
 void MDIP_SrcFormatSymbol();
+void MDIP_PlaySymbol(BYTE status);
 void MDIP_WifiSymbol(BYTE turnOn);
 void MDIP_SoundEffect(BYTE mode);
 void MDIP_TestTone(BYTE index, MENU_MODE mode);             // ÉùµÀÎ¢µ÷²ÎÊýµ÷½Ú
@@ -291,6 +292,7 @@ BYTE MDIP_GetNextChannel(BYTE index);                       // ²âÊÔÔëÒôÉùµÀÎ¢µ÷»
 #define DIP_SURROUND_OFF()              {g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);}
 #define DIP_SRC_FORMAT_OFF()            {g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);}
 #define DIP_DOT_OFF()                   {g2DIP_ShowBuffer[6] &= ~0xf000;}
+#define DIP_PLAY_OFF()              	{g2DIP_ShowBuffer[7] &= ~(0x0001 | 0x0002 | 0x0004 | 0x0008);}
 
 void MKCM_SetPowerOn(); 									// KCM¿ª»ú
 void MKCM_RestoreMemory();									// ¿ª»ú£¬´ÓKCMÖ®ÖÐ»Ö¸´¼ÇÒä

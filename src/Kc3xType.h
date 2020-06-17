@@ -12,8 +12,8 @@ typedef enum {
 	KCM_VOLUME_MUTE = 0x08,				// 音频静音及音量加减控制
 	KCM_TEST_TONE = 0x09,				// 噪音测试
 	KCM_WIFI_STATUS = 0x0d,				// WIFI状态指示
-	KCM_PLAY_STATUS	= 0x0e,				// 多媒体文件播放状态指示
-	KCM_PLAY_OPERATE = 0x0f,			// 控制多媒体文件播放模式
+	KCM_PLAY_STATUS = 0x0e,				// 多媒体文件播放状态
+	KCM_PLAY_OPERATE = 0x0f,			// 多媒体文件播放控制
 	KCM_PLAY_INDEX = 0x10,				// 控制多媒体文件播放编号，16位寄存器
 	KCM_PLAY_TIME = 0x12,				// 读取多媒体文件正在播放的时间，16位寄存器
 	KCM_SRC_VALID = 0x1c,				// 有效的音源输入改变，16位寄存器
@@ -157,31 +157,24 @@ typedef enum {
 	KCM_MODEL_36H = 0x56				// 模块型号KC36H
 } KC3X_MODEL_TYPE;
 
-typedef enum {
-	KCM_PLAY_STOP = 0x10,				// 多媒体播放停止
-	KCM_PLAY_PAUSE = 0x20,				// 多媒体播放暂停/播放
-	KCM_PLAY_ONLY = 0x30,				// 多媒体播放只暂停
-	KCM_PAUSE_ONLY = 0x40,				// 多媒体播放只播放
-	KCM_PLAY_SKIP_UP = 0x50,			// 多媒体播放前一首
-	KCM_PLAY_SKIP_DOWN = 0x60,			// 多媒体播放后一首
-	KCM_PLAY_FAST_FORW0 = 0x80,			// 多媒体播放快进，速度0
-	KCM_PLAY_FAST_FORW1 = 0x81,			// 多媒体播放快进，速度1
-	KCM_PLAY_FAST_FORW2 = 0x82,			// 多媒体播放快进，速度2
-	KCM_PLAY_FAST_FORW3 = 0x83,			// 多媒体播放快进，速度3
-	KCM_PLAY_FAST_BACK0 = 0x90,			// 多媒体播放快退，速度0
-	KCM_PLAY_FAST_BACK1 = 0x91,			// 多媒体播放快退，速度1
-	KCM_PLAY_FAST_BACK2 = 0x92,			// 多媒体播放快退，速度2
-	KCM_PLAY_FAST_BACK3 = 0x93,			// 多媒体播放快退，速度3
-	KCM_PLAY_RANDOM0 = 0xa0,			// 多媒体随机播放，时间0
-	KCM_PLAY_RANDOM1 = 0xa1,			// 多媒体随机播放，时间1
-	KCM_PLAY_RANDOM2 = 0xa2,			// 多媒体随机播放，时间2
-	KCM_PLAY_RANDOM3 = 0xa3,			// 多媒体随机播放，时间2
-	KCM_PLAY_REPEAT0 = 0xb4,			// 多媒体重复播放，类型0
-	KCM_PLAY_REPEAT1 = 0xb5,			// 多媒体重复播放，类型1
-	KCM_PLAY_REPEAT2 = 0xb6,			// 多媒体重复播放，类型2
-	KCM_PLAY_REPEAT3 = 0xb7				// 多媒体重复播放，类型3
-} KC3X_PLAY_OPERATE;
+#define KC3X_STATUS_PLAY_PAUSE			0x01				// 写入暂停，读取为已经暂停
+#define KC3X_STATUS_PLAY_PLAY			0x02				// 写入播放，读取为已经播放
+#define KC3X_STATUS_PLAY_STOP			0x03				// 写入停止，读取为已经停止
+#define KC3X_STATUS_PLAY_FLAG			0x03				// 写入停止，读取为已经停止
+#define KC3X_STATUS_RANDOM_NONE  		0x00				// 随机播放关闭，多媒体文件播放状态
+#define KC3X_STATUS_RANDOM_PATH			0x10				// 随机播放当前文件夹，多媒体文件播放状态
+#define KC3X_STATUS_RANDOM_ALL 			0x20				// 随机播放全部，多媒体文件播放状态
+#define KC3X_STATUS_REPEAT_NONE  		0x00				// 多媒体文件播放没有重复
+#define KC3X_STATUS_REPEAT_FILE  		0x40				// 多媒体文件播放重复当前文件
+#define KC3X_STATUS_REPEAT_PATH  		0x80				// 多媒体文件播放重复当前文件夹
+#define KC3X_STATUS_REPEAT_ALL  		0xc0				// 多媒体文件播放重复所有文件
 
+typedef enum {
+	KCM_OPERATE_SKIP_UP = 0x01,			// 播放前一个文件
+	KCM_OPERATE_SKIP_DOWN = 0x02,		// 播放后一个文件
+	KCM_OPERATE_FAST_FORW = 0x03,		// 多媒体播放快进
+	KCM_OPERATE_FAST_BACK = 0x04		// 多媒体播放快退
+} KC3X_PLAY_OPERATE;
 
 typedef enum {
 	KCM_VOL_CHIP_NONE = 0x00,			// 不使用模块内部的音量

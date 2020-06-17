@@ -267,40 +267,52 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
 			break;
 		case cRmKey_Record:                                        // 录音及暂停功能，现在暂时用来测试I2C总线读取
-			FDIP_ScreenFill = ~FDIP_ScreenFill;
-			if (FDIP_ScreenFill){
-				MDIP_ScreenFill(0xff);	
-				MDIP_ScreenUpdata();
-			}else {
-				MDIP_SurroundSymbol();
-				MDIP_SrcFormatSymbol();
-				MDIP_MenuSelect(cMenu_Restore, 0);
-			}
+			// FDIP_ScreenFill = ~FDIP_ScreenFill;
+			// if (FDIP_ScreenFill){
+			// 	MDIP_ScreenFill(0xff);	
+			// 	MDIP_ScreenUpdata();
+			// }else {
+			// 	MDIP_SurroundSymbol();
+			// 	MDIP_SrcFormatSymbol();
+			// 	MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+			// }
 			break;
 		case cRmKey_Random:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_RANDOM0);  // 多媒体随机播放，时间0
+			// MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_RANDOM0);  // 多媒体随机播放，时间0
 			break;
 		case cRmKey_Repeat:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_REPEAT0);  // 多媒体重复播放，类型0
+			// MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_REPEAT0);  // 多媒体重复播放，类型0
 			break;
 
 		case cRmKey_Stop:
-            MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_STOP);  // 多媒体播放停止
+            MKCM_WriteRegister(KCM_PLAY_STATUS, KC3X_STATUS_PLAY_STOP);  // 多媒体播放停止
 			break;
 		case cRmKey_PlayPause:
-            MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_PAUSE);  // 多媒体播放暂停/播放
+			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+				BYTE flag = gPlayStatus & KC3X_STATUS_PLAY_FLAG;
+				if (flag == KC3X_STATUS_PLAY_PLAY){					// 如果已经在播放之中
+		            MKCM_WriteRegister(KCM_PLAY_STATUS, KC3X_STATUS_PLAY_PAUSE);  // 暂停
+		            gPlayStatus &= ~KC3X_STATUS_PLAY_FLAG;					
+		            gPlayStatus |= KC3X_STATUS_PLAY_PAUSE;
+		        }else {
+			        MKCM_WriteRegister(KCM_PLAY_STATUS, KC3X_STATUS_PLAY_PLAY);  // 播放
+			        gPlayStatus &= ~KC3X_STATUS_PLAY_FLAG;
+		            gPlayStatus |= KC3X_STATUS_PLAY_PLAY;
+		        }
+		        MDIP_PlaySymbol(gPlayStatus);								// 加快图标显示，让操作感觉好点
+			}
 			break;
 		case cRmKey_FastBack:
-			//MKCM_PlayOperate(KCM_PLAY_FAST_BACK);  // 多媒体播放播放快退
+			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_FAST_BACK);  // 多媒体播放播放快退
 			break;
 		case cRmKey_FastForward:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_FAST_FORW0);  // 多媒体播放快进
+			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_FAST_FORW);  // 多媒体播放快进
 			break;
 		case cRmKey_SkipDown:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_SKIP_DOWN);  // 多媒体播放后一首
+			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_DOWN);  // 多媒体播放后一首
 			break;
 		case cRmKey_SkipUp:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_PLAY_SKIP_UP);  // 多媒体播放前一首
+			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_UP);  // 多媒体播放前一首
 			break;
 		case cRmKey_SoundEffect:
 			MDIP_MenuSelect(cMenu_SoundEffect, MENU_NORMAL);
