@@ -19,7 +19,12 @@
 </Folder>
 <Folder name="Other Files">
 </Folder>
-<Attribute topline="16" x="10" y="22">src\main.c</Attribute>
+<Attribute topline="7" x="2" y="14">src\main.c</Attribute>
+<Attribute topline="1" x="6" y="11">src\key.c</Attribute>
+<Attribute topline="385" x="14" y="398">src\function.c</Attribute>
+<Attribute topline="156" x="10" y="168">src\display.c</Attribute>
+<Attribute topline="278" x="65" y="287">src\main.h</Attribute>
+<Attribute topline="221" x="61" y="232">src\const.h</Attribute>
 <FolderState>111</FolderState>
 <DefConfig>mingw5</DefConfig>
 <Builder name="mingw5" type="MinGW" version="1.0" changed="1">

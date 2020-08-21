@@ -1,8 +1,0 @@
-var doc=App.ActiveDoc;
-var pos=doc.CaretPos;
-var txt=doc.GetLineText( pos.Line );
-var hd = "###### ";
-txt=hd + txt.replace(/^\s*#*\s*/g, "");
-doc.Delete(pos.Line, 0, pos.Line, 10000000);
-doc.Insert( txt );
-doc.SetCaretPos( pos.Line, hd.length, true );

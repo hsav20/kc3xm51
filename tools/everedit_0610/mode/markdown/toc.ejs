@@ -1,8 +1,0 @@
-var doc=App.ActiveDoc;
-var pos=doc.CaretPos;
-var txt="\n[TOC]\n";
-if( pos.Col )
-	txt="\n" + txt;
-
-doc.Insert( txt );
-
