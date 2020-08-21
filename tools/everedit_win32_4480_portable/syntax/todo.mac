@@ -1,0 +1,45 @@
+'************************************************************
+' ToDo Mode for EverEdit
+' ----------------------
+'   Written by Kaffa (kaffacoffee@outlook.com)
+'   Homepage: http://forum.everedit.net/
+'
+'************************************************************
+
+Include(".\const.mac")
+
+Set todo = CreateParser()
+
+'project
+todo.AddItem(todo.CreateItem(COLOR_WORD1, "^\s*.*[£º:]$", false, true))
+'task
+todo.AddItem(todo.CreateItem(COLOR_WORD2, "[-+*] .*$", false, false))
+'tag
+todo.AddItem(todo.CreateItem(COLOR_SUBLAN, "@\S*\b", false, false))
+todo.AddWord(todo.CreateWord(COLOR_SUBLAN, "@done @cancelled @work @life", true))
+todo.AddItem(todo.CreateItem(COLOR_SUBLAN, "\(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}\)", true))
+
+'folding
+todo.FoldingMethod = "indent"
+todo.IndentText "\S+[:£º]", False 
+todo.SetPairs "[]{}()""""''"
+
+'easter egg
+todo.AddItem(todo.CreateItem(COLOR_WORD4, "Who has seen the wind\?", true))
+
+''comment
+'Set rLineComment = todo.CreateRegion(COLOR_COMMENT1, "+#+", "$", True)
+'Set iLineComment = todo.CreateItem(COLOR_COMMENT2, "\#\#.+", False)
+'iLineComment.Capture 1, COLOR_COMMENT2
+'rLineComment.AddItem( iLineComment )
+'todo.AddRegion( rLineComment )
+
+''add todo to comment
+'Set iTodo = todo.CreateItem(COLOR_HIGHLIGHT2, "\b(TODO|DONE|CANCELLED)\b", False)
+'rLineComment.AddItem(iTodo)
+'todo.CommentLine "#"
+
+''integer arithmetic
+'todo.AddItem( todo.CreateItem(COLOR_FUNCTION, "\+|\-|\*|\/|\%|\<|\>|\!|\:|\&|\||\^|\~|\!|\$|\=|\'", False))
+
+todo.AddSnippet "todo.snippet"

@@ -1,0 +1,15 @@
+[Syntax]
+File=conf.mac
+Ext=conf
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=Y
+Title=Conf
+ParseMax=0

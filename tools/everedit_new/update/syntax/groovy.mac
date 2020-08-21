@@ -1,0 +1,48 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Groovy
+' Maintainer:  www.everedit.net  
+' History:
+'   2020/7/15 First Version
+'*******************************************************************************
+Include(".\const.mac")
+
+Set groovy=CreateParser()
+
+'comment
+Set rLineComment=groovy.CreateRegion( COLOR_COMMENT1, "+//+", "$", True )
+Set rBlockComment=groovy.CreateRegion( COLOR_COMMENT1, "+/*+", "+*/+", True )
+groovy.AddRegion( rLineComment )
+groovy.AddRegion( rBlockComment )
+
+'string
+Set rString3=groovy.CreateRegion( COLOR_COMMENT2, "+""""""+", "+""""""+", True )
+groovy.AddRegion( rString3 )
+
+Set rString2=groovy.CreateStringRegion( COLOR_STRING2, """", "\", False )
+Set rString1=groovy.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+groovy.AddRegion( rString2 )
+groovy.AddRegion( rString1 )
+
+'function
+groovy.AddItem( groovy.CreateItem(COLOR_FUNCTION, "[\w_]+(?=\()", False) )
+
+'Reserved words
+groovy.AddWord( groovy.CreateWord(COLOR_WORD1, "as def Boolean Byte Character Class Double Float Integer Long Number Object Short String property abstract assert boolean break byte case catch char class const continue default do double else extends false final finally float for goto if implements import instanceof in int interface long native new null package private protected public return short static strictfp super switch synchronized this throw throws transient true try void volatile while", True ) )
+
+'Predifined classes
+groovy.AddWord( groovy.CreateWord(COLOR_WORD2, "abs accept allProperties and any append asImmutable asSynchronized asWritable center collect compareTo contains count decodeBase64 div dump each eachByte eachFile eachFileRecurse eachLine eachMatch eachProperty eachPropertyName eachWithIndex encodeBase64 every execute filterLine find findAll findIndexOf flatten getErr getIn getOut getText inject inspect intersect intdiv invokeMethod isCase join leftShift max min minus mod multiply negate newInputStream newOutputStream newPrintWriter newReader newWriter next or padLeft padRight plus pop previous print println readBytes readLine readLines reverse reverseEach rightShift rightShiftUnsigned round size sort splitEachLine step subMap times toDouble toFloat toInteger tokenize toList toLong toURL transformChar transformLine upto use waitForOrKill withInputStream withOutputStream withPrintWriter withReader withStream withStreams withWriter withWriterAppend write writeLine", True ) )
+
+'number
+groovy.AddItem( groovy.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+'@xxxxx
+groovy.AddItem( groovy.CreateItem(COLOR_SUBLAN, "@[\w\d_]+\b", False) )
+
+'folding
+groovy.FoldText "\{", False, "\}", False
+groovy.IndentText "(\[|{|\w+:)$", False, "^\s*}|\]$", False
+
+groovy.SetPairs( "[]{}()""""''" )
+groovy.CommentLine("//")
+groovy.CommentBlock "/*", "*/"

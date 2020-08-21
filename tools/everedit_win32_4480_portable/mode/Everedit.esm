@@ -1,0 +1,7 @@
+[Menu]
+Title=Mode
+[Menu0]
+Key=CS+H
+Command0=3,Sort Button,${AppPath}\mode\everedit\sortbtn.mac
+[Menu1]
+Command0=3,Sort Menu,${AppPath}\mode\everedit\sortmenu.mac

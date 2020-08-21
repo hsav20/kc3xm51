@@ -1,0 +1,45 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:     AviSynth Script
+' Maintainer:   www.everedit.net
+' History:
+'   2013/08/16  First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set avs=CreateParser()
+
+Set rLineComment=avs.CreateRegion( COLOR_COMMENT1, "+#+", "$", True )
+Set rString2=avs.CreateStringRegion( COLOR_STRING2, """", "\", False )
+
+'Reserved words
+Set iWord1=avs.CreateWord( COLOR_WORD1, "bool catch clip false float function global int last no return string true try val yes", False )
+
+'Script functions
+Set iWord2=avs.CreateWord( COLOR_WORD2, "Abs Apply Assert AssertEval Audiobits Audiochannels Audiolength AudioLengthF Audiorate AVSChr AVSTime Cache Ceil Chr Cos Default Defined Eval Exist Exp FAbs FindStr Float Floor Frac Framecount Framerate FrameRateDenominator FrameRateNumerator GetParity HasAudio HasVideo Height HexValue Import Int IsAudioFloat IsAudioInt IsBool IsClip IsFieldBased IsFloat IsFrameBased IsInt IsInterleaved IsPlanar IsRGB IsRGB24 IsRGB32 IsString IsYUV IsYUY2 IsYV12 LCase LeftStr Log MidStr NOP Pi Pow Rand RevStr RightStr Round Select SetMemoryMax SetWorkingDir Sign Sin Spline Sqrt String StrLen Time UCase Value VersionNumber VersionString Width", False )
+iWord2.AutoCase=True
+
+'Builtin functions
+Set iWord3=avs.CreateWord( COLOR_WORD3, "AddBorders AlignedSplice Amplify AmplifydB Animate ApplyRange AssumeBFF AssumeFieldBased AssumeFPS AssumeFrameBased AssumeSampleRate AssumeTFF AudioDub AviFileSource AviSource BicubicResize BilinearResize Blackness BlankClip Blur Bob ChangeFPS ColorBars ColorKeyMask ColorYUV Compare ComplementParity ConditionalFilter ConditionalReader ConvertAudioTo16bit ConvertAudioTo24bit ConvertAudioTo32bit ConvertAudioTo8bit ConvertAudioToFloat ConvertBackToYUY2 ConvertFPS ConvertToMono ConvertToRGB ConvertToRGB24 ConvertToRGB32 ConvertToYUY2 ConvertToYV12 Crop CropBottom DelayAudio DeleteFrame DirectShowSource Dissolve DoubleWeave DuplicateFrame EnsureVBRMP3Sync FadeIn FadeIn0 FadeIn2 FadeIO FadeIO0 FadeIO2 FadeOut FadeOut0 FadeOut2 FixBrokenChromaUpsampling FixLuminance FlipHorizontal FlipVertical FrameEvaluate FreezeFrame GeneralConvolution GetChannel GetChannels GetLeftChannel GetRightChannel GreyScale HighPassAudio Histogram HorizontalReduceBy2 HSIAdjust ImageReader ImageSource ImageWriter Info Interleave InternalCache Invert IPCSource KillAudio Lanczos4Resize LanczosResize Layer Letterbox Levels Limiter Loop LowPassAudio Mask MergeChannels MergeChroma MergeLuma MessageClip MixAudio MonoToStereo Normalize Null OpenDMLSource Overlay PeculiarBlend PointResize PullDown ReduceBy2 ResampleAudio ResetMask Reverse RGBAdjust ScriptClip SegmentedAviSource SegmentedDirectShowSource SelectEven SelectEvery SelectOdd SelectRangeEvery SeparateFields Sharpen ShowAlpha ShowFiveVersions ShowFrameNumber ShowSMPTE SpatialSoften SSRC StackHorizontal StackVertical Subtitle Subtract SuperEQ SwapFields SwapUV TCPServer TCPSource TemporalSoften TimeStretch Tone Trim Turn180 TurnLeft TurnRight Tweak UnalignedSplice UToY Version VerticalReduceBy2 VToY WavSource Weave WriteFile WriteFileEnd WriteFileIf WriteFileStart YToUV LoadPlugin LoadVirtualDubPlugin LoadVFAPIPlugin LoadCPlugin", False )
+iWord3.AutoCase=True
+
+'Operators
+Set iOperator=avs.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.;@\[\]]",False )
+
+'Number
+Set iNumber=avs.CreateItem(COLOR_NUMBER, "\b\d+\b", False)
+
+'Vars?
+Set iVar=avs.CreateItem(COLOR_WORD4, "[%\$][\w_]+\b",False )
+ 
+avs.AddRegion rLineComment
+avs.AddRegion rString2
+avs.AddWord iWord1
+avs.AddWord iWord2
+avs.AddWord iWord3
+avs.AddItem iOperator
+avs.AddItem iNumber
+avs.AddItem iVar
+
+avs.SetPairs( "[]''""""{}()" )
+avs.CommentLine "#"

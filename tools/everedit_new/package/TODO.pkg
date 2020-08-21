@@ -1,0 +1,15 @@
+[Syntax]
+File=todo.mac
+Ext=
+Mode=todo
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=TODO
+ParseMax=0

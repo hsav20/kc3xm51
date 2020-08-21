@@ -1,0 +1,15 @@
+[Syntax]
+File=asm.mac
+Ext=asm
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=8
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=ASM
+ParseMax=0

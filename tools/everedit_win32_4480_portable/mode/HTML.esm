@@ -1,0 +1,200 @@
+[ToolBar]
+Image16=common.bmp
+Image32=common32.bmp
+[Button0]
+Icon=5
+Command0=0,Strong,<b>${SELECTED}$0</b>
+[Button1]
+Icon=6
+Command0=0,Italic,<i>${SELECTED}$0</i>
+[Button2]
+Icon=7
+Command0=0,Underline,<u>${SELECTED}$0</u>
+[Button3]
+Icon=20
+Command0=0,Font Color,<font size="$1" color="$2">$0</font>
+[Button4]
+SEP=Y
+[Button5]
+Icon=32
+Command0=0,Non Breaking Space,&nbsp;
+[Button6]
+Icon=31
+Command0=0,Break,<br>
+[Button7]
+Icon=33
+Command0=0,Paragrah,<p>${SELECTED}$0</p>
+[Button8]
+Icon=34
+Command0=0,Heading,<h$1>${SELECTED}$0</h$1>
+Command1=0,H1,<h1>${SELECTED}$0</h1>
+Command2=0,H2,<h2>${SELECTED}$0</h2>
+Command3=0,H3,<h3>${SELECTED}$0</h3>
+Command4=0,H4,<h4>${SELECTED}$0</h4>
+Command5=0,H5,<h5>${SELECTED}$0</h5>
+Command6=0,H6,<h6>${SELECTED}$0</h6>
+[Button9]
+Icon=21
+Command0=0,Anchor,<a href="">${SELECTED}$0</a>
+[Button10]
+Icon=35
+Command0=0,Horizontal Ruler,<hr>
+[Button11]
+Icon=0
+Command0=0,Center,<center>${SELECTED}$0</center>
+[Button12]
+Icon=28
+Command0=0,Block Quote,<blockquote>${SELECTED}$0</blockquote>
+[Button13]
+Icon=36
+Command0=0,Preformat Quote,<pre>${SELECTED}$0</pre>
+[Button14]
+Icon=9
+Command0=0,Unordered List,<ul>\n\t<li>\n\t$0<li>\n</ul>
+Command1=0,Ordered List,<ol>\n\t<li>\n\t$0<li>\n</ol>
+Command2=0,Definition List,<dl>\n\t<dt>\n\t<dd>\n</dl>
+[Button15]
+SEP=Y
+[Button16]
+Icon=23
+Command0=0,Script,<script type="text/javascript">\n<!--\n\t$0\n//-->\n</script>
+[Button17]
+Icon=24
+Command0=0,Applet,<applet code="" width="" height="">$0</applet>
+[Button18]
+Icon=26
+Command0=0,Form,<form method="${1:post}" action="$2">\n\t$0\n</form>
+[Button19]
+Icon=25
+Command0=0,Image Map,<map name="$0">\n\t<area shape="" href="" coords="" alt="">\n</map>
+[Button20]
+Icon=27
+Command0=0,Frame,<frameset rows="${1:,}" cols="${2:,}">\n\t<frame src="" name="">\n\t$0<frame src="" name="">\n</frameset>
+[Button21]
+Icon=30
+Command0=0,Div,<div id="" class="">\n\t$0\n</div>
+[Button22]
+SEP=Y
+[Button23]
+Icon=19
+Command0=1,Insert Table,${AppPath}\mode\html\HTMLBar.dll,HTMLTable
+[Button24]
+Icon=22
+Command0=0,Image,<img src="$0" width="" height="" border="0" alt="">
+Command1=3,Insert From File,${AppPath}\mode\html\insert_image.mac
+[Button25]
+Icon=14
+command0=0,Text Box,<input type="text" name="$0">
+command1=0,List Box,<select name="">\n\t<option value="$0" selected>\n\t<option value="">\n</select>
+command2=0,Radio Button,<input type="radio" name="$0">
+command3=0,Check Box,<input type="checkbox" name="$0">
+command4=0,Text Area,<textarea name="" rows="" cols="">$0</textarea>
+command5=0,Reset Button,<input type="reset">
+command6=0,Submit Button,<input type="submit">
+command7=0,Password Box,<input type="password" name="$0">
+command8=0,Hidden Field,<input type="hidden" name="$0">
+command9=0,Image,<input type="image" src="$0">
+command10=0,Button,<input type="button" value="$0" onclick="">
+[Button26]
+Icon=11
+Command0=3,HTML Entity,${AppPath}\mode\html\html_entity.mac
+[Button27]
+Icon=29
+Command0=3,HTML Snippet,${AppPath}\mode\html\html_snippet.mac
+[Button28]
+Icon=18
+Command0=1,Insert Color,${AppPath}\mode\html\HTMLBar.dll,HTMLColor
+[Button29]
+SEP=Y
+[Button30]
+Icon=37
+Command0=3,Preview(Built-In Browser),${AppPath}\mode\html\webpreview.mac
+[Button31]
+Icon=38
+Command0=3,Preview(External Browser),${AppPath}\mode\html\webpreview2.mac
+
+[Menu]
+Title=HTML
+[Menu0]
+Command0=3,Beautify HTML,${AppPath}\mode\html\beautify-html.ejs
+[Menu1]
+Command0=3,Beautify JS(Selection),${AppPath}\mode\js\jsBeautify.ejs
+[Menu2]
+Command0=3,Beautify CSS(Selection),${AppPath}\mode\css\beautify-css.ejs
+[Menu3]
+Popup=Y
+Title=Emmet
+[Menu3\0]
+Command0=3,Use Tab to Expand Abbreviation(Enable/Disable),${AppPath}\mode\html\use_tab_abbrev.ejs
+[Menu3\1]
+Key=C+E
+Command0=3,Abbreviation,${AppPath}\mode\html\abbrev.ejs
+[Menu3\2]
+Key=C+0
+Command0=3,Match Pair Inward,${AppPath}\mode\html\match_pair_inward.ejs
+[Menu3\3]
+Key=CS+0
+Command0=3,Match Pair Outward,${AppPath}\mode\html\match_pair_outward.ejs
+[Menu3\4]
+SEP=Y
+[Menu3\5]
+Key=C+R
+Command0=3,Remove Tag,${AppPath}\mode\html\remove_tag.ejs
+[Menu3\6]
+Key=CS+G
+Command0=3,Wrap With Abbrev,${AppPath}\mode\html\wrap_with_abbrev.ejs
+[Menu3\7]
+Command0=3,Toggle Comment,${AppPath}\mode\html\toggle_comment.ejs
+[Menu3\8]
+Key=CS+M
+Command0=3,Merge Lines,${AppPath}\mode\html\merge_lines.ejs
+[Menu3\9]
+SEP=Y
+[Menu3\10]
+Command0=3,Prev Edit Point,${AppPath}\mode\html\prev_edit_point.ejs
+[Menu3\11]
+Command0=3,Next Edit Point,${AppPath}\mode\html\next_edit_point.ejs
+[Menu3\12]
+Command0=3,Select Previous Item,${AppPath}\mode\html\select_previous_item.ejs
+[Menu3\13]
+Command0=3,Select Next Item,${AppPath}\mode\html\select_next_item.ejs
+[Menu3\14]
+SEP=Y
+[Menu3\15]
+Command0=3,Decrement Number By 10,${AppPath}\mode\html\decrement_number_by_10.ejs
+[Menu3\16]
+Command0=3,Increment Number By 10,${AppPath}\mode\html\increment_number_by_10.ejs
+[Menu3\17]
+Command0=3,Decrement Number By 01,${AppPath}\mode\html\decrement_number_by_01.ejs
+[Menu3\18]
+Command0=3,Increment Number By 01,${AppPath}\mode\html\increment_number_by_01.ejs
+[Menu3\19]
+Command0=3,Decrement Number By 1,${AppPath}\mode\html\decrement_number_by_1.ejs
+[Menu3\20]
+Command0=3,Increment Number By 1,${AppPath}\mode\html\increment_number_by_1.ejs
+[Menu3\21]
+SEP=Y
+[Menu3\22]
+Key=CS+R
+Command0=3,Reflect Css Value,${AppPath}\mode\html\reflect_css_value.ejs
+[Menu3\23]
+Key=CS+Y
+Command0=3,Evaluate Math Expression,${AppPath}\mode\html\evaluate_math_expression.ejs
+[Menu3\24]
+SEP=Y
+[Menu3\25]
+Command0=2,Emmet Help,http://docs.emmet.io
+[Menu4]
+Command0=2,W3C HTML 4.01,http://www.w3.org/TR/html4/
+[Menu5]
+Command0=2,W3C XHTML 1.0,http://www.w3.org/TR/xhtml1/
+[Menu6]
+Command0=2,W3C XHTML 1.1,http://www.w3.org/TR/xhtml11/
+[Menu7]
+Command0=2,W3C HTML 5,http://www.w3.org/TR/html5/
+[Menu8]
+Command0=2,Mozilla,https://developer.mozilla.org/en-US/docs/Web_Development
+[Menu9]
+Command0=2,Opera,http://www.opera.com/docs/specs/
+[Event]
+Dir=${AppPath}\mode\html\__event__

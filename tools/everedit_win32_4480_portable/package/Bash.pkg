@@ -1,0 +1,15 @@
+[Syntax]
+File=bash.mac
+Ext=sh
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=Bash
+ParseMax=0

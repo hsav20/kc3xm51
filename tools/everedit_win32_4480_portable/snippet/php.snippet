@@ -1,0 +1,161 @@
+#title=PHP
+#t=$.. = ( .. ) ? .. : ..
+#g=if?
+$$${1:retVal} = ( ${2:condition} ) ? ${3:a} : ${4:b} ;
+#t=$.. = array (..)
+#g=array
+$$${1:arrayName} = array( '$2'${3:,} );$0
+#t=$GLOBALS['..']
+#g=globals
+$GLOBALS['${1:variable}']${2: = }${3:something}${4:;}$0
+#t=<? .. ?>
+#g=ph
+<?${1:=} $0 ?>
+#t=<?php .. ?>
+#g=php
+<?php
+
+	$0
+
+?>
+#t=case ..
+#g=case
+case '${1:variable}':
+	${0:# code...}
+break;
+#t=class ..
+#g=class
+class ${1:ClassName}
+{
+	function __construct ( ${2:argument} )
+	{
+		${0:# code...}
+	}
+}
+
+#t=COOKIE['..']
+#g=cookie
+$_COOKIE['${1:variable}']
+#t=define( )
+#g=def
+define('$1', $2);
+$0
+#t=defined( )
+#g=def?
+defined( '$1' )$0
+#t=do .. while ..
+#g=do
+do
+{
+	${0:# code...}
+	
+} while ( ${1:$a <= 10} );
+#t=else ..
+#g=else
+else
+{
+	${0:# code...}
+}
+#t=elseif ..
+#g=elseif
+elseif ( ${1:condition} )
+{
+	${0:# code...}
+}
+#t=ENV['..']
+#g=env
+$_ENV['${1:variable}']
+#t=FILES['..']
+#g=files
+$_FILES['${1:variable}']
+#t=for ..
+#g=for
+for ( $$${1:i}=${2:0}; $$${1:i} < $3; $$${1:i}++ )
+{ 
+	${0:# code...}
+}
+#t=foreach ..
+#g=foreach
+foreach( $$${1:variable} as $$${2:key} => $$${3:value} )
+{
+	${0:# code...}
+}
+#t=function ..
+#g=function
+${1:public }function ${2:FunctionName} (${3: value}${4:=''})
+{
+	${0:# code...}
+}
+#t=GET['..']
+#g=get
+$_GET['${1:variable}']
+#t=if ..
+#g=if
+if ( ${1:condition} )
+{
+	${0:# code...}
+}
+#t=if .. else ..
+#g=ifelse
+if ( ${1:condition} )
+{
+	${2:# code...}
+}
+else
+{
+	${3:# code...}
+}
+$0
+#t=include(..)
+#g=incl
+include( '${1:file}' );$0
+#t=include_once(..)
+#g=incl1
+include_once( '${1:file}' );$0
+#t=POST['..']
+#g=post
+$_POST['${1:variable}']
+#t=print ".."
+#g=print
+print "${1:string}"${2: . };$0
+#t=REQUEST['..']
+#g=req
+$_REQUEST['${1:variable}']
+#t=require(..)
+#g=req
+require( '${1:file}' );$0
+#t=require_once(..)
+#g=req1
+require_once( '${1:file}' );$0
+#t=return $resVal
+#g=retres
+return ${1:resVal};$0
+#t=return FALSE
+#g=ret0
+return FALSE;$0
+#t=return TRUE
+#g=ret1
+return TRUE;$0
+#t=SERVER['..']
+#g=sever
+$_SERVER['${1:variable}']
+#t=SESSION['..']
+#g=session
+$_SESSION['${1:variable}']
+#t=switch ..
+#g=switch
+switch ( $1 )
+{
+	case $2:
+		${3:# code...}
+		break;		
+	default:
+		$0;
+		break;
+}
+#t=while ..
+#g=while
+while ( ${1:$a <= 10} )
+{
+	${0:# code...}
+}

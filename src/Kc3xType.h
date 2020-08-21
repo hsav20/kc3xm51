@@ -124,8 +124,9 @@ typedef enum {
 	KCM_SRC_VALID_HDMI1 = 0x0100,		// 有信号的音源输入：HDMI1
 	KCM_SRC_VALID_HDMI2 = 0x0200,		// 有信号的音源输入：HDMI2
 	KCM_SRC_VALID_HDMI3 = 0x0400,		// 有信号的音源输入：HDMI3
+	KCM_SRC_VALID_HDMIS = 0x0f00,		// HDMI位掩码
 
-	KCM_SRC_VALID_UCARD = 0x1000,		// 有信号的音源输入：USB声卡
+	KCM_SRC_VALID_USBA = 0x1000,		// 有信号的音源输入：USB声卡
 	KCM_SRC_VALID_E8CH = 0x2000,		// 有信号的音源输入：外置7.1声道
 	KCM_SRC_VALID_BT = 0x4000,			// 有信号的音源输入：蓝牙音频
 	KCM_SRC_VALID_WIFI = 0x8000			// 有信号的音源输入：WIFI音频

@@ -1,0 +1,47 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    VHDL
+' Maintainer:  www.everedit.net  
+' History:
+'   2013/07/28 Create
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set vhdl=CreateParser()
+
+Set rComment1=vhdl.CreateRegion(COLOR_COMMENT1, "+--+", "$", False)
+Set rString1=vhdl.CreateStringRegion(COLOR_STRING1, "'", "\", False)
+Set rString2=vhdl.CreateStringRegion(COLOR_STRING2, """", "\", False)
+
+'keywords
+Set iWord1=vhdl.CreateWord(COLOR_WORD1, "access after alias all architecture array assert attribute begin block body buffer bus case component configuration constant disconnect downto else elsif end entity exit file for function generate generic group guarded if impure in inertial inout is label library linkage literal loop map new next null of on open others out package port postponed procedure process pure range record register reject report return select severity signal shared subtype then to transport type unaffected units until use variable wait when while with note warning error failure", False)
+
+'data types
+Set iWord2=vhdl.CreateWord(COLOR_WORD2, "bit bit_vector character boolean integer real time string severity_level natural signed unsigned line text std_logic std_logic_vector std_ulogic std_ulogic_vector qsim_state qsim_state_vector qsim_12state qsim_12state_vector", False)
+
+'operators
+Set iWord3=vhdl.CreateWord(COLOR_WORD3, "and nand or nor xor xnor rol ror sla sll sra srl mod rem abs not", False)
+
+'attributes
+Set iWord4=vhdl.CreateWord(COLOR_WORD4, "high left length low range reverse_range right ascending behaviour structure simple_name instance_name path_name foreign active delayed event last_active last_event last_value quiet stable transaction driving driving_value base high left leftof low pos pred rightof succ val image value", False, "'")
+
+'operators
+Set iOperator=vhdl.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.;@\$\[\]]",False )
+
+
+vhdl.AddRegion( rComment1 )
+vhdl.AddRegion( rString1 )
+vhdl.AddRegion( rString2 )
+
+vhdl.AddWord( iWord1 )
+vhdl.AddWord( iWord2 )
+vhdl.AddWord( iWord3 )
+vhdl.AddWord( iWord4 )
+vhdl.AddItem( iOperator )
+
+'number
+vhdl.AddItem( vhdl.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+vhdl.SetPairs( "[]''""""{}()" )
+vhdl.CommentLine( "--" )
+vhdl.FoldingMethod="indent"

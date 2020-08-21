@@ -1,0 +1,83 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    C99
+' Maintainer:  Morler (based on EverEdit's C++ syntax file)
+' History:
+'   2013/04/04 First Version
+'	2013/04/08 fix missing operators '/' & decimal point '.'
+'	2013/04/10 little update about macro & support binary numbers
+'
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set c99=CreateParser()
+c99.WordChars="_"
+
+'comment
+Set rLineComment=c99.CreateRegion( COLOR_COMMENT1, "+//+", "$", True )
+Set rBlockComment=c99.CreateRegion( COLOR_COMMENT2, "+/*+", "+*/+", True )
+c99.AddRegion( rLineComment )
+c99.AddRegion( rBlockComment )
+
+'add todo to comment
+Set iTodo=c99.CreateItem( COLOR_HIGHLIGHT2, "\b(TODO|FIX)\b", False )
+rLineComment.AddItem( iTodo )
+rBlockComment.AddItem( iTodo )
+
+'single quote string
+Set rString1=c99.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+c99.AddRegion( rString1 )
+
+Set rString2=c99.CreateStringRegion( COLOR_STRING1, """", "\", False )
+c99.AddRegion( rString2 )
+
+'function
+c99.AddItem( c99.CreateItem(COLOR_FUNCTION, "[\w_][\w\d_]+(?=\()", False) )
+
+'Reserved words
+c99.AddWord( c99.CreateWord(COLOR_WORD1, "goto break return continue asm __asm__ case default if else switch while for do", True ) )
+
+'C data types & structures & storage modifiers & operators
+c99.AddWord( c99.CreateWord(COLOR_WORD2, "int long short char void signed unsigned float double _Complex _Imaginary _Bool bool complex imaginary typedef struct union enum static register auto volatile extern const fortran restrict inline sizeof", True ) )
+
+'C Standard Library Functions (based on Yang Zhang <imyeyeslove@163.com> uploaded VIM syntax file for C: http://www.vim.org/scripts/script.php?script_id=2952)
+c99.AddWord( c99.CreateWord(COLOR_WORD3, "__asprintf __assert __assert_fail __assert_perror_fail __btowc_alias __bzero __ctype_b_loc __ctype_get_mb_cur_max __ctype_tolower_loc __ctype_toupper_loc __getdelim __getpgid __isoc99_fscanf __isoc99_fwscanf __isoc99_scanf __isoc99_sscanf __isoc99_swscanf __isoc99_vfscanf __isoc99_vfwscanf __isoc99_vscanf __isoc99_vsscanf __isoc99_vswscanf __isoc99_vwscanf __isoc99_wscanf __libc_current_sigrtmax __libc_current_sigrtmin __mbrlen __mempcpy __nldbl_nexttowardf __REDIRECT __REDIRECT_NTH __secure_getenv __sigpause __sigsetjmp __stpcpy __stpncpy __strtok_r __strtol_internal __strtoll_internal __strtoul_internal __strtoull_internal __sysv_signal __tolower_l __toupper_l __wcstol_internal __wcstoll_internal __wcstoul_internal __wcstoull_internal __wctob_alias __xpg_strerror_r _exit _Exit _longjmp _setjmp a64l abort abs access acct alarm asctime asctime_r asprintf at_quick_exit atexit atof atoi atol atoll basename bcmp bcopy brk bsd_signal bsearch btowc bzero calloc canonicalize_file_name cfree chdir chown chroot clearenv clearerr clearerr_unlocked clock clock_getcpuclockid clock_getres clock_gettime clock_nanosleep clock_settime close confstr crypt ctermid ctime ctime_r cuserid daemon difftime div dprintf drand48 drand48_r dup dup2 dup3 duplocale dysize eaccess ecvt ecvt_r encrypt endusershell erand48 erand48_r euidaccess execl execle execlp execv execve execvp execvpe exit faccessat fchdir fchown fchownat fclose fcloseall fcvt fcvt_r fdatasync fdopen feclearexcept fedisableexcept feenableexcept fegetenv fegetexcept fegetexceptflag fegetround feholdexcept feof feof_unlocked feraiseexcept ferror ferror_unlocked fesetenv fesetexceptflag fesetround fetestexcept feupdateenv fexecve fflush fflush_unlocked ffs ffsl ffsll fgetc fgetc_unlocked fgetpos fgetpos64 fgets fgets_unlocked fgetwc fgetwc_unlocked fgetws fgetws_unlocked fileno fileno_unlocked flockfile fmemopen fopen fopen64 fopencookie fork fpathconf fprintf fputc fputc_unlocked fputs fputs_unlocked fputwc fputwc_unlocked fputws fputws_unlocked fread fread_unlocked free freelocale freopen freopen64 fscanf fseek fseeko fseeko64 fsetpos fsetpos64 fsync ftell ftello ftello64 ftruncate ftruncate64 ftrylockfile funlockfile fwide fwprintf fwrite fwrite_unlocked fwscanf gcvt get_current_dir_name getc getc_unlocked getchar getchar_unlocked getcwd getdate getdate_r getdelim getdomainname getdtablesize getegid getenv geteuid getgid getgroups gethostid gethostname getline getloadavg getlogin getlogin_r getpagesize getpass getpgid getpgrp getpid getppid getpt getresgid getresuid gets getsid getsubopt getuid getusershell getw getwc getwc_unlocked getwchar getwchar_unlocked getwd gmtime gmtime_r grantpt group_member gsignal imaxabs imaxdiv index initstate initstate_r isascii isatty isctype iswalnum iswalnum_l iswalpha iswalpha_l iswblank iswblank_l iswcntrl iswcntrl_l iswctype iswctype_l iswdigit iswdigit_l iswgraph iswgraph_l iswlower iswlower_l iswprint iswprint_l iswpunct iswpunct_l iswspace iswspace_l iswupper iswupper_l iswxdigit iswxdigit_l jrand48 jrand48_r kill killpg l64a labs lchown lcong48 lcong48_r ldiv link linkat llabs lldiv localeconv localtime localtime_r lockf lockf64 longjmp lrand48 lrand48_r lseek lseek64 malloc matherr mblen mbrlen mbrtowc mbsinit mbsnrtowcs mbsrtowcs mbstowcs mbtowc memccpy memchr memcmp memcpy memfrob memmem memmove mempcpy memrchr memset mkdtemp mkostemp mkostemp64 mkostemps mkostemps64 mkstemp mkstemp64 mkstemps mkstemps64 mktemp mktime mrand48 mrand48_r nanosleep newlocale nice nrand48 nrand48_r obstack_printf obstack_vprintf on_exit open_memstream open_wmemstream pathconf pause pclose perror pipe pipe2 popen posix_memalign posix_openpt pread pread64 printf profil psiginfo psignal ptsname ptsname_r putc putc_unlocked putchar putchar_unlocked putenv puts putw putwc putwc_unlocked putwchar putwchar_unlocked pwrite pwrite64 qecvt qecvt_r qfcvt qfcvt_r qgcvt qsort qsort_r quick_exit raise rand rand_r random random_r rawmemchr read readlink readlinkat realloc realpath remove rename renameat revoke rewind rindex rmdir rpmatch sbrk scanf seed48 seed48_r setbuf setbuffer setdomainname setegid setenv seteuid setgid sethostid sethostname setjmp setkey setlinebuf setlocale setlogin setpgid setpgrp setregid setresgid setresuid setreuid setsid setstate setstate_r setuid setusershell setvbuf sigaction sigaddset sigaltstack sigandset sigblock sigdelset sigemptyset sigfillset siggetmask sighold sigignore siginterrupt sigisemptyset sigismember siglongjmp signal sigorset sigpause sigpending sigprocmask sigqueue sigrelse sigreturn sigset sigsetmask sigstack sigsuspend sigtimedwait sigvec sigwait sigwaitinfo sleep snprintf sprintf srand srand48 srand48_r srandom srandom_r sscanf ssignal stime stpcpy stpncpy strcasecmp strcasecmp_l strcasestr strcat strchr strchrnul strcmp strcoll strcoll_l strcpy strcspn strdup strerror strerror_l strerror_r strfry strftime strftime_l strlen strncasecmp strncasecmp_l strncat strncmp strncpy strndup strnlen strpbrk strptime strptime_l strrchr strsep strsignal strspn strstr strtod strtod_l strtof strtof_l strtoimax strtok strtok_r strtol strtol_l strtold strtold_l strtoll strtoll_l strtoq strtoul strtoul_l strtoull strtoull_l strtoumax strtouq strverscmp strxfrm strxfrm_l swab swprintf swscanf symlink symlinkat sync syscall sysconf system sysv_signal tcgetpgrp tcsetpgrp tempnam time timegm timelocal timer_create timer_delete timer_getoverrun timer_gettime timer_settime tmpfile tmpfile64 tmpnam tmpnam_r toascii tolower tolower_l toupper toupper_l towctrans towctrans_l towlower towlower_l towupper towupper_l truncate truncate64 ttyname ttyname_r ttyslot tzset ualarm ungetc ungetwc unlink unlinkat unlockpt unsetenv uselocale usleep valloc vasprintf vdprintf vfork vfprintf vfscanf vfwprintf vfwscanf vhangup vprintf vscanf vsnprintf vsprintf vsscanf vswprintf vswscanf vwprintf vwscanf wcpcpy wcpncpy wcrtomb wcscasecmp wcscasecmp_l wcscat wcschr wcschrnul wcscmp wcscoll wcscoll_l wcscpy wcscspn wcsdup wcsftime wcsftime_l wcslen wcsncasecmp wcsncasecmp_l wcsncat wcsncmp wcsncpy wcsnlen wcsnrtombs wcspbrk wcsrchr wcsrtombs wcsspn wcsstr wcstod wcstod_l wcstof wcstof_l wcstoimax wcstok wcstol wcstol_l wcstold wcstold_l wcstoll wcstoll_l wcstombs wcstoq wcstoul wcstoul_l wcstoull wcstoull_l wcstoumax wcstouq wcswcs wcswidth wcsxfrm wcsxfrm_l wctob wctomb wctrans wctrans_l wctype wctype_l wcwidth wmemchr wmemcmp wmemcpy wmemmove wmempcpy wmemset wprintf write wscanf", True ) )
+
+'operators
+c99.AddItem( c99.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.,:;\/\[\]]",False ) )
+Set rError=c99.CreateRegion( COLOR_COMMENT1, "#\s*error\b", "$", True )
+c99.AddRegion( rError )
+
+'include
+Set iInclude1=c99.CreateItem( COLOR_MACRO, "#\s*include\s*(<.*?>)", False )
+iInclude1.Capture 1, COLOR_STRING2
+Set iInclude2=c99.CreateItem( COLOR_MACRO, "#\s*include\s*(?="")", False )
+iInclude2.Capture 1, COLOR_STRING2
+
+c99.AddItem( iInclude1 )
+c99.AddItem( iInclude2 )
+
+'macro
+c99.AddItem( c99.CreateItem(COLOR_MACRO, "#\s*if\s+!?defined",False ) )
+
+Set macro_token=c99.CreateItem( COLOR_MACRO, "#\s*((if|pragma|elif|error|ifndef|define|undef|ifdef)\s+([A-Za-z0-9_]+)\s*|(else|endif))", False )
+macro_token.Capture 3, COLOR_VAR
+
+c99.AddItem( macro_token )
+
+'number
+c99.AddItem( c99.CreateItem(COLOR_NUMBER, "\b([0-9]+\.?[0-9]*|0x[0-9a-fA-F]+|0[b][01]+)\b", False) )
+
+c99.AddSnippet "c.snippet"
+
+'folding
+Call c99.FoldText( "\{", False )
+Call c99.UnfoldText( "\}", False )
+
+Call c99.IndentText( "(\[|{|\w+:)\s*$", False )
+Call c99.UnindentText( "^\s*}|\]$", False )
+
+Call c99.SetPairs( "[]{}()""""''" )
+
+Call c99.CommentLine("//")
+Call c99.CommentBlock("/*", "*/")

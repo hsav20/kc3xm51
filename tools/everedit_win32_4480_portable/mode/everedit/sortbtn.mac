@@ -1,0 +1,12 @@
+' Sort Buttons
+' Copyright@www.Everedit.net
+' 2013-04-19
+
+Set doc=App.ActiveDoc
+strContent=doc.Text
+
+Include(App.AppPath+"\mode\everedit\sort.vbs")
+
+If ExecuteSort("Button")=True Then 
+	doc.Text=strContent
+End If

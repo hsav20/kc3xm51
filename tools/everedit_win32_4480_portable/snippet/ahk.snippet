@@ -1,0 +1,988 @@
+#title=AHK
+#t=#AllowSameLineComments
+#g=allowsamelinecomments
+\#AllowSameLineComments
+#t=#ClipboardTimeout
+#g=clipboardtimeout
+\#ClipboardTimeout${1:, milliseconds}
+#t=#CommentFlag
+#g=commentflag
+\#CommentFlag${1:, NewString}
+#t=#ErrorStdOut
+#g=errorstdout
+\#ErrorStdOut
+#t=#EscapeChar
+#g=escapechar
+\#EscapeChar${1:, NewChar}
+#t=#HotkeyInterval
+#g=hotkeyinterval
+\#HotkeyInterval${1:, Value}
+#t=#HotkeyModifierTimeout
+#g=hotkeymodifiertimeout
+\#HotkeyModifierTimeout${1:, milliseconds}
+#t=#Hotstring
+#g=hotstring
+\#Hotstring${1:, NewOptions}
+#t=#Include
+#g=include
+\#Include ${1:FileName}
+#t=#IncludeAgain
+#g=includeagain
+\#IncludeAgain ${1:FileName}
+#t=#InputLevel
+#g=inputlevel
+\#InputLevel, ${1:Level}
+#t=#InstallKeybdHook
+#g=installkeybdhook
+\#InstallKeybdHook
+#t=#InstallMouseHook
+#g=installmousehook
+\#InstallMouseHook
+#t=#KeyHistory
+#g=keyhistory
+\#KeyHistory, ${1:MaxEvents}
+#t=#LTrim
+#g=ltrim
+\#LTrim, ${1:On|Off}
+#t=#MaxHotkeysPerInterval
+#g=maxhotkeysperinterval
+\#MaxHotkeysPerInterval, ${1:Value}
+#t=#MaxMem
+#g=maxmem
+\#MaxMem, ${1:ValueInMegabytes}
+#t=#MaxThreads
+#g=maxthreads
+\#MaxThreads, ${1:Value}
+#t=#MaxThreadsBuffer
+#g=maxthreadsbuffer
+\#MaxThreadsBuffer, ${1:On|Off}
+#t=#MaxThreadsPerHotkey
+#g=maxthreadsperhotkey
+\#MaxThreadsPerHotkey, ${1:Value}
+#t=#MenuMaskKey
+#g=menumaskkey
+\#MenuMaskKey, ${1:keyname}
+#t=#NoEnv
+#g=noenv
+\#NoEnv
+#t=#NoTrayIcon
+#g=notrayicon
+\#NoTrayIcon
+#t=#Persistent
+#g=persistent
+\#Persistent
+#t=#SingleInstance
+#g=singleinstance
+\#SingleInstance ${1:force|ignore|off}
+#t=#UseHook
+#g=usehook
+\#UseHook ${1:On|Off}
+#t=#Warn
+#g=warn
+\#Warn ${1:WarningType}${2:, WarningMode}
+#t=#WinActivateForce
+#g=winactivateforce
+\#WinActivateForce
+#t=Abs
+#g=abs
+Abs(${1:Number})
+#t=ACos
+#g=acos
+ACos(${1:Number})
+#t=Array
+#g=array
+Array(${1:values...})
+#t=Asc
+#g=asc
+Asc(${1:String})
+#t=ASin
+#g=asin
+ASin(${1:Number})
+#t=ATan
+#g=atan
+ATan(${1:Number})
+#t=AutoTrim
+#g=autotrim
+AutoTrim, ${1:On|Off}
+#t=BlockInput
+#g=blockinput
+BlockInput, ${1:On|Off|Send|Mouse|SendAndMouse|Default|MouseMove|MouseMoveOff}
+#t=catch
+#g=catch
+catch ${1:OutputVar}
+#t=Ceil
+#g=ceil
+Ceil(${1:Number})
+#t=Chr
+#g=chr
+Chr(${1:Number})
+#t=Click
+#g=click
+Click
+#t=ClipWait
+#g=clipwait
+ClipWait, ${1:SecondsToWait}${2:, 1}
+#t=ComObjActive
+#g=comobjactive
+ComObjActive(${1:ProgIdOrCLSID})
+#t=ComObjArray
+#g=comobjarray
+ComObjArray(${1:VarType}, ${2:Count1}, ${3:Count2}${4:, ... Count8})
+#t=ComObjConnect
+#g=comobjconnect
+ComObjConnect(${1:obj}${2:, funcPrefixOrObj})
+#t=ComObjCreate
+#g=comobjcreate
+ComObjCreate(${1:ProgIdOrCLSID}${2:, IID})
+#t=ComObjEnwrap
+#g=comobjenwrap
+ComObjEnwrap(${1:pdisp})
+#t=ComObjError
+#g=comobjerror
+ComObjError(${1:Enable})
+#t=ComObjFlags
+#g=comobjflags
+ComObjFlags(${1:ComObject}, ${2:NewFlags}${3:, Mask})
+#t=ComObjGet
+#g=comobjget
+ComObjGet(${1:name})
+#t=ComObjMissing
+#g=comobjmissing
+ComObjMissing()
+#t=ComObjParameter
+#g=comobjparameter
+ComObjParameter(${1:vt}, ${2:val}${3:, flags})
+#t=ComObjQuery
+#g=comobjquery
+ComObjQuery(${1:ComObject}, ${2:SID}${3:, IID})
+#t=ComObjType
+#g=comobjtype
+ComObjType(${1:obj}${2:, "Name"/"IID"})
+#t=ComObjUnwrap
+#g=comobjunwrap
+ComObjUnwrap(${1:obj})
+#t=ComObjValue
+#g=comobjvalue
+ComObjValue(${1:obj})
+#t=continue
+#g=continue
+continue
+#t=Control
+#g=control
+Control, ${1:Cmd}, ${2:Value}, ${3:Control}, ${4:WinTitle}, ${5:WinText}, ${6:ExcludeTitle}${7:, ExcludeText}
+#t=ControlClick
+#g=controlclick
+ControlClick, ${1:Control-or-Pos}, ${2:WinTitle}, ${3:WinText}, ${4:WhichButton}, ${5:ClickCount}, ${6:Options}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=ControlFocus
+#g=controlfocus
+ControlFocus, ${1:Control}, ${2:WinTitle}, ${3:WinText}, ${4:ExcludeTitle}, ${5:ExcludeText}
+#t=ControlGet
+#g=controlget
+ControlGet, ${1:OutputVar}, ${2:Cmd}, ${3:Value}, ${4:Control}, ${5:WinTitle}, ${6:WinText}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=ControlGetFocus
+#g=controlgetfocus
+ControlGetFocus, ${1:OutputVar}, ${2:WinTitle}, ${3:WinText}, ${4:ExcludeTitle}, ${5:ExcludeText}
+#t=ControlGetPos
+#g=controlgetpos
+ControlGetPos, ${1:X}, ${2:Y}, ${3:Width}, ${4:Height}, ${5:Control}, ${6:WinTitle}, ${7:WinText}, ${8:ExcludeTitle}${9:, ExcludeText}
+#t=ControlGetText
+#g=controlgettext
+ControlGetText, ${1:OutputVar}, ${2:Control}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}, ${6:ExcludeText}
+#t=ControlMove
+#g=controlmove
+ControlMove, ${1:Control}, ${2:X}, ${3:Y}, ${4:Width}, ${5:Height}, ${6:WinTitle}, ${7:WinText}, ${8:ExcludeTitle}${9:, ExcludeText}
+#t=ControlSend
+#g=controlsend
+ControlSend, ${1:Control}, ${2:Keys}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=ControlSendRaw
+#g=controlsendraw
+ControlSendRaw, ${1:Control}, ${2:Keys}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=ControlSetText
+#g=controlsettext
+ControlSetText, ${1:Control}, ${2:NewText}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=CoordMode
+#g=coordmode
+CoordMode, ${1:ToolTip|Pixel|Mouse}${2:, Screen|Relative}
+#t=Cos
+#g=cos
+Cos(${1:Number})
+#t=Critical
+#g=critical
+Critical, ${1:Off}
+#t=DetectHiddenText
+#g=detecthiddentext
+DetectHiddenText, ${1:On|Off}
+#t=DetectHiddenWindows
+#g=detecthiddenwindows
+DetectHiddenWindows, ${1:On|Off}
+#t=DllCall
+#g=dllcall
+DllCall(${1:"DllFile\Function"}, ${2:Type1}, ${3:Arg1}, ${4:Type2}, ${5:Arg2}, ${6:...}, ${7:"Cdecl}${8:, ReturnType"})
+#t=Drive
+#g=drive
+Drive, ${1:Sub-command}, ${2:Drive}${3:, Value}
+#t=DriveGet
+#g=driveget
+DriveGet, ${1:OutputVar}, ${2:Cmd}${3:, Value}
+#t=DriveSpaceFree
+#g=drivespacefree
+DriveSpaceFree, ${1:OutputVar}${2:, C:\}
+#t=Edit
+#g=edit
+Edit
+#t=else
+#g=else
+else
+#t=EnvAdd
+#g=envadd
+EnvAdd, ${1:Var}, ${2:Value}${3:, TimeUnits}
+#t=EnvDiv
+#g=envdiv
+EnvDiv, ${1:Var}${2:, Value}
+#t=EnvGet
+#g=envget
+EnvGet, ${1:OutputVar}${2:, EnvVarName}
+#t=EnvMult
+#g=envmult
+EnvMult, ${1:Var}${2:, Value}
+#t=EnvSet
+#g=envset
+EnvSet, ${1:EnvVar}${2:, Value}
+#t=EnvSub
+#g=envsub
+EnvSub, ${1:Var}, ${2:Value}${3:, TimeUnits}
+#t=EnvUpdate
+#g=envupdate
+EnvUpdate
+#t=Exception
+#g=exception
+Exception(${1:message}, ${2:what}${3:, extra})
+#t=Exit
+#g=exit
+Exit, ${1:ExitCode}
+#t=ExitApp
+#g=exitapp
+ExitApp, ${1:ExitCode}
+#t=Exp
+#g=exp
+Exp(${1:Number})
+#t=FileAppend
+#g=fileappend
+FileAppend, ${1:Text}, ${2:Filename}${3:, Encoding}
+#t=FileCopy
+#g=filecopy
+FileCopy, ${1:Source}, ${2:Dest}${3:, Flag(1 = overwrite)}
+#t=FileCopyDir
+#g=filecopydir
+FileCopyDir, ${1:Source}, ${2:Dest}${3:, Flag}
+#t=FileCreateDir
+#g=filecreatedir
+FileCreateDir, ${1:Path}
+#t=FileCreateShortcut
+#g=filecreateshortcut
+FileCreateShortcut, ${1:Target}, ${2:C:\My}, ${3:Shortcut.lnk}, ${4:WorkingDir}, ${5:Args}, ${6:Description}, ${7:IconFile}, ${8:ShortcutKey}, ${9:IconNumber}${10:, RunState}
+#t=FileDelete
+#g=filedelete
+FileDelete, ${1:FilePattern}
+#t=FileEncoding
+#g=fileencoding
+FileEncoding, ${1:CPnnn|UTF-8/16-RAW}
+#t=FileExist
+#g=fileexist
+FileExist(${1:"FilePattern"})
+#t=FileGetAttrib
+#g=filegetattrib
+FileGetAttrib, ${1:OutputVar(RASHNDOCT)}${2:, Filename}
+#t=FileGetShortcut
+#g=filegetshortcut
+FileGetShortcut, ${1:LinkFile}, ${2:OutTarget}, ${3:OutDir}, ${4:OutArgs}, ${5:OutDescription}, ${6:OutIcon}, ${7:OutIconNum}${8:, OutRunState}
+#t=FileGetSize
+#g=filegetsize
+FileGetSize, ${1:OutputVar}, ${2:Filename}${3:, Units}
+#t=FileGetTime
+#g=filegettime
+FileGetTime, ${1:OutputVar}, ${2:Filename}, ${3:WhichTime(M}, ${4:C}, ${5:or}, ${6:A -- default}, ${7:is}${8:, M)}
+#t=FileGetVersion
+#g=filegetversion
+FileGetVersion, ${1:OutputVar}${2:, Filename}
+#t=FileInstall
+#g=fileinstall
+FileInstall, ${1:Source}, ${2:Dest}${3:, Flag(1 = overwrite)}
+#t=FileMove
+#g=filemove
+FileMove, ${1:Source}, ${2:Dest}${3:, Flag(1 = overwrite)}
+#t=FileMoveDir
+#g=filemovedir
+FileMoveDir, ${1:Source}, ${2:Dest}${3:, Flag(2 = overwrite)}
+#t=FileOpen
+#g=fileopen
+FileOpen(${1:file}, ${2:mode}${3:, encoding})
+#t=FileRead
+#g=fileread
+FileRead, ${1:OutputVar}${2:, Filename}
+#t=FileReadLine
+#g=filereadline
+FileReadLine, ${1:OutputVar}, ${2:Filename}${3:, LineNum}
+#t=FileRecycle
+#g=filerecycle
+FileRecycle, ${1:FilePattern}
+#t=FileRecycleEmpty
+#g=filerecycleempty
+FileRecycleEmpty, ${1:C:\}
+#t=FileRemoveDir
+#g=fileremovedir
+FileRemoveDir, ${1:Path}${2:, Recurse?(1 = yes)}
+#t=FileSelectFile
+#g=fileselectfile
+FileSelectFile, ${1:OutputVar}, ${2:Options}, ${3:RootDir\DefaultFilename}, ${4:Prompt}${5:, Filter}
+#t=FileSelectFolder
+#g=fileselectfolder
+FileSelectFolder, ${1:OutputVar}, ${2:*StartingFolder}, ${3:Options}${4:, Prompt}
+#t=FileSetAttrib
+#g=filesetattrib
+FileSetAttrib, ${1:Attributes(+-^RASHNOT)}, ${2:FilePattern}, ${3:OperateOnFolders?}${4:, Recurse?}
+#t=FileSetTime
+#g=filesettime
+FileSetTime, ${1:YYYYMMDDHH24MISS}, ${2:FilePattern}, ${3:WhichTime(M|C|A)}, ${4:OperateOnFolders?}${5:, Recurse?}
+#t=Floor
+#g=floor
+Floor(${1:Number})
+#t=for
+#g=for
+for, ${1:key}, ${2:val in}${3:, obj}
+#t=FormatTime
+#g=formattime
+FormatTime, ${1:OutputVar}, ${2:YYYYMMDDHH24MISS}${3:, Format}
+#t=GetKeyName
+#g=getkeyname
+GetKeyName(${1:key})
+#t=GetKeySC
+#g=getkeysc
+GetKeySC(${1:key})
+#t=GetKeyState
+#g=getkeystate
+GetKeyState(${1:KeyName}${2:, "P" or "T"})
+#t=GetKeyState
+#g=getkeystate
+GetKeyState, ${1:OutputVar}, ${2:WhichKey}${3:, Mode(P|T)}
+#t=GetKeyVK
+#g=getkeyvk
+GetKeyVK(${1:key})
+#t=gosub
+#g=gosub
+gosub, ${1:Label}
+#t=goto
+#g=goto
+goto, ${1:Label}
+#t=GroupActivate
+#g=groupactivate
+GroupActivate, ${1:GroupName}${2:, R}
+#t=GroupAdd
+#g=groupadd
+GroupAdd, ${1:GroupName}, ${2:WinTitle}, ${3:WinText}, ${4:Label}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=GroupClose
+#g=groupclose
+GroupClose, ${1:GroupName}${2:, A|R}
+#t=GroupDeactivate
+#g=groupdeactivate
+GroupDeactivate, ${1:GroupName}${2:, R}
+#t=Gui
+#g=gui
+Gui, ${1:sub-command}, ${2:Param2}, ${3:Param3}${4:, Param4}
+#t=GuiControl
+#g=guicontrol
+GuiControl, ${1:Sub-command}, ${2:ControlID}${3:, Param3}
+#t=GuiControlGet
+#g=guicontrolget
+GuiControlGet, ${1:OutputVar}, ${2:Sub-command}, ${3:ControlID}${4:, Param4}
+#t=Hotkey
+#g=hotkey
+Hotkey, ${1:KeyName}, ${2:Label}${3:, Options}
+#t=if
+#g=if
+if (${1:expression})
+#t=if var
+#g=ifv
+if ${1:Var} ${2:contains} ${3:list,of,stuff}
+#t=IfExist
+#g=ifexist
+IfExist, ${1:File|Dir|Pattern}
+#t=IfMsgBox
+#g=ifmsgbox
+IfMsgBox, ${1:Yes|No|OK|Cancel|Abort|Ignore|Retry|Timeout}
+#t=IfNotExist
+#g=ifnotexist
+IfNotExist, ${1:File|Dir|Pattern}
+#t=IfWinActive
+#g=ifwinactive
+IfWinActive, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=IfWinExist
+#g=ifwinexist
+IfWinExist, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=IfWinNotActive
+#g=ifwinnotactive
+IfWinNotActive, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=IfWinNotExist
+#g=ifwinnotexist
+IfWinNotExist, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=IL_Add
+#g=il_add
+IL_Add(${1:ImageListID}, ${2:Filename}, ${3:IconNumber}${4:, ResizeNonIcon?})
+#t=IL_Create
+#g=il_create
+IL_Create(${1:InitialCount}, ${2:GrowCount}${3:, LargeIcons?})
+#t=IL_Destroy
+#g=il_destroy
+IL_Destroy(${1:ImageListID})
+#t=ImageSearch
+#g=imagesearch
+ImageSearch, ${1:OutputVarX}, ${2:OutputVarY}, ${3:X1}, ${4:Y1}, ${5:X2}, ${6:Y2}${7:, ImageFile}
+#t=IniDelete
+#g=inidelete
+IniDelete, ${1:Filename}, ${2:Section}${3:, Key}
+#t=IniRead
+#g=iniread
+IniRead, ${1:OutputVar}, ${2:Filename}, ${3:Section}, ${4:Key}${5:, Default}
+#t=IniWrite
+#g=iniwrite
+IniWrite, ${1:Value}, ${2:Filename}, ${3:Section}${4:, Key}
+#t=Input
+#g=input
+Input, ${1:OutputVar}, ${2:Options}, ${3:EndKeys}${4:, MatchList}
+#t=InputBox
+#g=inputbox
+InputBox, ${1:OutputVar}, ${2:Title}, ${3:Prompt}, ${4:HIDE}, ${5:Width}, ${6:Height}, ${7:X}, ${8:Y}, ${9:Font}, ${10:Timeout}${11:, Default}
+#t=InStr
+#g=instr
+InStr(${1:Haystack}, ${2:Needle}, ${3:CaseSensitive?}, ${4:StartingPos}${5:, Occurrence})
+#t=IsByRef
+#g=isbyref
+IsByRef(${1:var})
+#t=IsFunc
+#g=isfunc
+IsFunc(${1:FunctionName})
+#t=IsLabel
+#g=islabel
+IsLabel(${1:LabelName})
+#t=IsObject
+#g=isobject
+IsObject(${1:param})
+#t=KeyHistory
+#g=keyhistory
+KeyHistory
+#t=KeyWait
+#g=keywait
+KeyWait, ${1:KeyName}${2:, Options}
+#t=ListHotkeys
+#g=listhotkeys
+ListHotkeys
+#t=ListLines
+#g=listlines
+ListLines
+#t=ListVars
+#g=listvars
+ListVars
+#t=Ln
+#g=ln
+Ln(${1:Number})
+#t=Log
+#g=log
+Log(${1:Number})
+#t=Loop
+#g=loop
+Loop, ${1:Count}
+#t=LTrim
+#g=ltrim
+LTrim(${1:string}${2:, omitchars = " `t"})
+#t=LV_Add
+#g=lv_add
+LV_Add(${1:Options}, ${2:Col1}, ${3:Col2}${4:, ...})
+#t=LV_Delete
+#g=lv_delete
+LV_Delete(${1:RowNumber})
+#t=LV_DeleteCol
+#g=lv_deletecol
+LV_DeleteCol(${1:ColumnNumber})
+#t=LV_GetCount
+#g=lv_getcount
+LV_GetCount(${1:"S"})
+#t=LV_GetNext
+#g=lv_getnext
+LV_GetNext(${1:StartingRowNumber}${2:, "C|F"})
+#t=LV_GetText
+#g=lv_gettext
+LV_GetText(${1:OutputVar}, ${2:RowNumber}${3:, ColumnNumber})
+#t=LV_Insert
+#g=lv_insert
+LV_Insert(${1:RowNumber}, ${2:Options}, ${3:Col1}, ${4:Col2}${5:, ...})
+#t=LV_InsertCol
+#g=lv_insertcol
+LV_InsertCol(${1:ColumnNumber}, ${2:Options}${3:, ColumnTitle})
+#t=LV_Modify
+#g=lv_modify
+LV_Modify(${1:RowNumber}, ${2:Options}, ${3:NewCol1}, ${4:NewCol2}${5:, ...})
+#t=LV_ModifyCol
+#g=lv_modifycol
+LV_ModifyCol(${1:ColumnNumber}, ${2:Options}${3:, ColumnTitle})
+#t=LV_SetImageList
+#g=lv_setimagelist
+LV_SetImageList(${1:ImageListID}${2:, 0|1|2})
+#t=Menu
+#g=menu
+Menu, ${1:MenuName}, ${2:Cmd}, ${3:P3}, ${4:P4}${5:, P5}
+#t=Mod
+#g=mod
+Mod(${1:Dividend}${2:, Divisor})
+#t=MouseClick
+#g=mouseclick
+MouseClick, ${1:WhichButton}, ${2:X}, ${3:Y}, ${4:ClickCount}, ${5:Speed}, ${6:D|U}${7:, R}
+#t=MouseClickDrag
+#g=mouseclickdrag
+MouseClickDrag, ${1:WhichButton}, ${2:X1}, ${3:Y1}, ${4:X2}, ${5:Y2}, ${6:Speed}${7:, R}
+#t=MouseGetPos
+#g=mousegetpos
+MouseGetPos, ${1:OutputVarX}, ${2:OutputVarY}, ${3:OutputVarWin}, ${4:OutputVarControl}${5:, 1|2|3}
+#t=MouseMove
+#g=mousemove
+MouseMove, ${1:X}, ${2:Y}, ${3:Speed}${4:, R}
+#t=Msgbox1
+#g=msgbox
+MsgBox, ${1:text}
+#t=MsgBox2
+#g=msgbox
+MsgBox, ${1:Options}, ${2:Title}, ${3:Text}${4:, Timeout}
+#t=NumGet
+#g=numget
+NumGet(${1:VarOrAddress}, ${2:Offset = 0}${3:, Type = "UPtr"})
+#t=NumPut
+#g=numput
+NumPut(${1:Number}, ${2:VarOrAddress}, ${3:Offset = 0}${4:, Type = "UPtr"})
+#t=ObjAddRef
+#g=objaddref
+ObjAddRef(${1:address})
+#t=ObjClone
+#g=objclone
+ObjClone(${1:obj})
+#t=Object
+#g=object
+Object(${1:obj})
+#t=ObjGetAddress
+#g=objgetaddress
+ObjGetAddress(${1:obj}${2:, key})
+#t=ObjGetCapacity
+#g=objgetcapacity
+ObjGetCapacity(${1:obj}${2:, key})
+#t=ObjHasKey
+#g=objhaskey
+ObjHasKey(${1:obj}${2:, key})
+#t=ObjInsert
+#g=objinsert
+ObjInsert(${1:obj}, ${2:key}${3:, value})
+#t=ObjMaxIndex
+#g=objmaxindex
+ObjMaxIndex(${1:obj})
+#t=ObjMinIndex
+#g=objminindex
+ObjMinIndex(${1:obj})
+#t=ObjNewEnum
+#g=objnewenum
+ObjNewEnum(${1:obj})
+#t=ObjRelease
+#g=objrelease
+ObjRelease(${1:address})
+#t=ObjRemove
+#g=objremove
+ObjRemove(${1:obj}, ${2:first}${3:, last})
+#t=ObjSetCapacity
+#g=objsetcapacity
+ObjSetCapacity(${1:obj}, ${2:key}${3:, bytesize})
+#t=OnExit
+#g=onexit
+OnExit, ${1:Label}
+#t=OnMessage
+#g=onmessage
+OnMessage(${1:MsgNumber}${2:, "FunctionName"})
+#t=OutputDebug
+#g=outputdebug
+OutputDebug, ${1:Text}
+#t=Pause
+#g=pause
+Pause, ${1:On|Off|Toggle}${2:, OperateOnUnderlyingThread?}
+#t=PixelGetColor
+#g=pixelgetcolor
+PixelGetColor, ${1:OutputVar}, ${2:X}, ${3:Y}${4:, Alt|Slow|RGB}
+#t=PixelSearch
+#g=pixelsearch
+PixelSearch, ${1:OutputVarX}, ${2:OutputVarY}, ${3:X1}, ${4:Y1}, ${5:X2}, ${6:Y2}, ${7:ColorID}, ${8:Variation}${9:, Fast|RGB}
+#t=PostMessage
+#g=postmessage
+PostMessage, ${1:Msg}, ${2:wParam}, ${3:lParam}, ${4:Control}, ${5:WinTitle}, ${6:WinText}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=Process
+#g=process
+Process, ${1:Cmd}, ${2:PID-or-Name}${3:, Param3}
+#t=Progress
+#g=progress
+Progress, ${1:Param1}, ${2:SubText}, ${3:MainText}, ${4:WinTitle}${5:, FontName}
+#t=Random
+#g=random
+Random, ${1:OutputVar}, ${2:Min}${3:, Max}
+#t=RegDelete
+#g=regdelete
+RegDelete, ${1:HKLM|HKU|HKCU|HKCR|HKCC}, ${2:SubKey}${3:, ValueName}
+#t=RegExMatch
+#g=regexmatch
+RegExMatch(${1:Haystack}, ${2:NeedleRegEx}, ${3:UnquotedOutputVar = ""}${4:, StartingPos = 1})
+#t=RegExReplace
+#g=regexreplace
+RegExReplace(${1:Haystack}, ${2:NeedleRegEx}, ${3:Replacement = ""}${4:, OutputVarCount = ""}${5:, Limit = -1}${6:, StartingPos = 1})
+#t=RegisterCallback
+#g=registercallback
+RegisterCallback(${1:"FunctionName"}, ${2:Options = ""}, ${3:ParamCount = FormalCount}${4:, EventInfo = Address})
+#t=RegRead
+#g=regread
+RegRead, ${1:OutputVar}, ${2:HKLM|HKU|HKCU|HKCR|HKCC}, ${3:SubKey}${4:, ValueName}
+#t=RegWrite
+#g=regwrite
+RegWrite, ${1:REG_SZ|REG_EXPAND_SZ|REG_MULTI_SZ|REG_DWORD|REG_BINARY}, ${2:HKLM|HKU|HKCU|HKCR|HKCC}, ${3:SubKey}, ${4:ValueName}${5:, Value}
+#t=Round
+#g=round
+Round(${1:Number}${2:, Places})
+#t=RTrim
+#g=rtrim
+RTrim(${1:string}${2:, omitchars = " `t"})
+#t=Run
+#g=run
+Run, ${1:Target}, ${2:WorkingDir}, ${3:Max|Min|Hide|UseErrorLevel}${4:, OutputVarPID}
+#t=RunAs
+#g=runas
+RunAs, ${1:User}, ${2:Password}${3:, Domain}
+#t=RunWait
+#g=runwait
+RunWait, ${1:Target}, ${2:WorkingDir}, ${3:Max|Min|Hide|UseErrorLevel}${4:, OutputVarPID}
+#t=SB_SetIcon
+#g=sb_seticon
+SB_SetIcon(${1:Filename}, ${2:IconNumber}${3:, PartNumber})
+#t=SB_SetParts
+#g=sb_setparts
+SB_SetParts(${1:Width1}, ${2:Width2}${3:, ... Width255})
+#t=SB_SetText
+#g=sb_settext
+SB_SetText(${1:NewText}, ${2:PartNumber}${3:, Style})
+#t=SendLevel
+#g=sendlevel
+SendLevel, ${1:Level}
+#t=SendMessage
+#g=sendmessage
+SendMessage, ${1:Msg}, ${2:wParam}, ${3:lParam}, ${4:Control}, ${5:WinTitle}, ${6:WinText}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=SendMode
+#g=sendmode
+SendMode, ${1:Event|Play|Input|InputThenPlay}
+#t=SetBatchLines
+#g=setbatchlines
+SetBatchLines, ${1:-1 | 20ms | LineCount}
+#t=SetCapsLockState
+#g=setcapslockstate
+SetCapsLockState, ${1:On|Off|AlwaysOn|AlwaysOff}
+#t=SetControlDelay
+#g=setcontroldelay
+SetControlDelay, ${1:Delay}
+#t=SetDefaultMouseSpeed
+#g=setdefaultmousespeed
+SetDefaultMouseSpeed, ${1:Speed}
+#t=SetEnv
+#g=setenv
+SetEnv, ${1:Var}${2:, Value}
+#t=SetFormat
+#g=setformat
+SetFormat, ${1:float|integer}${2:, TotalWidth.DecimalPlaces|hex|d}
+#t=SetKeyDelay
+#g=setkeydelay
+SetKeyDelay, ${1:Delay}${2:, PressDuration}
+#t=SetMouseDelay
+#g=setmousedelay
+SetMouseDelay, ${1:Delay}
+#t=SetNumLockState
+#g=setnumlockstate
+SetNumLockState, ${1:On|Off|AlwaysOn|AlwaysOff}
+#t=SetRegView
+#g=setregview
+SetRegView, ${1:RegView}
+#t=SetScrollLockState
+#g=setscrolllockstate
+SetScrollLockState, ${1:On|Off|AlwaysOn|AlwaysOff}
+#t=SetStoreCapslockMode
+#g=setstorecapslockmode
+SetStoreCapslockMode, ${1:On|Off}
+#t=SetTimer
+#g=settimer
+SetTimer, ${1:Label}${2:, Period|On|Off}
+#t=SetTitleMatchMode
+#g=settitlematchmode
+SetTitleMatchMode, ${1:Fast|Slow|RegEx|1|2|3}
+#t=SetWinDelay
+#g=setwindelay
+SetWinDelay, ${1:Delay}
+#t=SetWorkingDir
+#g=setworkingdir
+SetWorkingDir, ${1:DirName}
+#t=Shutdown
+#g=shutdown
+Shutdown${1:}${2:, Code}
+#t=Sin
+#g=sin
+Sin(${1:Number})
+#t=Sleep
+#g=sleep
+Sleep, ${1:Delay}
+#t=Sort
+#g=sort
+Sort, ${1:VarName}${2:, Options}
+#t=SoundBeep
+#g=soundbeep
+SoundBeep, ${1:Frequency}${2:, Duration}
+#t=SoundGet
+#g=soundget
+SoundGet, ${1:OutputVar}, ${2:ComponentType}, ${3:ControlType}${4:, DeviceNumber}
+#t=SoundGetWaveVolume
+#g=soundgetwavevolume
+SoundGetWaveVolume, ${1:OutputVar}${2:, DeviceNumber}
+#t=SoundPlay
+#g=soundplay
+SoundPlay, ${1:Filename}${2:, wait}
+#t=SoundSet
+#g=soundset
+SoundSet, ${1:NewSetting}, ${2:ComponentType}, ${3:ControlType}${4:, DeviceNumber}
+#t=SoundSetWaveVolume
+#g=soundsetwavevolume
+SoundSetWaveVolume, ${1:Percent}${2:, DeviceNumber}
+#t=SplashImage
+#g=splashimage
+SplashImage, ${1:ImageFile}, ${2:Options}, ${3:SubText}, ${4:MainText}, ${5:WinTitle}${6:, FontName}
+#t=SplashTextOff
+#g=splashtextoff
+SplashTextOff
+#t=SplashTextOn
+#g=splashtexton
+SplashTextOn, ${1:Width}, ${2:Height}, ${3:Title}${4:, Text}
+#t=SplitPath
+#g=splitpath
+SplitPath, ${1:InputVar}, ${2:OutFileName}, ${3:OutDir}, ${4:OutExtension}, ${5:OutNameNoExt}${6:, OutDrive}
+#t=Sqrt
+#g=sqrt
+Sqrt(${1:Number})
+#t=StatusBarGetText
+#g=statusbargettext
+StatusBarGetText, ${1:OutputVar}, ${2:Part#}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=StatusBarWait
+#g=statusbarwait
+StatusBarWait, ${1:BarText}, ${2:Seconds}, ${3:Part#}, ${4:WinTitle}, ${5:WinText}, ${6:Interval}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=StrGet
+#g=strget
+StrGet(${1:address}, ${2:max}${3:, encoding})
+#t=StringCaseSense
+#g=stringcasesense
+StringCaseSense, ${1:On|Off|Locale}
+#t=StringGetPos
+#g=stringgetpos
+StringGetPos, ${1:OutputVar}, ${2:InputVar}, ${3:SearchText}, ${4:L#|R#}${5:, Offset}
+#t=StringLeft
+#g=stringleft
+StringLeft, ${1:OutputVar}, ${2:InputVar}${3:, Count}
+#t=StringLen
+#g=stringlen
+StringLen, ${1:OutputVar}${2:, InputVar}
+#t=StringLower
+#g=stringlower
+StringLower, ${1:OutputVar}, ${2:InputVar}${3:, T}
+#t=StringMid
+#g=stringmid
+StringMid, ${1:OutputVar}, ${2:InputVar}, ${3:StartChar}, ${4:Count}${5:, L}
+#t=StringReplace
+#g=stringreplace
+StringReplace, ${1:OutputVar}, ${2:InputVar}, ${3:SearchText}, ${4:ReplaceText}${5:, All}
+#t=StringRight
+#g=stringright
+StringRight, ${1:OutputVar}, ${2:InputVar}${3:, Count}
+#t=StringSplit
+#g=stringsplit
+StringSplit, ${1:OutputArray}, ${2:InputVar}, ${3:Delimiters}${4:, OmitChars}
+#t=StringTrimLeft
+#g=stringtrimleft
+StringTrimLeft, ${1:OutputVar}, ${2:InputVar}${3:, Count}
+#t=StringTrimRight
+#g=stringtrimright
+StringTrimRight, ${1:OutputVar}, ${2:InputVar}${3:, Count}
+#t=StringUpper
+#g=stringupper
+StringUpper, ${1:OutputVar}, ${2:InputVar}${3:, T}
+#t=StrLen
+#g=strlen
+StrLen(${1:String})
+#t=StrPut
+#g=strput
+StrPut(${1:string}, ${2:address}, ${3:max}${4:, encoding})
+#t=SubStr
+#g=substr
+SubStr(${1:String}, ${2:StartingPos}${3:, Length})
+#t=Suspend
+#g=suspend
+Suspend, ${1:On|Off|Toggle|Permit}
+#t=SysGet
+#g=sysget
+SysGet, ${1:OutputVar}, ${2:Sub-command}${3:, Param3}
+#t=Tan
+#g=tan
+Tan(${1:Number})
+#t=Thread
+#g=thread
+Thread, ${1:Setting}, ${2:P2}${3:, P3}
+#t=throw
+#g=throw
+throw${1:, Expression}
+#t=ToolTip
+#g=tooltip
+ToolTip, ${1:Text}${2:, X}${3: ,Y}${4:, WhichToolTip}
+#t=Transform
+#g=transform
+Transform, ${1:OutputVar}, ${2:Cmd}, ${3:Value1}${4:, Value2}
+#t=TrayTip
+#g=traytip
+TrayTip, ${1:Title}, ${2:Text}, ${3:Seconds}${4:, Options}
+#t=Trim
+#g=trim
+Trim(${1:string}${2:, omitchars = " `t"})
+#t=try
+#g=try
+try
+#t=TV_Add
+#g=tv_add
+TV_Add(${1:Name}, ${2:ParentItemID}${3:, Options})
+#t=TV_Delete
+#g=tv_delete
+TV_Delete(${1:ItemID})
+#t=TV_Get
+#g=tv_get
+TV_Get(${1:ItemID}${2:, "Expand | Check | Bold"})
+#t=TV_GetChild
+#g=tv_getchild
+TV_GetChild(${1:ParentItemID})
+#t=TV_GetCount
+#g=tv_getcount
+TV_GetCount()
+#t=TV_GetNext
+#g=tv_getnext
+TV_GetNext(${1:ItemID}${2:, "Checked | Full"})
+#t=TV_GetParent
+#g=tv_getparent
+TV_GetParent(${1:ItemID})
+#t=TV_GetPrev
+#g=tv_getprev
+TV_GetPrev(${1:ItemID})
+#t=TV_GetSelection
+#g=tv_getselection
+TV_GetSelection()
+#t=TV_GetText
+#g=tv_gettext
+TV_GetText(${1:OutputVar}${2:, ItemID})
+#t=TV_Modify
+#g=tv_modify
+TV_Modify(${1:ItemID}, ${2:Options}${3:, NewName})
+#t=TV_SetImageList
+#g=tv_setimagelist
+TV_SetImageList(${1:ImageList}${2:, 0|2})
+#t=until
+#g=until
+until$$${1:, Expression}
+#t=URLDownloadToFile
+#g=urldownloadtofile
+URLDownloadToFile, ${1:URL}${2:, Filename}
+#t=VarSetCapacity
+#g=varsetcapacity
+VarSetCapacity(${1:Var}, ${2:RequestedCapacity}${3:, FillByte})
+#t=while
+#g=while
+while (${1:Expression})
+#t=WinActivate
+#g=winactivate
+WinActivate, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinActivateBottom
+#g=winactivatebottom
+WinActivateBottom, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinActive
+#g=winactive
+WinActive(${1:"WinTitle"}, ${2:"WinText"}, ${3:"ExcludeTitle"}${4:, "ExcludeText"})
+#t=WinClose
+#g=winclose
+WinClose, ${1:WinTitle}, ${2:WinText}, ${3:SecondsToWait}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinExist
+#g=winexist
+WinExist(${1:"WinTitle"}, ${2:"WinText"}, ${3:"ExcludeTitle"}${4:, "ExcludeText"})
+#t=WinGet
+#g=winget
+WinGet, ${1:OutputVar}, ${2:Cmd}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=WinGetActiveStats
+#g=wingetactivestats
+WinGetActiveStats, ${1:Title}, ${2:Width}, ${3:Height}, ${4:X}${5:, Y}
+#t=WinGetActiveTitle
+#g=wingetactivetitle
+WinGetActiveTitle, ${1:OutputVar}
+#t=WinGetClass
+#g=wingetclass
+WinGetClass, ${1:OutputVar}, ${2:WinTitle}, ${3:WinText}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinGetPos
+#g=wingetpos
+WinGetPos, ${1:X}, ${2:Y}, ${3:Width}, ${4:Height}, ${5:WinTitle}, ${6:WinText}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=WinGetText
+#g=wingettext
+WinGetText, ${1:OutputVar}, ${2:WinTitle}, ${3:WinText}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinGetTitle
+#g=wingettitle
+WinGetTitle, ${1:OutputVar}, ${2:WinTitle}, ${3:WinText}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinHide
+#g=winhide
+WinHide, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinKill
+#g=winkill
+WinKill, ${1:WinTitle}, ${2:WinText}, ${3:SecondsToWait}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinMaximize
+#g=winmaximize
+WinMaximize, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinMenuSelectItem
+#g=winmenuselectitem
+WinMenuSelectItem, ${1:WinTitle}, ${2:WinText}, ${3:Menu}, ${4:SubMenu1}, ${5:SubMenu2}, ${6:SubMenu3}, ${7:SubMenu4}, ${8:SubMenu5}, ${9:SubMenu6}, ${10:ExcludeTitle}${11:, ExcludeText}
+#t=WinMinimize
+#g=winminimize
+WinMinimize, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinMinimizeAll
+#g=winminimizeall
+WinMinimizeAll
+#t=WinMinimizeAllUndo
+#g=winminimizeallundo
+WinMinimizeAllUndo
+#t=WinMove
+#g=winmove
+WinMove, ${1:WinTitle}, ${2:WinText}, ${3:X}, ${4:Y}, ${5:Width}, ${6:Height}, ${7:ExcludeTitle}${8:, ExcludeText}
+#t=WinRestore
+#g=winrestore
+WinRestore, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinSet
+#g=winset
+WinSet, ${1:AlwaysOnTop|Trans}, ${2:On|Off|Toggle|Value(0-255)}, ${3:WinTitle}, ${4:WinText}, ${5:ExcludeTitle}${6:, ExcludeText}
+#t=WinSetTitle
+#g=winsettitle
+WinSetTitle, ${1:WinTitle}, ${2:WinText}, ${3:NewTitle}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinShow
+#g=winshow
+WinShow, ${1:WinTitle}, ${2:WinText}, ${3:ExcludeTitle}${4:, ExcludeText}
+#t=WinWait
+#g=winwait
+WinWait, ${1:WinTitle}, ${2:WinText}, ${3:Seconds}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinWaitActive
+#g=winwaitactive
+WinWaitActive, ${1:WinTitle}, ${2:WinText}, ${3:Seconds}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=WinWaitClose
+#g=winwaitclose
+WinWaitClose, ${1:WinTitle}, ${2:WinText}, ${3:Seconds}, ${4:ExcludeTitle}${5:, ExcludeText}
+#t=ComObjFlags
+#g=comobjflags
+ComObjFlags(${1:ComObject}, ${2:NewFlags}${3:, Mask})

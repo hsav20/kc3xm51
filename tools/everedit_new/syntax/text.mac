@@ -1,0 +1,20 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Plain text file(txt/log)
+' Maintainer:  www.everedit.net  
+' History:
+'   2014/03/13 First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set txt=CreateParser()
+txt.WordChars="_"
+
+'number
+txt.AddItem( txt.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+'operators
+txt.AddItem( txt.CreateItem(COLOR_WORD1, "[:punct:]+",False ) )
+txt.SetPairs( "[]{}()""""''" )
+txt.FoldingMethod="indent"
+

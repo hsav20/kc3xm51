@@ -1,0 +1,61 @@
+function isNull(v){
+	if( v=="null" ) return true;
+	if( v==null ) return true;
+	if( v=="" ) return true;
+	return false;
+}
+
+var doc=App.ActiveDoc;
+var mt=false;
+
+var doc=App.ActiveDoc;
+function Simple()
+{
+	var pos=doc.CaretPos;
+	var txt=doc.GetLineText( pos.Line );
+	var head=txt.match(mt?/^\s*- \[[xX ]\]\s*/:/^\s*[\u2611\u2B1C]\s*/) + "";
+	if( !isNull(head) ){
+		head=txt.match(mt?/^\s*- \[[xX]\]\s*/:/^\s*[\u2611]\s*/) + "";
+		if( !isNull(head) ){
+			txt=txt.replace(mt?/^(\s*)- \[[xX]\]\s*/:/^(\s*)[\u2611]\s*/, function($1, $2){
+				return mt?($2 + '- [ ] '):($2+'\u2B1C ');
+			});
+		}
+		else{
+			txt=txt.replace(mt?/^(\s*)- \[ \]\s*/:/^(\s*)[\u2B1C]\s*/, function($1, $2){
+				return mt?($2 + '- [x] '):($2+'\u2611 ');
+			});
+		}
+		doc.Delete(pos.Line, 0, pos.Line, 10000000);
+		doc.InsertAt(pos.Line, 0, txt);
+	}
+	else{
+		head = mt?'- [X] ':'\u2611 ';
+		doc.InsertAt(pos.Line, 0, head);
+	}
+}
+
+if( !doc.HasSel() ){
+	Simple();
+}
+else{
+	var spos=doc.SelStartPos();
+	var epos=doc.SelEndPos();
+	if( spos.Line==epos.Line )
+		Simple();
+	else{
+		spos.Col=0;
+		epos.Col=10000000;
+		var sel=doc.GetText(spos, epos, 2); //2 is unix style EOL
+		sel = sel.replace(/^\n/gm, '');
+		sel = sel.replace(mt?/^\s*- \[[xX ]\]\s*/gm:/^\s*[\u2611\u2B1C]\s*/gm, '');
+		sel = sel.replace(/^(\s*)/gm, function($1){
+			return mt?($1+'- [x] '):($1+'\u2611 ');
+		});
+		
+		doc.Delete(spos, epos);
+		doc.Insert( sel );
+		doc.SetSel(doc.CaretPos, spos);
+	}
+}
+

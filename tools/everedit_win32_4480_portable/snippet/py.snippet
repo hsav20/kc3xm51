@@ -1,0 +1,66 @@
+#title=Python
+#t=__magic__
+#g=__
+__${1:init}__
+#t=For Loop
+#g=for
+for ${1:x} in ${2:xrange(1,10)}:
+	${0:pass}
+#t=Function
+#g=def
+def ${1:function}($2):
+	${0:pass}
+#t=if __name__ == '__main__'
+#g=ifmain
+if __name__ == '__main__':
+	${1:main()}$0
+#t=If Condition
+#g=if
+if ${1:$SELECTION}:
+	${0:pass}
+#t=Method
+#g=defs
+def ${1:function}(self${2}):
+	${0:pass}
+#t=New Class
+#g=class
+class ${1:ClassName}(${2:object}):
+	"""${3:comment}"""
+	def __init__(self, ${4:arg}):
+		super($1, self).__init__()
+		$0
+#t=New Property
+#g=property
+def ${1:foo}():
+    doc = "${2:The property.}"
+    def fget(self):
+        return self._$1
+    def fset(self, value):
+        4:self._$1 = value
+    def fdel(self):
+        5:del self._$1
+    return locals()
+$1 = property(**$1())$0
+#t=Self
+#g=.
+self
+#t=Try/Except
+#g=try
+try:
+	${1:pass}
+except ${2:Exception}, ${3:e}:
+	${4:raise}
+#t=Try/Except/Else/Finally
+#g=try
+try:
+	${1:pass}
+except${2: ${3:Exception}, ${4:e}}:
+	${5:raise}
+else:
+	${6:pass}
+finally:
+	${7:pass}
+#t=While Loop
+#g=while
+while ${1:SELECTION}:
+	${0:pass}

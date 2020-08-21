@@ -1,0 +1,15 @@
+[Syntax]
+File=nodebrain.mac
+Ext=nb
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=NodeBrain
+ParseMax=0

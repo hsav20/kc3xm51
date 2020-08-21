@@ -1,0 +1,16 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:   	JScript
+' Maintainer:  	www.everedit.net  
+' History:
+'   2012/04/11	First Version
+'   2014/07/17  Added outline support
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set js=CreateParser()
+
+Set rJsRegion=js.DefaultRegion
+Set js_creator=js
+
+Include( ".\js_base.mac" )

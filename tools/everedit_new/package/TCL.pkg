@@ -1,0 +1,15 @@
+[Syntax]
+File=tcl.mac
+Ext=tcl
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=TCL
+ParseMax=0

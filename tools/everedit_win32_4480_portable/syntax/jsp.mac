@@ -1,0 +1,43 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    JSP
+' Maintainer:  www.everedit.net  
+' History:
+'   2013/04/19 First Version
+'   2014/07/15 Added block comment and fixed some highlight bugs
+'	2015/04/05 Added new features for JSP
+'*******************************************************************************
+Include( ".\html_base.mac" )
+
+Set rJspBlockComment=html.CreateRegion( COLOR_COMMENT2, "+<%--+", "+--%>+", False )
+
+Set rJspAt=html.CreateRegion( COLOR_DEFAULT, "+<%@+", "+%>+", False )
+Set rJsp=html.CreateRegion( COLOR_DEFAULT, "+<%+", "+%>+", False )
+
+Set java_creator=html
+Set rJavaRegion=rJsp
+Include( ".\java_base.mac" )
+
+'<% %>
+rJsp.AddItem( html.CreateItem(COLOR_SUBLAN, "<%[=!]?|%>", False) )
+rJsp.Name="source.jsp"
+
+Set rJavaRegion=rJspAt
+Include( ".\java_base.mac" )
+
+rJspAt.AddWord( html.CreateWord(COLOR_WORD1, "include page", True ) )
+rJspAt.AddItem( html.CreateItem(COLOR_WORD2, "\w+\s*(?==)", True ) )
+rJspAt.AddItem( html.CreateItem(COLOR_SUBLAN, "<%@|%>", False) )
+
+'-----------------------add rJsp to html parser
+html.AddRegion( rJspBlockComment )
+html.AddRegion( rJspAt )
+html.AddRegion( rJsp )
+
+'default html tags
+html.AddRegion( rScript )
+html.AddRegion( rCss )
+html.AddRegion( rHtmlBlockComment )
+html.AddRegion( rHtmlTag )
+
+rHtmlTag.AddItem( html.CreateItem(COLOR_WORD3, "(?<=<)jsp:\w+", False) )

@@ -1,0 +1,21 @@
+[Syntax]
+File=asp.mac
+Ext=asp
+Mode=HTML
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=0
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=ASP
+ParseMax=2000
+ToolGroupEx=
+OutlineMax=10000
+RegexGroup=2
+OutlineMethod=5
+OutlineRegex=^[ \t]*(public\s+|private\s+)?((sub|function|property|class)[ \t].*$)
+OutlineScript=

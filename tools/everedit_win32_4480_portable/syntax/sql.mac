@@ -1,0 +1,51 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:   MSSQL
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/02/15 First Version
+'   2014/06/08 Added string match in block comment
+'   2014/06/27 Added `` match as a string
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set sql=CreateParser()
+
+Set rLineComment=sql.CreateRegion(COLOR_COMMENT1, "+--+", "$", True )
+Set rBlockComment=sql.CreateRegion(COLOR_COMMENT1, "+/*+", "*/", True )
+Set rString2=sql.CreateStringRegion( COLOR_MACRO, """", "", True )
+Set rString1=sql.CreateStringRegion( COLOR_STRING2, "'", "", True )
+Set rString3=sql.CreateStringRegion( COLOR_STRING2, "`", "", True )
+
+sql.AddRegion( rLineComment )
+sql.AddRegion( rBlockComment )
+sql.AddRegion( rString2 )
+sql.AddRegion( rString1 )
+sql.AddRegion( rString3 )
+
+Set rCommentString1=sql.CreateStringRegion( COLOR_COMMENT1, "'", "", True )
+rBlockComment.AddRegion rCommentString1
+
+'num
+Set iWordNum=sql.CreateItem(COLOR_MACRO, "\b\d+\b", False)
+'$xxxx$
+Set iWordDollar=sql.CreateItem(COLOR_VAR, "\$.+\$", False)
+
+'word
+Set wWord1=sql.CreateWord(COLOR_WORD1, "add all alter any as asc authorization backup begin between break browse bulk by cascade check checkpoint close clustered column commit committed compute confirm constraint contains continue controlrow create cross current current_date current_time cursor database dbcc deallocate declare default delete deny desc disk distinct distributed double drop dummy dump else end errlvl errorexit escape except exec execute exists exit fetch file fillfactor floppy for foreign freetext from full go goto grant group having holdlock identity_insert identitycol if in index inner insert intersect into is isolation join key kill level lineno load mirrorexit national nocheck nonclustered not null of off offsets on once only open opendatasource option or order outer over percent perm permanent pipe plan precision prepare primary print privileges proc procedure processexit public raiserror read readtext reconfigure references repeatable replication restore restrict return revoke rollback rowcount rowguidcol rule save schema select serializable set setuser shutdown some statistics sum table tape temp temporary textsize then to top tran transaction trigger truncate tsequal uncommitted union unique update updatetext use user values varying view waitfor when where while with work writetext", False)
+
+'@@function
+Set iWord2=sql.CreateItem(COLOR_WORD3, "@@(connections|cpu_busy|cursor_rows|datefirst|dbts|error|fetch_status|identity|idle|io_busy|langid|language|lock_timeout|max_connections|max_precision|nestlevel|options|pack_received|pack_sent|packet_errors|procid|remserver|rowcount|servername|servicename|spid|textsize|timeticks|total_errors|total_read|total_write|trancount|version)\b", False)
+'functions
+Set wWord3=sql.CreateItem(COLOR_WORD2, "abs acos and app_name ascii asin atan atn2 avg case cast ceiling char charindex coalesce col_length col_name columnproperty containstable convert cos cot count current_timestamp current_user cursor_status databaseproperty datalength dateadd datediff datename datepart day db_id db_name degrees difference exp file_id file_name filegroup_id filegroup_name filegroupproperty fileproperty floor formatmessage freetexttable fulltextcatalogproperty fulltextserviceproperty getansinull getdate grouping host_id host_name ident_incr ident_seed identity index_col indexproperty is_member is_srvrolemember isdate isnull isnumeric left len log log10 lower ltrim max min month nchar newid nullif object_id object_name objectproperty openquery openrowset parsename patindex patindex permissions pi power quotename radians rand replace replicate reverse right round rtrim session_user sign sin soundex space sqrt square stats_date stdev stdevp str stuff substring sum suser_id suser_name suser_sid suser_sname system_user tan textptr textvalid typeproperty unicode upper user user_id user_name var varp year", False)
+
+
+sql.AddItem( iWordNum )
+sql.AddItem( iWordDollar )
+sql.AddWord( wWord1 )
+sql.AddItem( iWord2 )
+sql.AddWord( wWord3 )
+
+Call sql.SetPairs( "[]{}()""""''" )
+Call sql.CommentLine("-- ")
+Call sql.CommentBlock("/*", "*/")

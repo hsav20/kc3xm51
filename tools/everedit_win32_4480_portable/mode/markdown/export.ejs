@@ -1,0 +1,29 @@
+var html_file=App.ShowFileDialog(false, "", "*.html;*.htm");
+if( html_file!="" ){
+	var fso = new ActiveXObject("Scripting.FileSystemObject")
+	var ext = fso.GetExtensionName(html_file)
+	fso=null;
+	if( ext=="" )
+		html_file += ".html";
+
+	Include(SCRIPT_PATH + '\\marked.js');
+	Include(SCRIPT_PATH+'\\export_impl.ejs');
+
+	var file = new ActiveXObject('Adodb.Stream');
+	file.Type = 2;
+	file.Open();
+	file.Charset = 'utf-8';
+	file.WriteText( content );
+	file.SaveToFile(html_file, 2);
+	file.Close();
+	App.Alert('Done!');
+
+	var shell = new ActiveXObject("WScript.Shell")
+	try{
+		shell.Run(html_file);
+	}
+	catch(err){
+	}
+	file=null;
+}
+

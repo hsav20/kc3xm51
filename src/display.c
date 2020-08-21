@@ -164,7 +164,11 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// 菜单选择
     case cMenu_SdRemove:                                   // 显示SD插出
     case cMenu_UDiskInsert:                                // 显示U盘插入
     case cMenu_UDiskRemove:                                // 显示U盘插出
-		MDIP_DiskInOut(index - cMenu_SdInsert);
+    case cMenu_UsbaInsert:               	               // 显示USB声卡插入
+    case cMenu_UsbaRemove:               	               // 显示USB声卡插出
+    case cMenu_BtInsert:               	                 	// 显示蓝牙音频插入
+    case cMenu_BtRemove:               	                 	// 显示蓝牙音频插出
+		MDIP_ExtrInOut(index - cMenu_SdInsert);				// 显示外置音源插入/插出 
 		break;
     case cMenu_PlayTrack:                                  // 显示多媒体文件信息
         MDIP_PlayTrack();
@@ -706,15 +710,15 @@ void MDIP_Fireware(){
 }
 
 
-CONST_CHAR Tab_DIP_DiskInOut[] = {
-	"SD-IN SD-OUTUD-IN UD-OUT"
-//	 ++++++------++++++------
+CONST_CHAR Tab_DIP_ExtrInOut[] = {
+	"SD-IN SD-OUTUD-IN UD-OUTPC-IN PC-OUTBT-IN BT-OUT"
+//	 ++++++------++++++------++++++------++++++------
 };
 
-void MDIP_DiskInOut(BYTE type){
+void MDIP_ExtrInOut(BYTE type){						// 显示外置音源插入/插出 
 	gDIP_MenuTimer = 50;
 //MDEBUG(0xd9);MDEBUG(type);
-    MDIP_WriteString((char*)&Tab_DIP_DiskInOut[type * 6]);
+    MDIP_WriteString((char*)&Tab_DIP_ExtrInOut[type * 6]);
 }
 void MDIP_PlayTrack(){
     BYTE temp;

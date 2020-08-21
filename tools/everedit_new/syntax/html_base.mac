@@ -1,0 +1,170 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    HTML Base for HTML/PHP/ASP/JSP etc.
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/02/15 First Version
+'   2012/06/05 Improved for EE 2.0
+'   2012/10/29 Improved for EE 2.50
+'   2013/04/11 Moved css to css_base, js to js_base
+'   2013/07/03 Updated string of script/style tag
+'   2014/07/04 Added single < match
+'   2014/07/10 Enhanced indent regex
+'   2014/07/22 Enhanced script/style tag close detection, Improved style syntax highlight in style=""
+'	2016/10/24 improved tag match
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set html=CreateParser()
+html.Name="source.html"
+
+Set rHtmlBlockComment=html.CreateRegion( COLOR_COMMENT1, "+<!--+", "+-->+", False )
+Set rHtmlTag=html.CreateRegion( COLOR_TAG, "<[a-zA-Z%]+|</[^>]|<![^>]", "/?>", False )
+Set rTagString2=html.CreateStringRegion( COLOR_STRING2, """", "", True )
+Set rTagString1=html.CreateStringRegion( COLOR_STRING1, "'", "", True )
+
+Set iTagWord=html.CreateItem(COLOR_WORD2, "\b[\w\-]+\s*=", False)
+rHtmlTag.AddItem( iTagWord )
+
+'style in tag style=""
+Set rTagStyleDouble=html.CreateRegion( COLOR_DEFAULT, "\bstyle\s*=\s*""", """", False )
+rTagStyleDouble.Name="source.css"
+Set css_creator=html
+Set rCssRegion=rTagStyleDouble
+Include( ".\css_oneline.mac" )
+Set rCssString1InTagStyle=css_creator.CreateStringRegion( COLOR_STRING1, "'", "", True )
+rCssRegion.AddRegion( rCssString1InTagStyle )
+
+'style in tag style=''
+Set rTagStyleSingle=html.CreateRegion( COLOR_DEFAULT, "\bstyle\s*=\s*'", "'", False )
+rTagStyleSingle.Name="source.css"
+Set css_creator=html
+Set rCssRegion=rTagStyleSingle
+Include( ".\css_oneline.mac" )
+Set rCssString2InTagStyle=css_creator.CreateStringRegion( COLOR_STRING2, """", "", True )
+rCssRegion.AddRegion( rCssString2InTagStyle )
+
+'style=" or '
+rTagStyleDouble.AddItem( iTagWord )
+rTagStyleDouble.AddItem( html.CreateItem(COLOR_WORD2, """", False) )
+
+rTagStyleSingle.AddItem( iTagWord )
+rTagStyleSingle.AddItem( html.CreateItem(COLOR_WORD2, "'", False) )
+
+'single < match
+Set rHtmlTagErr=html.CreateItem( COLOR_HIGHLIGHT1, "<(?=[^a-zA-Z%]|$)", False )
+html.AddItem( rHtmlTagErr )
+
+Set rXmlTitle=html.CreateRegion( COLOR_COMMENT1, "+<?xml+",  "+?>+", False)
+html.AddRegion rXmlTitle
+
+html.AddWord( html.CreateWord(COLOR_DEFAULT, "aacute agrave acirc amp atilde aring auml aelig ccedil copy eacute egrave ecirc euml euro iacute igrave icirc iuml eth gt lt nbsp ntilde oacute ograve ocirc otilde ouml oslash quot reg szlig uacute ugrave ucirc uuml yacute thorn trade yuml", False) )
+Set iCharEntity=html.CreateItem(COLOR_STRING1, "&(\w|\d|#)+;", False)
+html.AddItem( iCharEntity )
+
+rHtmlTag.AddRegion( rTagStyleDouble )
+rHtmlTag.AddRegion( rTagStyleSingle )
+rHtmlTag.AddRegion( rTagString2 )
+rHtmlTag.AddRegion( rTagString1 )
+'rHtmlTag.AddItem( html.CreateItem(COLOR_WORD2, "\b[\w\-]+\s*=", False) )
+
+'HTML Attributes
+rHtmlTag.AddWord( html.CreateWord(COLOR_WORD2, "abbr accept-charset accept accesskey action align alink alt archive axis background bgcolor border cellpadding cellspacing char charoff charset checked cite class classid clear code codebase codetype color cols colspan compact content coords data datetime declare defer dir disabled enctype face for frame frameborder headers height href hreflang hspace http-equiv id ismap label lang language link longdesc marginheight marginwidth maxlength media method multiple name nohref noresize noshade nowrap object onblur onchange onclick ondblclick onfocus onkeydown onkeypress onkeyup onload onmousedown onmousemove onmouseout onmouseover onmouseup onreset onselect onsubmit onunload profile prompt readonly rel rev rows rowspan rules scheme scope scrolling selected shape size span src standby start style summary tabindex target text title type usemap valign value valuetype version vlink vspace width async autocomplete autofocus autoplay challenge contenteditable contextmenu controls default dirname draggable dropzone form formaction formenctype formmethod formnovalidate formtarget hidden high icon keytype kind list loop low manifest max mediagroup min novalidate onabort onafterprint onbeforeprint onbeforeunload oncanplay oncanplaythrough oncontextmenu oncuechange ondrag ondragend ondragenter ondragleave ondragover ondragstart ondrop ondurationchange onemptied onended onerror onhashchange oninput oninvalid onloadeddata onloadedmetadata onloadstart onmessage onmousewheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onpopstate onprogress onratechange onreadystatechange onredo onresize onscroll onseeked onseeking onshow onstalled onstorage onsuspend ontimeupdate onundo onvolumechange onwaiting open optimum pattern placeholder poster preload pubdate radiogroup required reversed sandbox scoped seamless sizes spellcheck srcdoc srclang step wrap", False, "-") )
+
+'<title may be COLOR_WORD2
+rHtmlTag.AddItem( html.CreateItem(COLOR_TAG, "<\w+|</\w+", False) )
+
+Const strDummyEnd="+UJW*&VC+"
+'---------------------------------------------------------------------
+'script tag
+
+Set rScriptOneLine=html.CreateRegion( COLOR_SUBLAN, "\Q<script\E\b[^>]*/>", "", False )
+Set rScriptOneLineTagString2=html.CreateStringRegion( COLOR_STRING2, """", "", True )
+Set rScriptOneLineTagString1=html.CreateStringRegion( COLOR_STRING1, "'", "", True )
+rScriptOneLine.AddRegion rScriptOneLineTagString1
+rScriptOneLine.AddRegion rScriptOneLineTagString2
+
+html.AddRegion( rScriptOneLine )
+
+Set rScript=html.CreateRegion( COLOR_SUBLAN, "+<script+", "+>+", False )
+Set rScriptTagString2=html.CreateStringRegion( COLOR_STRING2, """", "", True )
+Set rScriptTagString1=html.CreateStringRegion( COLOR_STRING1, "'", "", True )
+rScript.AddRegion rScriptTagString1
+rScript.AddRegion rScriptTagString2
+
+Set rJsScript=html.CreateRegion(COLOR_DEFAULT, "", strDummyEnd, True)
+rJsScript.Name="source.js"
+rScript.TransRegion=rJsScript
+
+Set rScriptEnd=html.CreateRegion( COLOR_SUBLAN, "+</script+", "+>+", False )
+rJsScript.AddRegion( rScriptEnd )
+rScriptEnd.TransRegion=html.DefaultRegion
+
+Set js_creator=html
+Set rJsRegion=rJsScript
+Include( ".\js_base.mac" )
+
+Set rScriptEndInBlockComment=html.CreateRegion( COLOR_SUBLAN, "+</script+", "+>+", False )
+rJsBlockComment.AddRegion( rScriptEndInBlockComment )
+rScriptEndInBlockComment.TransRegion=html.DefaultRegion
+
+Set rScriptEndInLineComment=html.CreateRegion( COLOR_SUBLAN, "+</script+", "+>+", False )
+rJsLineComment.AddRegion( rScriptEndInLineComment )
+rScriptEndInLineComment.TransRegion=html.DefaultRegion
+'---------------------------------------------------------------------
+'css tag
+Set rCssOneLine=html.CreateRegion( COLOR_SUBLAN, "\Q<style\E\b[^>]*/>", "", False )
+Set rCssTagOneLineString2=html.CreateStringRegion( COLOR_STRING2, """", "", True )
+Set rCssTagOneLineString1=html.CreateStringRegion( COLOR_STRING1, "'", "", True )
+rCssOneLine.AddRegion rCssTagOneLineString1
+rCssOneLine.AddRegion rCssTagOneLineString2
+html.AddRegion( rCssOneLine )
+
+Set rCss=html.CreateRegion( COLOR_SUBLAN, "+<style+", "(?<!/)>", False )
+Set rCssTagString2=html.CreateStringRegion( COLOR_STRING2, """", "", True )
+Set rCssTagString1=html.CreateStringRegion( COLOR_STRING1, "'", "", True )
+rCss.AddRegion rCssTagString1
+rCss.AddRegion rCssTagString2
+
+Set rCssScript=html.CreateRegion( COLOR_DEFAULT, "", strDummyEnd, True )
+rCssScript.Name="source.css"
+rCss.TransRegion=rCssScript
+
+Set rCssEnd=html.CreateRegion( COLOR_SUBLAN, "+</style+", "+>+", False )
+rCssScript.AddRegion( rCssEnd )
+rCssEnd.TransRegion=html.DefaultRegion
+
+Set css_creator=html
+Set rCssRegion=rCssScript
+Include( ".\css_base.mac" )
+
+Set rCssEndInBlockComment=html.CreateRegion( COLOR_SUBLAN, "+</style+", "+>+", False )
+rCssBlockComment.AddRegion( rCssEndInBlockComment )
+rCssEndInBlockComment.TransRegion=html.DefaultRegion
+
+'----------------------------------------------------------------------
+'word and tag in script and style
+Set iSubLanTag=html.CreateItem( COLOR_TAG, "<script|</script|<style|</style|>|/>", False)
+Set iSubLanWord=html.CreateItem( COLOR_WORD2, "\b[\w\-]+\s*=", False)
+rScriptOneLine.AddItem iSubLanTag
+rScriptOneLine.AddItem iSubLanWord
+rScript.AddItem iSubLanTag
+rScript.AddItem iSubLanWord
+rScriptEnd.AddItem iSubLanTag
+rScriptEndInBlockComment.AddItem iSubLanTag
+rScriptEndInLineComment.AddItem iSubLanTag
+
+rCssOneLine.AddItem iSubLanTag
+rCssOneLine.AddItem iSubLanWord
+rCss.AddItem iSubLanTag
+rCss.AddItem iSubLanWord
+rCssEnd.AddItem iSubLanTag
+rCssEndInBlockComment.AddItem iSubLanTag
+'----------------------------------------------------------------------
+
+html.FoldText "<(html|body|table|tbody|tr|div|blockquote|pre|code|p|form|ul|ol|dl|menu|article|section|aside|nav|footer|header|datalist|figure)", False
+html.UnfoldText "</(html|body|table|tbody|tr|div|blockquote|pre|code|p|form|ul|ol|dl|menu|article|section|aside|nav|footer|header|datalist|figure)", False
+html.CommentBlock "<!--", "-->"
+html.SetPairs( "<>()[]{}""""''" )
+html.AddSnippet( "html.snippet" )
+html.IndentText "<\w[^>]*?[^/]>\s*$", False, "^\s*</[^>]*?>$", False

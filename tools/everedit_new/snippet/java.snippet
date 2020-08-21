@@ -1,0 +1,284 @@
+#title=Java
+#t=Class
+#g=class
+${1:public }class ${2:MyClass} extends ${3:Object}
+{
+	$2 (${4:arguments}) {
+		${0:// expression}
+	}
+}
+
+#t=If Statement
+#g=if
+if (${1:condition}) {
+	${0:// expression}
+}
+#t=If/Else Statement
+#g=ifelse
+if (${1:condition}) {
+	${0:// expression}
+} else {
+
+}
+
+#t=JSP: c:out
+#g=jcout
+<c:out value="$1"/>$0
+#t=Logger
+#g=log
+/** Logger for this class and subclasses. */
+protected final Log log = LogFactory.getLog(getClass());
+
+#t=Main Method
+#g=main
+public static void main(String[] args) {
+	${1:System.exit(0)};
+}
+#t=Private Method
+#g=pm
+/**
+ * $2
+ *
+ * @param $4 $5
+ * ${6:@return} $7
+ */
+private ${1:void} ${2:method}(${3:String} $4) {
+	$0
+}
+#t=Private Static Final
+#g=ps
+private static final ${1:String} ${2:str} = ${3:"value"};
+#t=Private Variable
+#g=pv
+private ${1:String} ${2:str} = ${3:"value"};
+#t=Public Method
+#g=pum
+/**
+ * $2
+ *
+ * @param $4 $5
+ * ${6:@return} $7
+ */
+public ${1:void} ${2:method}(${3:String} $4) {
+	$0
+}
+
+
+#t=System.out.println
+#g=sout
+System.out.println($1);
+
+#t=Try/Catch/Finally
+#g=tc
+try {
+	${2:// expression}
+} catch (${1:Exception} e) {
+	${3:// expression}
+} finally {
+	${0:// expression}
+}
+#t=While Statement
+#g=while
+while (${1:condition}) {
+	${0:// expression}
+}
+#t=do-while Statement
+#g=dow
+do {
+	${0:// expression}
+} while (^!);
+#t=StringBuilder
+#g=sb
+StringBuilder
+#t=System.in.read()
+#g=sir
+System.in.read($0);$1
+#t=System.exit()
+#g=sex
+System.exit(${0:-1});$1
+#t=System.out.print()
+#g=sop
+System.out.print($0);$1
+#t=System.out.println()
+#g=sopl
+System.out.println($0);$1
+#t=System.out.write()
+#g=sow
+System.out.write($0);$1
+#t=ArithmeticException
+#g=AE
+ArithmeticException
+#t=ArrayIndexOutOfBoundsException
+#g=AIOBE
+ArrayIndexOutOfBoundsException
+#t=ArrayIndexOutOfBoundsException
+#g=AIOOBE
+ArrayIndexOutOfBoundsException
+#t=BufferedInputStream
+#g=BIS
+BufferedInputStream
+#t=BufferedOutputStream
+#g=BOS
+BufferedOutputStream
+#t=ConnectException
+#g=CE
+ConnectException
+#t=DataInputStream
+#g=DIS
+DataInputStream
+#t=DataOutputStream
+#g=DOS
+DataOutputStream
+#t=FileInputStream
+#g=FIS
+FileInputStream
+#t=FileOutputStream
+#g=FOS
+FileOutputStream
+#t=IOException
+#g=IOE
+IOException
+#t=InputStreamReader
+#g=ISR
+InputStreamReader
+#t=InterruptedException
+#g=IRE
+InterruptedException
+#t=IndexOutOfBoundsException
+#g=IOBE
+IndexOutOfBoundsException
+#t=InvalidTargetObjectTypeException
+#g=ITOTE
+InvalidTargetObjectTypeException
+#t=InvalidPropertiesFormatException
+#g=IPFE
+InvalidPropertiesFormatException
+#t=InvalidPreferencesFormatException
+#g=IPFE
+InvalidPreferencesFormatException
+#t=java.lang.ArithmeticException
+#g=JAE
+java.lang.ArithmeticException
+#t=java.lang.ArrayIndexOutOfBoundsException
+#g=JAOE
+java.lang.ArrayIndexOutOfBoundsException
+#t=java.lang.ArrayIndexOutOfBoundsException
+#g=JAIOOBE
+java.lang.ArrayIndexOutOfBoundsException
+#t=java.net.ConnectException
+#g=JCE
+java.net.ConnectException
+#t=java.lang.ArrayIndexOutOfBoundsException
+#g=JAIOOBE
+java.lang.ArrayIndexOutOfBoundsException
+#t=java.io.ileNotFoundException
+#g=JFNFE
+java.io.ileNotFoundException
+#t=java.io.IOException
+#g=JIOE
+java.io.IOException
+#t=java.lang.InterruptedException
+#g=JIRE
+java.lang.InterruptedException
+#t=java.io.FileNotFoundException
+#g=JFNFE
+java.io.FileNotFoundException
+#t=java.lang.IndexOutOfBoundsException
+#g=JIOOBE
+java.lang.IndexOutOfBoundsException
+#t=javax.management.modelmbean.InvalidTargetObjectTypeException
+#g=JITOTE
+javax.management.modelmbean.InvalidTargetObjectTypeException
+#t=java.util.InvalidPropertiesFormatException
+#g=JIPFE
+java.util.InvalidPropertiesFormatException
+#t=java.util.prefs.InvalidPreferencesFormatException
+#g=JIPFE
+java.util.prefs.InvalidPreferencesFormatException
+#t=java.net.MalformedURLException
+#g=JMURLE
+java.net.MalformedURLException
+#t=java.lang.NullPointerException
+#g=JNPE
+java.lang.NullPointerException
+#t=java.security.PrivilegedActionException
+#g=JPAE
+java.security.PrivilegedActionException
+#t=javax.xml.parsers.ParserConfigurationException
+#g=JPCE
+javax.xml.parsers.ParserConfigurationException
+#t=java.lang.RuntimeException
+#g=JRE
+java.lang.RuntimeException
+#t=org.xml.sax.SAXException
+#g=JSAXE
+org.xml.sax.SAXException
+#t=javax.xml.soap.SOAPException
+#g=JSOAPE
+javax.xml.soap.SOAPException
+#t=java.sql.SQLException
+#g=JSQLE
+java.sql.SQLException
+#t=java.sql.SQLSyntaxErrorException
+#g=JSQLSEE
+java.sql.SQLSyntaxErrorException
+#t=java.rmi.ServerRuntimeException
+#g=JSRE
+java.rmi.ServerRuntimeException
+#t=java.io.UnsupportedEncodingException
+#g=JUEE
+java.io.UnsupportedEncodingException
+#t=java.net.UnknownHostException
+#g=JUHE
+java.net.UnknownHostException
+#t=NullPointerException
+#g=NPE
+NullPointerException
+#t=MalformedURLException
+#g=MURLE
+MalformedURLException
+#t=OutputStreamWriter
+#g=OSW
+OutputStreamWriter
+#t=PipedInputStream
+#g=PIS
+PipedInputStream
+#t=PipedOutputStream
+#g=POS
+PipedOutputStream
+#t=PrivilegedActionException
+#g=PAE
+PrivilegedActionException
+#t=ParserConfigurationException
+#g=PCE
+ParserConfigurationException
+#t=printStackTrace();
+#g=PST
+printStackTrace();
+#t=RuntimeException
+#g=RE
+RuntimeException
+#t=SAXException
+#g=SAXE
+SAXException
+#t=SOAPException
+#g=SOAPE
+SOAPException
+#t=SQLException
+#g=SQLE
+SQLException
+#t=SQLFeatureNotSupportedException
+#g=SQLFNSE
+SQLFeatureNotSupportedException
+#t=SQLSyntaxErrorException
+#g=SQLSEE
+SQLSyntaxErrorException
+#t=ServerRuntimeException
+#g=SRE
+ServerRuntimeException
+#t=UnsupportedEncodingException
+#g=UEE
+UnsupportedEncodingException
+#t=UnknownHostException
+#g=UHE
+UnknownHostException

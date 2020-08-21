@@ -1,0 +1,53 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Coffee Script
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/10/07 First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set coff=CreateParser()
+
+Set rComment1=coff.CreateRegion(COLOR_COMMENT1, "+#+", "$", False )
+Set rComment2=coff.CreateRegion(COLOR_COMMENT1, "+###+", "+###+", False )
+
+Set rString1=coff.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+Set rString2=coff.CreateStringRegion( COLOR_STRING2, """", "\", False )
+
+'keywords
+coff.AddWord( coff.CreateWord(COLOR_WORD1, "break case catch class continue default delete do else extends false finally for if import in initialize instanceof int interface is isnt new null of return super switch throw true try typeof var void while with", True ) )
+
+'classes
+coff.AddWord( coff.CreateWord(COLOR_WORD2, "ActiveXObject Array Audio Boolean Date Error FileReader Function Image JSON Math Number Object Option RegExp String WebSocket Worker XMLHttpRequest", True ) )
+
+'ECMA properties
+coff.AddWord( coff.CreateWord(COLOR_WORD3, "__proto__ arguments caller global ignoreCase Infinity lastIndex length LN10 LN2 LOG10E LOG2E MAX_VALUE MIN_VALUE multiline NaN NEGATIVE_INFINITY PI POSITIVE_INFINITY prototype source SQRT1_2 SQRT2 undefined", True ) )
+
+'ECMA functions
+coff.AddWord( coff.CreateWord(COLOR_WORD4, "abs acos apply asin atan atan2 atob bind btoa call ceil charAt charCodeAt compile concat cos create decodeURI decodeURIComponent defineProperties defineProperty encodeURI encodeURIComponent escape eval every exec exp filter floor forEach freeze fromCharCode getData getDate getDay getElementById getElementsByName getElementsByTagName getFullYear getHours getMilliseconds getMinutes getMonth getOwnPropertyDescriptor getOwnPropertyNames getPrototypeOf getSeconds getTime getTimezoneOffset getUTCDate getUTCDay getUTCFullYear getUTCHours getUTCMilliseconds getUTCMinutes getUTCMonth getUTCSeconds getYear indexOf isArray isExtensible isFinite isFrozen isNaN isSealed join keys lastIndexOf localeCompare log map match max min now parse parseFloat parseInt pop pow preventExtensions push random reduce reduceRight replace reverse round seal search setData setDate setFullYear setHours setMilliseconds setMinutes setMonth setSeconds setTime setUTCDate setUTCFullYear setUTCHours setUTCMilliseconds setUTCMinutes setUTCMonth setUTCSeconds setYear shift sin slice some sort splice split sqrt substr substring tan test toDateString toExponential toFixed toGMTString toISOString toLocaleDateString toLocaleLowerCase toLocaleString toLocaleTimeString toLocaleUpperCase toLowerCase toPrecision toSource toString toTimeString toUpperCase toUTCString unescape unshift valueOf", True ) )
+
+'DOM objects
+coff.AddWord( coff.CreateWord(COLOR_WORD4, "anchors applicationCache attributes body cells childNodes clipboardData currentTarget dataTransfer document elements external form forms frames fromElement history images indexedDB links localStorage location mineTypes navigator opener options parent relatedTarget rows screen sessionStorage srcElement style styleSheets tBodies tFoot tHead target toElement top window", True ) )
+
+'DOM functions
+coff.AddWord( coff.CreateWord(COLOR_WORD4, "__defineGetter__ __defineSetter__ __lookupGetter__ __lookupSetter__ add addEventListener alert appendChild assign attachEvent back blur captureEvents checkValidity clearInterval clearTimeout click cloneNode close confirm contains createCaption createTFoot createTHead defineProperty deleteCaption deleteCell deleteRow deleteTFoot deleteTHead dettachEvent dispatchEvent focus forward getAttribute getContext getElementById getElementsByClassName getElementsByName getElementsByTagName gettNamedItem go hasAttribute hasChildNodes initEvent insertAjacentElement insertAjacentHTML insertAjacentText insertBefore insertCell insertRow isEqualNode isSameNode item moveBy moveTo namedItem open preventDefault print prompt querySelector querySelectorAll releaseEvents reload remove removeAttribute removeChild removeEventListener removeNamedItem replace replaceChild reset resizeBy resizeTo scrollBy scrollTo select setAttribute setCustomValidity setInterval setNamedItem setSelectionRange setTimeout stopPropagation stringify submit toDataURI write writeln", True ) )
+
+'DOM properties
+coff.AddWord( coff.CreateWord(COLOR_WORD4, "accept accessKey action align alt altKey appCodeName appName appVersion availHeight availWidth bubbles button cancelable cancelBubble cellIndex charset checked className clientX clientY colorDepth colSpan content cookie coords ctrlKey dir disabled domain enctype hash height host hostname href hreflang httpEquiv id index innerHTML innerwidth keyCode label lang lastModified length maxLength media metaKey method multiple name nodeName nodeType nodeValue offsetX offsetY onabort onafterprint onbeforeonload onbeforeprint onblur onblur oncanplay oncanplaythrough onchange onclick oncontextmenu ondblclick ondrag ondragend ondragenter ondragleave ondragover ondragstart ondrop ondurationchange onemptied onended onerror onerror onfocus onfocus onformchange onforminput onhaschange oninput oninvalid onkeydown onkeypress onkeyup onload onloadeddata onloadedmetadata onloadstart onmessage onmousedown onmousemove onmouseout onmouseover onmouseup onmousewheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onpopstate onprogress onratechange onreadystatechange onredo onreset onresize onscroll onseeked onseeking onselect onstalled onstorage onsubmit onsuspend ontimeupdate onundo onunload onvolumechange onwaiting outerheight outerwidth pathname platform port protocol readOnly referrer rel returnValue rev rowIndex rowSpan scheme screenX screenY search selectedIndex shape shiftKey size src status summary tabIndex target text timeStamp title type useMap userAgent userLanguage value width", True ) )
+
+'nodejs globals
+coff.AddWord( coff.CreateWord(COLOR_WORD4, "__dirname __filename Buffer console exports module process require", True ) )
+
+coff.AddItem( coff.CreateItem(COLOR_NUMBER, "\b([0-9]+\.?[0-9]*|0x[0-9a-fA-F]+)\b", False) )
+coff.AddItem( coff.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.,:;\/\[\]]",False ) )
+
+coff.AddRegion rComment2
+coff.AddRegion rComment1
+
+coff.AddRegion rString2
+coff.AddRegion rString1
+
+coff.SetPairs "[]''""""{}()"
+coff.CommentLine "#"
+coff.FoldingMethod="indent"

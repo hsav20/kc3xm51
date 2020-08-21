@@ -1,0 +1,305 @@
+Dim docmap
+Set docmap = CreateObject("Scripting.Dictionary")
+Dim list
+
+Dim defmap
+Set defmap = CreateObject("Scripting.Dictionary")
+
+Dim re
+Set re = new regexp  'Create the RegExp object
+re.Global = True
+re.Pattern = "^func[ \t]+(\(\w+ \*?\w+\)[ \t]+)?(\w+)[ \t]*\(.*\)([ \t]+.*)?\{$"
+
+Dim reVar
+Set reVar = new regexp 
+reVar.Global = True
+reVar.Pattern = "^var[ \t]+(\w+).+$"
+
+Dim reType
+Set reType = new regexp 
+reType.Global = True
+reType.Pattern = "^type[ \t]+(\w+).+$"
+
+Set reClass = new regexp  'Create the RegExp object
+reClass.Global = True
+reClass.Pattern = "^\(\w+ \*?(\w+)\)[ \t]+$"
+
+Set reWord = new regexp  'Create the RegExp object
+reWord.Global = True
+reWord.Pattern = "^[ \t]*("")?([a-zA-Z0-9_./-]+)("")?([ \t](.+))?$"
+
+Dim reImport
+Set reImport = new regexp 
+reImport.Global = True
+reImport.Pattern = "^import[ \t]+("")([a-zA-Z0-9_./-]+)("")$"
+
+Dim InConst
+Dim InVar
+Dim InImport
+
+InConst = False
+InVar = False
+InImport = False
+ '
+Function SortDictionary(objDict, intSort)
+ 
+   ' declare constants
+   Const dictKey  = 1
+   Const dictItem = 2
+ 
+   ' declare our variables
+   Dim strDict()
+   Dim objKey
+   Dim strKey,strItem
+   Dim X,Y,Z
+ 
+   ' get the dictionary count
+   Z = objDict.Count
+ 
+   ' we need more than one item to warrant sorting
+   If Z > 1 Then
+     ' create an array to store dictionary information
+     ReDim strDict(Z,2)
+     X = 0
+     ' populate the string array
+     For Each objKey In objDict
+         strDict(X,dictKey)  = CStr(objKey)
+         strDict(X,dictItem) = CStr(objDict(objKey))
+         X = X + 1
+     Next
+ 
+     ' perform a a shell sort of the string array
+     For X = 0 To (Z - 2)
+       For Y = X To (Z - 1)
+         If StrComp(strDict(X,intSort),strDict(Y,intSort),vbTextCompare) > 0 Then
+             strKey  = strDict(X,dictKey)
+             strItem = strDict(X,dictItem)
+             strDict(X,dictKey)  = strDict(Y,dictKey)
+             strDict(X,dictItem) = strDict(Y,dictItem)
+             strDict(Y,dictKey)  = strKey
+             strDict(Y,dictItem) = strItem
+         End If
+       Next
+     Next
+ 
+     ' erase the contents of the dictionary object
+     objDict.RemoveAll
+ 
+     ' repopulate the dictionary with the sorted information
+     For X = 0 To (Z - 1)
+       objDict.Add strDict(X,dictKey), strDict(X,dictItem)
+     Next
+ 
+   End If
+ 
+ End Function
+
+Function ProcessLine(line_text, idx)
+
+	Set stuff = re.Execute(line_text)
+
+	If InStr( 1, line_text, "//" ) >= 1 Then
+		a = Split(line_text, "//")
+		line_text = a(0)
+	End If
+
+	If line_text = ")" Then
+
+		InConst = False
+		InImport = False
+		InVar = False
+
+	ElseIf stuff.Count >= 1 Then
+
+		'App.OutputLine( "func:" & stuff.Count & ":" & line_text )
+
+		cn = stuff(0).SubMatches(0)
+
+		If cn <> "" Then
+			Set parts = reClass.Execute(cn)
+			cn = parts(0).SubMatches(0)
+		End If
+		
+		fn = stuff(0).SubMatches(1)
+		
+		' Build docmap
+		If Not docmap.Exists( cn ) Then 
+			docmap.Add cn, CreateObject("Scripting.Dictionary")
+			If cn <> "" Then
+				defmap.Item(cn) = idx
+			End If
+		End If 
+
+		docmap.Item(cn).Add idx, fn & "()"
+
+		IsFunc = true
+
+	Else
+
+		' Test here for variable
+		Set stuff = reVar.Execute(line_text)
+
+		If stuff.Count >= 1 Then
+
+			cn = "variables"
+			fn = stuff(0).SubMatches(0) 
+
+			If Not docmap.Exists( cn ) Then 
+				docmap.Add cn, CreateObject("Scripting.Dictionary")
+			End If 
+
+			docmap.Item(cn).Add idx, fn			
+
+		Else
+
+
+		Set stuff = reType.Execute(line_text)
+
+			If stuff.Count >= 1 Then
+
+				cn = "types"
+				fn = stuff(0).SubMatches(0) 
+
+				If Not docmap.Exists( cn ) Then 
+					docmap.Add cn, CreateObject("Scripting.Dictionary")
+				End If 
+
+				docmap.Item(cn).Add idx, fn			
+			Else		
+
+				Set stuff = reImport.Execute(line_text)
+
+				If stuff.Count >= 1 Then
+
+					cn = "imports"
+					fn = stuff(0).SubMatches(1) 
+
+					If Not docmap.Exists( cn ) Then 
+						docmap.Add cn, CreateObject("Scripting.Dictionary")
+					End If 
+
+					docmap.Item(cn).Add idx, fn			
+					
+				Else						
+
+					If line_text = "var (" Then
+						InVar = True
+					ElseIf line_text = "const (" Then
+						InConst = True
+					ElseIf line_text = "import (" Then
+						InImport = True
+					Else
+
+						If (InVar Or InConst Or InImport) And Trim(line_text) <> "" Then
+
+							cn = "variables"
+							If InConst Then
+								cn = "constants"
+							ElseIf InImport Then
+								cn = "imports"
+							End If
+								
+							If Not docmap.Exists( cn ) Then 
+								docmap.Add cn, CreateObject("Scripting.Dictionary")
+							End If 
+
+							Set pp = reWord.Execute( line_text )
+
+							If pp.Count > 0 Then
+								fn = pp(0).SubMatches(1) 
+								docmap.Item(cn).Add idx, fn
+							End If				 
+							
+						End If
+						
+						IsFunc = False
+					End If
+				End If
+			End If
+
+		End If
+
+		
+
+	End If
+
+End Function
+
+Function SaveTextAsUTF8(filetext, filepath)
+	Set file=CreateObject("Adodb.Stream")
+	file.Type=2
+	file.Mode=3
+	file.Charset = "utf-8"
+	file.Open
+	file.WriteText filetext
+	file.SaveToFile filepath, 2
+	file.close
+	Set file=Nothing
+End Function
+
+Set doc=App.ActiveDoc
+Const MAX_PARSE=10000
+count=doc.LineCount
+If count>MAX_PARSE Then
+	count=MAX_PARSE
+End If
+
+all_text=""
+
+' Scan each line of the file
+For idx=0 To count-1
+	line_text=doc.GetLineText(idx)
+	ProcessLine line_text, idx 
+Next
+
+Dim vkeys
+For Each v In docmap.Keys 
+	' 3 = var, 0 = func, 1 = Class, 2 = D?, 4 = Enum, 5 = <>, 6 = Type, 7 = 
+
+	n = v
+	i = 1
+	si = 0
+	ll = 0
+	If n = "" Then
+		n = "Functions"
+		i = 0
+	ElseIf n = "variables" Then
+		n = "Variables"
+		i = 3
+		si = 3
+	ElseIf n = "imports" Then
+		n = "Imports"
+		i = 5
+		si = 5
+	ElseIf n = "constants" Then
+		n = "Constants"
+		i = 4
+		si = 4
+	ElseIf n = "types" Then
+		n = "Types"
+		i = 6
+		si = 6
+	Else
+		ll = defmap.Item(v)
+	End If
+	
+	all_text = all_text & CStr(ll) & ":" & CStr(i) & "#" & n & vbCrLf
+
+	Set vkeys = docmap.Item(v)
+	SortDictionary  vkeys, 2 
+
+	For Each lkey In vkeys.Keys
+		all_text = all_text & Chr(9) & CStr(lkey) & ":" & CStr(si)  & "#" & docmap.Item(v).Item(lkey) & vbCrLf
+	Next
+	
+Next
+
+'App.OutputLine( "Regex matches: -" )
+'App.OutputLine( all_text )
+
+If Len(all_text) Then
+	path=App.CreateTempFile(False)
+	SaveTextAsUTF8 all_text, path
+	doc.OpenOutlineFile path
+	App.RemoveFile path
+End If

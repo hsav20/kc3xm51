@@ -1,0 +1,52 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Tcl
+' Maintainer:  xtradev
+' History:
+'   2014/05/24 Create.
+'   2014/05/27 Change case sensitivity. Fix escape and continuation characters.
+'   2014/07/24 Add :-. to WordChars.
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set tcl=Parser.CreateParser()
+
+'comment
+Set rLineComment=tcl.CreateRegion( COLOR_COMMENT1, "+#+", "$", False )
+tcl.AddRegion( rLineComment )
+tcl.CommentLine("# ")
+
+'todo
+Set iTodo=tcl.CreateItem( COLOR_HIGHLIGHT2, "\b(TODO|FIX|FIXME|TBD)\b", False )
+rLineComment.AddItem( iTodo )
+
+'string
+tcl.AddRegion( tcl.CreateStringRegion( COLOR_STRING2, """", "\", False, "\" ) )
+
+'number
+tcl.AddItem( tcl.CreateItem(COLOR_NUMBER, "(?<!\w)[-+]?\d+(\.\d+)?", False) )
+
+'$variable
+tcl.AddItem( tcl.CreateItem(COLOR_VAR, "\$((::)?\w+)+", False) )
+
+'operator
+tcl.AddItem( tcl.CreateItem(COLOR_OPERATOR, "\s([\!\~\+\-\*\/\%\&\|\^\<\>]|\*\*|&&|<<|>>|==|!=|<=|>=|eq|ne|in|ni)\s", True) )
+
+'command
+tcl.AddItem( tcl.CreateItem(COLOR_FUNCTION, "(?<=(^|\[)\s*)((::)?\w+)+", False) )
+
+'option
+tcl.AddItem( tcl.CreateItem(COLOR_WORD3, "\-\w+|\-\-", False) )
+
+'word
+tcl.WordChars=":-."
+tcl.AddWord( tcl.CreateWord(COLOR_FUNCTION, "else cget configure", True, "") )
+
+'fold
+tcl.FoldText "\{", False, "\}", False
+
+'indent
+tcl.IndentText "\{", False, "^\s*\}$", False
+
+'pairs
+tcl.SetPairs( "[]{}()""""" )

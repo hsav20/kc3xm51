@@ -1,0 +1,54 @@
+function isNull(v){
+	if( v=="null" ) return true;
+	if( v==null ) return true;
+	if( v=="" ) return true;
+	return false;
+}
+
+var doc=App.ActiveDoc;
+function Simple()
+{
+	var pos=doc.CaretPos;
+	var txt=doc.GetLineText( pos.Line );
+
+	var txt2="";
+	if( pos.Line>0 )
+		txt2 = doc.GetLineText( pos.Line-1 );
+	var head=txt2.match(/^\s*\d+\. /) + "";
+	if( !isNull(head) ){
+		head = head.replace(/\d+/g, function($1) {
+		   return parseInt($1)+1;
+		});
+	}
+	else{
+		head="1. ";
+	}
+	doc.InsertAt(pos.Line, 0, head);
+}
+
+if( !doc.HasSel() ){
+	Simple();
+}
+else{
+	var spos=doc.SelStartPos();
+	var epos=doc.SelEndPos();
+	if( spos.Line==epos.Line )
+		Simple();
+	else{
+		spos.Col=0;
+		epos.Col=10000000;
+		var sel=doc.GetText(spos, epos, 2); //2 is unix style EOL
+		sel = sel.replace(/^\n/gm, "");
+		sel = sel.replace(/^(\s*)(\d+)\. (.*)$/gm, "$1$3");
+		var start=0;
+		sel = sel.replace(/^(\s*)/gm, function($1){
+			start++;
+			return $1+start+". ";
+		});
+		
+		doc.Delete(spos, epos);
+		doc.Insert( sel );
+		doc.SetSel(doc.CaretPos, spos);
+	}
+}
+

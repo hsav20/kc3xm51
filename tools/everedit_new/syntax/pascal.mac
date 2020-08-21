@@ -1,0 +1,52 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Free Pascal
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/08/16 First Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set pas=CreateParser()
+
+Set rComment1=pas.CreateRegion(COLOR_COMMENT2, "+{+", "+}+", False )
+Set rComment2=pas.CreateRegion(COLOR_COMMENT1, "+//+", "$", False )
+
+Set rString1=pas.CreateStringRegion( COLOR_STRING1, "'", "", False )
+
+'Turbo Pascal reserved words
+Set iWord1=pas.CreateWord(COLOR_WORD1, "absolute and array asm begin break case const constructor continue destructor div do downto else end file for function goto if implementation in inherited inline interface label mod nil not object of on operator or packed procedure program record repeat self set shl shr string then to type unit until uses var while with xor", False)
+
+'Free Pascal reserved words
+Set iWord2=pas.CreateWord(COLOR_WORD2, "dispose exit false new true", False)
+
+'Functions and procedures
+Set iWord3=pas.CreateWord(COLOR_WORD3, "Addr Append Arctan Assign Assigned BinStr Blockread Blockwrite Break Chdir Chr Close CompareByte CompareChar CompareDWord CompareWord Concat Continue Copy Cos CSeg Dec Delete DSeg Eof Eoln Erase Exp Filepos Filesize FillByte Fillchar FillDWord Fillword Flush Frac Freemem Getdir Getmem GetMemoryManager Halt HexStr Hi High Inc Insert Int IOresult IsMemoryManagerSet Length Ln Lo LongJmp Low Lowercase Mark Maxavail Memavail Mkdir Move MoveCharNull Odd Ofs Ord Paramcount Paramstr Pi Pos Power Pred Ptr Random Randomize Read Readln Release Rename Reset Rewrite Rmdir Round Runerror Seek SeekEof SeekEoln Seg SetJmp SetLength SetMemoryManager SetTextBuf Sin SizeOf Sptr Sqr Sqrt SSeg Str StringOfChar Succ Swap Trunc Truncate Upcase Val Write WriteLn", False)
+iWord3.AutoCase=True
+
+Set iWord4=pas.CreateWord(COLOR_WORD4, "Boolean Byte ByteBool Cardinal Char Comp Double Extended Int64 Integer LongBool Longint QWord Real Shortint Single SmallInt Word WordBool", False)
+iWord4.AutoCase=True
+
+'operators
+Set iOperator=pas.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.;@\$\[\]]",False )
+
+
+pas.AddRegion( rComment1 )
+pas.AddRegion( rComment2 )
+pas.AddRegion( rString1 )
+
+pas.AddWord( iWord1 )
+pas.AddWord( iWord2 )
+pas.AddWord( iWord3 )
+pas.AddWord( iWord4 )
+pas.AddItem( iOperator )
+
+'number
+pas.AddItem( pas.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+pas.IndentText "\b(begin|repeat|asm|if|else)\s*", False,  "\b(end|until)\s*$", False
+pas.FoldText "\b(begin)\s*$", False, "\b(end)\s*$", False
+pas.SetPairs( "[]''""""{}()" )
+pas.CommentLine( "//" )
+pas.CommentBlock "{*", "*}"
+pas.AddCallTip "pascal.ecp", True, "", "(", ";", ")"

@@ -1,0 +1,232 @@
+#title=Batch File
+#t=Calculator
+#g=calc
+SET /a x=20
+SET /a y=3*x
+SET /a y+=140
+SET /a y/=2
+ECHO.y = %y%
+
+#t=Call Sub
+#g=call
+CALL :${2:SUBNAME}
+GOTO :End$2
+
+:$2
+	${3:ECHO Sub Contents}
+	goto :EOF
+:End$2
+
+#t=Convert Ansi To Unicode
+#g=a2u
+CMD /u /c TYPE ${1:myfile.txt} > ${2:myunicodefile.txt}
+#t=Convert Unicode To Ansi
+#g=u2i
+CMD /a /c TYPE ${1:myfile.txt} > ${2:myansifile.txt}
+#t=Delay
+#g=delay
+REM delay ${1:5} seconds
+ping 127.0.0.1 -n $1 -w 1000 >nul
+#t=Echo Off
+#g=ef
+@ECHO OFF
+
+#t=Echo_Off_Cls_Set_Title
+#g=title
+@ECHO OFF
+PUSHD "%~dp0"
+CLS
+SET title=${1:Input Title here}
+$0
+POPD
+#t=Exit On Keypress
+#g=exit
+REM -- End of application --
+ECHO.&PAUSE&GOTO:EOF
+#t=File Line Count
+#g=filel
+SET file=${1:textfile.txt}
+SET /a cnt=0
+FOR /f %%a in ('type "%file%"^|find "" /v /c') DO SET /a cnt=%%a
+ECHO %file% has %cnt% lines
+#t=File Size
+#g=files
+SET "filename=${1:myfile.txt}"
+FOR %%A in (%filename%) DO ECHO.Size of "%%A" is %%~zA bytes
+
+#t=For Files Loop
+#g=forf
+FOR %%i in (*.*) DO ${1:ECHO} %%i
+
+#t=For Number Loop
+#g=forn
+FOR /l %%a IN (10,-1,0) DO @ECHO.%%a:&echo.This is line number %%a
+
+#t=For Subfolder Files Loop
+#g=for
+@ECHO OFF
+REM To process all files in subfolders (only one level)
+SETLOCAL EnableDelayedExpansion
+
+FOR /D %%I in (${1:*}) DO (
+	PUSHD "%%~I"
+	FOR %%J in (${2:*}) DO CALL :${3:SUBNAME} "%%I" "%%J"
+	POPD
+)
+
+ENDLOCAL
+PAUSE
+GOTO :End${3:SUBNAME}
+
+REM SUB routine
+:${3:SUBNAME}
+	${4:ECHO %1 %2}
+	GOTO :EOF
+:End${3:SUBNAME}
+
+#t=If Call Sub
+#g=ifc
+IF ${1:condition} CALL :${2:SUBNAME}
+GOTO :END$2
+
+:$2
+	${3:ECHO contents}
+	GOTO :EOF
+:END$2
+
+
+#t=If Exist Else
+#g=ife
+IF EXIST ${1:"c:\windows"} (
+    ${2:SET "IsWin=YES"}
+) ELSE (
+    ${3:SET "IsWin=NO"}
+)
+ECHO. Is this a windows pc?  %IsWin%
+#t=Increment A Var
+#g=inc
+REM increment the variable $1
+SET /a ${1:cnt}=0
+SET /a $1+=1
+#t=Initializing A Batch
+#g=init
+@ECHO OFF
+REM.-- Prepare the Command Processor --
+SETLOCAL ENABLEEXTENSIONS
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+#t=Pushd_Popd
+#g=pushd
+PUSHD ${1:"%~dp0"}
+	$0
+POPD
+
+#t=Shift Arguments
+#g=shifta
+:Loop
+
+	${1:ECHO %~1}
+	
+	REM process next arg, from %1
+	SHIFT /1
+IF NOT "%~1"=="" GOTO :Loop
+#t=Template Choose
+#g=choose
+@ECHO OFF
+CLS
+ECHO.
+ECHO A ${1:MenuItemA}
+ECHO B ${2:MenuItemB}
+ECHO C ${3:MenuItemC}
+ECHO.
+CHOICE /c:abc ${4:Choose an option:}
+IF errorlevel 3 GOTO ${5:Option_C}
+IF errorlevel 2 GOTO ${6:Option_B}
+IF errorlevel 1 GOTO ${7:Option_A}
+
+:${7:Option_A}
+  ECHO ${7:Option_A}
+GOTO END
+
+:${6:Option_B}
+  ECHO ${6:Option_B}
+GOTO END
+
+:${5:Option_C}
+  ECHO ${5:Option_C}
+GOTO END
+
+:END
+
+#t=Template Menu
+#g=menu
+@ECHO OFF
+PUSHD "%~dp0"
+CLS
+SET title=${1:Input Title Here}
+
+:MainMenu
+ECHO.
+ECHO ================
+ECHO $1
+ECHO ================
+ECHO 1 ${2:MenuItem1}
+ECHO 2 ${3:MenuItem2}
+ECHO 3 Exit
+ECHO ----------------
+ECHO Please Choose[1/2/3]：
+SET /p answer=
+IF %answer%==1 CALL :${4:SUB1}
+IF %answer%==2 CALL :${5:SUB2}
+IF %answer%==3 GOTO :EOF
+GOTO MainMenu
+
+REM Sub Routine ${4:SUB1}
+:${4:SUB1}
+	${6:ECHO Sub Routine 1 contents}
+	PAUSE
+GOTO :EOF
+
+REM Sub Routine ${5:SUB2}
+:${5:SUB2}
+	${7:ECHO Sub Routine 2 contents}
+	PAUSE
+GOTO :EOF
+
+POPD
+#t=UAC Elevate
+#g=uac
+:::::::::::::::::::::::::::::::::::::::::
+:: Automatically check & get admin rights
+:::::::::::::::::::::::::::::::::::::::::
+@ECHO OFF
+CLS 
+
+:checkPrivileges 
+NET FILE 1>NUL 2>NUL
+IF '%errorlevel%' == '0' ( GOTO gotPrivileges ) ELSE ( GOTO getPrivileges ) 
+
+:getPrivileges 
+IF '%1'=='ELEV' (SHIFT & GOTO gotPrivileges)  
+ECHO. 
+ECHO **************************************
+ECHO Invoking UAC for Privilege Escalation 
+ECHO **************************************
+
+SETLOCAL DisableDelayedExpansion
+SET "batchPath=%~0"
+SETLOCAL EnableDelayedExpansion
+ECHO SET UAC = CreateObject^("Shell.Application"^) > "%temp%\OEgetPrivileges.vbs" 
+ECHO UAC.ShellExecute "!batchPath!", "ELEV", "", "runas", 1 >> "%temp%\OEgetPrivileges.vbs" 
+"%temp%\OEgetPrivileges.vbs" 
+EXIT /B 
+
+:gotPrivileges 
+::::::::::::::::::::::::::::
+:START
+::::::::::::::::::::::::::::
+$0
+#t=Window Size
+#g=size
+rem -- Set the window size --
+MODE CON: COLS=90 LINES=10

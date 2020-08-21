@@ -1,0 +1,20 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    CSS
+' Maintainer:  www.everedit.net
+' History:
+'  2012/04/11 First Version
+'   **Don't modify this file!**
+'*******************************************************************************
+
+Include( ".\const.mac" )
+
+Set css=CreateParser()
+css.WordChars="-."
+css.Name="source.css"
+
+Set css_creator=css
+Set rCssRegion=css.DefaultRegion
+
+Include( ".\css_base.mac" )
+

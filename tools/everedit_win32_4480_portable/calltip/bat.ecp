@@ -1,0 +1,124 @@
+%CD% \nExpands to the current directory string.
+%DATE% \nExpands to current date using same format as DATE command.
+%TIME% \nExpands to current time using same format as TIME command.
+%RANDOM% \nExpands to a random decimal number between 0 and 32767.
+%ERRORLEVEL% \nExpands to the current ERRORLEVEL value
+%CMDEXTVERSION% \nExpands to the current Command Processor Extensions version number.
+%CMDCMDLINE% \nExpands to the original command line that invoked the Command Processor.
+APPEND [d:]path[;][d:]path[...] \nDisplays or sets the search path for data files. DOS will search the specified path(s) if the file is not found in the current path.
+APPEND [/X:on|off][/path:on|off] [/E] \nDisplays or sets the search path for data files. DOS will search the specified path(s) if the file is not found in the current path.
+ASSIGN x=y [...] /sta \nRedirects disk drive requests to a different drive. 
+ASSOC [.ext[=[fileType]]] \nDisplays or modifies file extension associations.
+AT [\\computername] [ [id] [/DELETE] | /DELETE [/YES]] \nSchedules commands and programs to run on a computer.
+AT [\\computername] time [/INTERACTIVE] [ /EVERY:date[,...] | /NEXT:date[,...]] "command" \nSchedules commands and programs to run on a computer.
+ATTRIB [d:][path]filename [/S] \nDisplays or changes file attributes.
+ATTRIB [+R | -R] [+A | -A ] [+S | -S] [+H | -H] [drive:][path][filename] [/S [/D]] \nDisplays or changes file attributes.
+BREAK \nSets or clears extended CTRL+C checking.
+CACLS filename [/T] [/E] [/C] [/G user:perm] [/R user [...]] \nDisplays or modifies access control lists (ACLs) of files.
+CALL [drive:][path]filename [batch-parameters] \nCalls one batch program from another.
+CD [/D] [drive:][path] \nDisplays the name of or changes the current directory.
+CHCP [nnn] \nDisplays or sets the active code page number.
+CHDIR [/D] [drive:][path] \nDisplays the name of or changes the current directory.
+CHKDSK [volume[[path]filename]]] [/F] [/V] [/R] [/X] [/I] [/C] [/L[:size]] \nChecks a disk and displays a status report.
+CHKNTFS volume [...] \nDisplays or modifies the checking of disk at boot time.
+CHKNTFS /D \nDisplays or modifies the checking of disk at boot time.
+CHKNTFS /T[:time] \nDisplays or modifies the checking of disk at boot time.
+CHKNTFS /X volume [...] \nDisplays or modifies the checking of disk at boot time.
+CHKNTFS /C volume [...] \nDisplays or modifies the checking of disk at boot time.
+CLS \nClears the screen.
+CMD [/A | /U] [/Q] [/D] [/E:ON | /E:OFF] [/F:ON | /F:OFF] [/V:ON | /V:OFF] [[/S] [/C | /K] string] \nStarts a new instance of the Windows command interpreter.
+COLOR [attr] \nSets the default console foreground and background colors.
+COMP [data1] [data2] [/D] [/A] [/L] [/N=number] [/C] [/OFF[LINE]] \nCompares the contents of two files or sets of files.
+COMPACT [/C | /U] [/S[:dir]] [/A] [/I] [/F] [/Q] [filename [...]] \nDisplays or alters the compression of files on NTFS partitions.
+CONVERT volume /FS:NTFS [/V] [/CvtArea:filename] [/NoSecurity] [/X] \nConverts FAT volumes to NTFS.  You cannot convert the current drive.
+COPY [/D] [/V] [/N] [/Y | /-Y] [/Z] [/A | /B ] source [/A | /B] [+ source [/A | /B] [+ ...]] [destination [/A | /B]] \nCopies one or more files to another location.
+DATE [/T | date] \nDisplays or sets the date.
+DEFRAG <volume> [-a] [-f] [-v] [-?] \nDefragment a disk drive.
+DEL [/P] [/F] [/S] [/Q] [/A[[:]attributes]] names \nDeletes one or more files.
+DIR [drive:][path][filename] [/A[[:]attributes]] [/B] [/C] [/D] [/L] [/N] [/O[[:]sortorder]] [/P] [/Q] [/S] [/T[[:]timefield]] [/W] [/X] [/4] \nDisplays a list of files and subdirectories in a directory.
+DISKCOMP [drive1: [drive2:]] \nCompares the contents of two floppy disks.
+DISKCOPY [drive1: [drive2:]] [/V] \nCopies the contents of one floppy disk to another.
+DOSKEY [/REINSTALL] [/LISTSIZE=size] [/MACROS[:ALL | :exename]] [/HISTORY] [/INSERT | /OVERSTRIKE] [/EXENAME=exename] [/MACROFILE=filename] [macroname=[text]] \nEdits command lines, recalls Windows commands, and creates macros.
+ECHO [ON | OFF] \nTurns command echoing on or off.
+ECHO [message] \nDisplays messages
+ENDLOCAL \nEnds localization of environment changes in a batch file.
+ERASE [/P] [/F] [/S] [/Q] [/A[[:]attributes]] names \nDeletes one or more files.
+EXIT [/B] [exitCode] \nQuits the CMD.EXE program (command interpreter).
+EXPAND Source Destination \nExpands one or more compressed files.
+EXPAND -r Source [Destination] \nExpands one or more compressed files, renaming expanded files.
+EXPAND -D Source.cab [-F:Files] \nDisplay list of files in source.
+EXPAND Source.cab -F:Files Destination \nExpand named files from a .CAB.
+FC [/A] [/C] [/L] [/LBn] [/N] [/OFF[LINE]] [/T] [/U] [/W] [/nnnn] [drive1:][path1]filename1 [drive2:][path2]filename2 \nCompares two files or sets of files, and displays the differences between them.
+FC /B [drive1:][path1]filename1 [drive2:][path2]filename2 \nPerforms a binary comparison of two files and displays the differences between them.
+FIND [/V] [/C] [/N] [/I] [/OFF[LINE]] "string" [[drive:][path]filename[ ...]] \nSearches for a text string in a file or files.
+FINDSTR [/B] [/E] [/L] [/R] [/S] [/I] [/X] [/V] [/N] [/M] [/O] [/P] [/F:file] [/C:string] [/G:file] [/D:dir list] [/A:color attributes] [/OFF[LINE]] strings [[drive:][path]filename[ ...]] \nSearches for strings in files.
+FOR %variable IN (set) DO command [command-parameters] \nRuns a specified command for each file in a set of files.
+FOR /D %variable IN (set) DO command [command-parameters] \nRuns a specified command for each file in a set of files.
+FOR /R [[drive:]path] %variable IN (set) DO command [command-parameters] \nRuns a specified command for each file in a set of files.
+FOR /L %variable IN (start,step,end) DO command [command-parameters] \nRuns a specified command for each file in a set of files.
+FOR /F ["options"] %variable IN (file-set | "string" | 'command') DO command [command-parameters] \nRuns a specified command for each file in a set of files.
+FORMAT volume [/FS:file-system] [/V:label] [/Q] [/A:size] [/C] [/X]
+FORMAT volume [/V:label] [/Q] [/F:size] \nFormats a disk for use with Windows.
+FORMAT volume [/V:label] [/Q] [/T:tracks /N:sectors] \nFormats a disk for use with Windows.
+FORMAT volume [/V:label] [/Q] \nFormats a disk for use with Windows.
+FORMAT volume [/Q] \nFormats a disk for use with Windows. \nFormats a disk for use with Windows.
+FTYPE [fileType[=[openCommandString]]] \nDisplays or modifies file types used in file extension associations.
+GOTO label \nDirects the Windows command interpreter to a labeled line in a batch program.
+GRAFTABL [xxx] \nEnables Windows to display an extended character set in graphics mode.
+GRAFTABL /STATUS \nEnables Windows to display an extended character set in graphics mode.
+GRAPHICS [type] [[drive:][path]filename] [/R] [/B] [/LCD] [/PRINTBOX:STD | /PRINTBOX:LCD] \nLoads a program that can print graphics.
+HELP [command] \nProvides Help information for Windows commands.
+IF [NOT] ERRORLEVEL number command \nReturns true if the last program run returned an exit code equal to or greater than the number specified.
+IF [NOT] string1==string2 command \nReturns true if the specified text strings match.
+IF [NOT] EXIST filename command \nReturns true if the specified filename exists.
+IF [/I] string1 compare-op string2 command \nReturns true when comparing two strings where compare-op may be one of EQU,NEQ,LSS,LEQ,GTR,GEQ.
+IF CMDEXTVERSION number command \nReturns true if the internal version number associated with the Command Extensions is the number specified.
+IF DEFINED variable command \nReturns true if the environment variable is defined.
+ipconfig /all /displaydns /flushdns /registerdns /release /renew /setclassid /showclassid
+LABEL [drive:][label] \nCreates, changes, or deletes the volume label of a disk.
+LABEL [/MP] [volume] [label] \nCreates, changes, or deletes the volume label of a disk.
+MD [drive:]path \nCreates a directory.
+MKDIR [drive:]path \nCreates a directory.
+MODE COMm[:] [BAUD=b] [PARITY=p] [DATA=d] [STOP=s] [to=on|off] [xon=on|off] [odsr=on|off] [octs=on|off] [dtr=on|off|hs] [rts=on|off|hs|tg] [idsr=on|off]; Configure serial port
+MODE [device] [/STATUS] \nDisplay device status.
+MODE LPTn[:]=COMm[:] \nRedirect printing.
+MODE CON[:] CP SELECT=yyy \nSelect code page.
+MODE CON[:] CP [/STATUS] \nDisplay code page status.
+MODE CON[:] [COLS=c] [LINES=n] \nConfigure display mode.
+MODE CON[:] [RATE=r DELAY=d] \nConfigure typematic rate.
+MORE [/E [/C] [/P] [/S] [/Tn] [+n]] < [drive:][path]filename \nDisplays output one screen at a time.
+MORE /E [/C] [/P] [/S] [/Tn] [+n] [files] \nDisplays output one screen at a time.
+MOVE [/Y | /-Y] [drive:][path]filename1[,...] destination \nMoves one or more files from one directory to another directory.
+MOVE [/Y | /-Y] [drive:][path]dirname1 dirname2 \nRenames a directory.
+PATH \nDisplays the search path for executable files.
+PATH [[drive:]path[;...][;%PATH%] \nSets a search path for executable files.
+PAUSE \nSuspends processing of a batch file and displays a message.
+POPD \nRestores the previous value of the current directory saved by PUSHD.
+PRINT [/D:device] [[drive:][path]filename[...]] \nPrints a text file.
+PROMPT [text] \nChanges the Windows command prompt.
+PUSHD [path | ..] \nSaves the current directory then changes it.
+RD [/S] [/Q] [drive:]path \nRemoves a directory.
+RECOVER [drive:][path]filename \nRecovers readable information from a bad or defective disk.
+REM [comment] \nRecords comments (remarks) in batch files or CONFIG.SYS.
+REN [drive:][path]filename1 filename2 \nRenames a file or files.
+RENAME [drive:][path]filename1 filename2 \nRenames a file or files.
+REPLACE [drive1:][path1]filename [drive2:][path2] [/A] [/P] [/R] [/W] \nReplaces files.
+REPLACE [drive1:][path1]filename [drive2:][path2] [/P] [/R] [/S] [/W] [/U] \nReplaces files.
+RMDIR [/S] [/Q] [drive:]path \nRemoves a directory.
+SET [variable=[string]] \nDisplays, sets, or removes Windows environment variables.
+SET /A expression \nEvaluates a numerical expression, storing the result in a variable.
+SET /P variable=[promptString] \nSet the value of a variable to a line of input entered by the user.
+SETLOCAL \nBegins localization of environment changes in a batch file.
+SHIFT [/n] \nShifts the position of replaceable parameters in batch files.
+SORT [/R] [/+n] [/M kilobytes] [/L locale] [/REC recordbytes] [[drive1:][path1]filename1] [/T [drive2:][path2]] [/O [drive3:][path3]filename3] \nSorts input.
+START ["title"] [/Dpath] [/I] [/MIN] [/MAX] [/SEPARATE | /SHARED] [/LOW | /NORMAL | /HIGH | /REALTIME | /ABOVENORMAL | /BELOWNORMAL] [/WAIT] [/B] [command/program] [parameters] \nStarts a separate window to run a specified program or command.
+SUBST [drive1: [drive2:]path] \nAssociates a path with a drive letter.
+SUBST drive1: /D \nDeletes a substituted (virtual) drive.
+TIME [/T | time] \nDisplays or sets the system time.
+TITLE [string] \nSets the window title for a CMD.EXE session.
+TREE [drive:][path] [/F] [/A] \nGraphically displays the directory structure of a drive or path.
+TYPE [drive:][path]filename \nDisplays the contents of a text file.
+VER \nDisplays the Windows version.
+VERIFY [ON | OFF] \nTells Windows whether to verify that your files are written correctly to a disk.
+VOL [drive:] \nDisplays a disk volume label and serial number.
+XCOPY source [destination] [/A | /M] [/D[:date]] [/P] [/S [/E]] [/V] [/W] [/C] [/I] [/Q] [/F] [/L] [/G] [/H] [/R] [/T] [/U] [/K] [/N] [/O] [/X] [/Y] [/-Y] [/Z] [/EXCLUDE:file1[+file2][+file3]...] \nCopies files and directory trees.

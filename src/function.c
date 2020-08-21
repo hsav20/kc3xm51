@@ -343,7 +343,7 @@ char MKCM_SdUdiskInsert(WORD flag, WORD g2Local_1){         // ºÏ≤ÈSD/U≈Ã≤Â»Î£¨”
                 }
                 MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
                 g2PlayIndex = 0;
-g2PlayIndex = 15;                
+//g2PlayIndex = 15;                
                 MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // ≤•∑≈µ⁄0 ◊
             }else {
                 MDIP_MenuSelect((flag == KCM_SRC_VALID_SD) ? cMenu_SdInsert : cMenu_UDiskInsert, 0);     // œ‘ æSD/U≈Ã≤Â»Î
@@ -372,6 +372,36 @@ char MKCM_SdUdiskRemove(WORD flag, WORD g2Local_1){         // ºÏ≤ÈSD/U≈Ã∞Œ≥ˆ£¨”
     }
     return 0;
 }
+char MKCM_UsbaBtInsert(WORD flag, WORD g2Local_1){         	// ºÏ≤ÈUSB…˘ø®/¿∂—¿“Ù∆µ≤Â»Î£¨”–≤Â»Î∑µªÿ1
+	if (g2Local_1 & flag){                   				// ±æ¥Œ”–USB…˘ø®/¿∂—¿“Ù∆µ
+    	if (!(g2SUB_SrcValid & flag)){       				// …œ¥Œ√ª”–USB…˘ø®/¿∂—¿“Ù∆µ
+	    	if (mINPUT_SWITCH != INPUT_SWITCH_USBA && mINPUT_SWITCH != INPUT_SWITCH_BT){ // »Áπ˚‘≠¿¥≤ª «—°‘ÒUSB…˘ø®/¿∂—¿“Ù∆µ
+                gSUB_SrcAuto = mINPUT_SWITCH;           // ±£¥Ê‘≠¿¥µƒ—°‘Ò
+            }
+            if (flag == KCM_SRC_VALID_USBA){
+                mINPUT_SWITCH = INPUT_SWITCH_USBA;
+            }else if (flag == KCM_SRC_VALID_BT){
+                mINPUT_SWITCH = INPUT_SWITCH_BT;
+            }
+            MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
+            MDIP_MenuSelect((flag == KCM_SRC_VALID_USBA) ? cMenu_UsbaInsert : cMenu_BtInsert, 0);     // œ‘ æSD/U≈Ã≤Â»Î
+		    return 1;
+	   	}
+    }
+    return 0;
+}
+char MKCM_UsbaBtRemove(WORD flag, WORD g2Local_1){         // ºÏ≤ÈUSB…˘ø®/¿∂—¿“Ù∆µ∞Œ≥ˆ£¨”–∞Œ≥ˆ∑µªÿ1
+    if (!(g2Local_1 & flag)){                               // ±æ¥Œ√ª”–USB…˘ø®/¿∂—¿“Ù∆µ
+        if (g2SUB_SrcValid & flag){                         // …œ¥Œ”–USB…˘ø®/¿∂—¿“Ù∆µ
+            if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // ≤ª «◊‘∂Ø—°‘Ò ß–ß
+                MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  // ª÷∏¥‘≠¿¥µƒ ‰»Î
+            }
+            MDIP_MenuSelect((flag == KCM_SRC_VALID_USBA) ? cMenu_UsbaRemove : cMenu_BtRemove, 0);        // œ‘ æUSB…˘ø®/¿∂—¿“Ù∆µ≤Â≥ˆ
+            return 1;
+        }
+    }
+    return 0;
+}
 void MKCM_ReadSrcValid(){
 	WORD g2Local_1 = MKCM_Read2Byte(KCM_SRC_VALID);         // ±æ¥Œµƒ”––ß“Ù‘¥
 //if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
@@ -387,10 +417,19 @@ void MKCM_ReadSrcValid(){
         MKCM_HdmiRemove(KCM_SRC_VALID_HDMI3, g2Local_1);
 
         if (!MKCM_SdUdiskInsert(KCM_SRC_VALID_UDISK, g2Local_1)){   // ºÏ≤ÈU≈Ã≤Â»Î£¨√ª”–≤≈ºÏ≤ÈSD≤Â»Î
-            MKCM_SdUdiskInsert(KCM_SRC_VALID_SD, g2Local_1);    // ºÏ≤ÈSD≤Â»Î
+            MKCM_SdUdiskInsert(KCM_SRC_VALID_SD, g2Local_1);    	// ºÏ≤ÈSD≤Â»Î
         }
         MKCM_SdUdiskRemove(KCM_SRC_VALID_SD, g2Local_1);
         MKCM_SdUdiskRemove(KCM_SRC_VALID_UDISK, g2Local_1);
+
+        if (!MKCM_UsbaBtInsert(KCM_SRC_VALID_USBA, g2Local_1)){   // ºÏ≤ÈUSB…˘ø®≤Â»Î£¨√ª”–≤≈ºÏ≤È¿∂—¿“Ù∆µ≤Â»Î
+            MKCM_UsbaBtInsert(KCM_SRC_VALID_BT, g2Local_1);    	// ºÏ≤È¿∂—¿“Ù∆µ≤Â»Î
+        }
+        MKCM_UsbaBtRemove(KCM_SRC_VALID_USBA, g2Local_1);
+        MKCM_UsbaBtRemove(KCM_SRC_VALID_BT, g2Local_1);
+
+        
+        
         g2SUB_SrcValid = g2Local_1;
     }else {
         MLOG("KCM_SRC_VALID = Last:%04x\r\n", (u32)g2Local_1);
@@ -429,10 +468,12 @@ CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE
     KCM_INPUT_DIGITAL | 2, 			                        // 3= ˝¬Î3
     KCM_INPUT_MEDIA | 0,                                    // 4=SD
     KCM_INPUT_MEDIA | 1,		                            // 5=UDISK
-    KCM_INPUT_HDMI | 0,				                        // 6=HDMI1
-    KCM_INPUT_HDMI | 1,                                     // 7=HDMI2
-    KCM_INPUT_HDMI | 2,                                     // 8=HDMI3
-    KCM_INPUT_HDMI | 4,	                                    // 9=HDMI-ARC 
+    KCM_INPUT_MEDIA | 2,                                    // 6=USB…˘ø®
+    KCM_INPUT_MEDIA | 3,		                            // 7=¿∂—¿“Ù∆µ
+    KCM_INPUT_HDMI | 0,				                        // 8=HDMI1
+    KCM_INPUT_HDMI | 1,                                     // 9=HDMI2
+    KCM_INPUT_HDMI | 2,                                     // 10=HDMI3
+    KCM_INPUT_HDMI | 4,	                                    // 11=HDMI-ARC 
 };  						 
 
 CONST_CHAR Tab_SurroundMode[] = {

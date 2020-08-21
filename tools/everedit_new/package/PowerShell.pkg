@@ -1,0 +1,15 @@
+[Syntax]
+File=powershell.mac
+Ext=ps1
+Mode=
+HelpFile=
+MatchFileName=
+MatchFirstLine=
+Tab=4
+ColMarker=
+ToolGroup=-1
+SoftTab=N
+RemoveSpaces=N
+EnsureEOL=N
+Title=PowerShell
+ParseMax=0

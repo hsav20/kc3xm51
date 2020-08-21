@@ -1,0 +1,63 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:     AutoHotkey
+' Maintainer:   www.everedit.net and tidbit
+' History:
+'   2013/04/06  First Version
+'   2013/08/16  Updated Keywords
+'   2013/11/19  tidbit made list 'camelCaseCase' instead of 'CamelCaseCase'
+'   2015/04/30  tidbit duplicates removed, some CaSE fixed, new things added.
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set ahk=CreateParser()
+
+Set rComment1=ahk.CreateRegion(COLOR_COMMENT1, "(?<!`);", "$", False )
+Set rComment2=ahk.CreateRegion(COLOR_COMMENT2, "+/*+", "+*/+", False )
+'Set rComment3=ahk.CreateRegion(COLOR_COMMENT1, "+//+", "$", False )
+
+Set rString1=ahk.CreateStringRegion( COLOR_STRING1, "'", "`", False )
+Set rString2=ahk.CreateStringRegion( COLOR_STRING2, """", "`", False )
+
+Set iWord1=ahk.CreateWord(COLOR_WORD1, "autoTrim blockInput break catch click clipboardTimeout clipWait commentFlag continue control controlClick controlFocus controlGet controlGetFocus controlGetPos controlGetText controlMove controlSend controlSendRaw controlSetText coordMode critical detectHiddenText detectHiddenWindows drive driveGet driveSpaceFree edit else envAdd envDiv envGet envMult envSet envSub envUpdate errorStdOut escapeChar exit exitApp fileAppend fileCopy fileCopyDir fileCreateDir fileCreateShortcut fileDelete fileEncoding fileGetAttrib fileGetShortcut fileGetSize fileGetTime fileGetVersion fileInstall fileMove fileMoveDir fileRead fileReadLine fileRecycle fileRecycleEmpty fileRemoveDir fileSelectFile fileSelectFolder fileSetAttrib fileSetTime for formatTime gosub goto groupActivate groupAdd groupClose groupDeactivate gui guiControl guiControlGet hotkey hotkeyInterval hotkeyModifierTimeout hotstring if ifExist ifInString ifMsgBox ifNotExist ifNotInString ifTimeout ifWinActive ifWinExist ifWinNotActive ifWinNotExist imageSearch include includeAgain iniDelete iniRead iniWrite input inputBox inputLevel installKeybdHook installMouseHook keyHistory keyWait listHotkeys listLines listVars loop lTrim maxHotkeysPerInterval maxMem maxThreads maxThreadsBuffer maxThreadsPerHotkey menu menuMaskKey mouseClick mouseClickDrag mouseGetPos mouseMove msgBox noEnv noTrayIcon onExit outputDebug pause persistent pixelGetColor pixelSearch postMessage process progress random regDelete regRead regWrite reload return run runAs runWait send sendEvent sendInput sendLevel sendMessage sendMode sendPlay sendRaw setBatchLines setCapsLockState setControlDelay setDefaultMouseSpeed setEnv setFormat setKeyDelay setMouseDelay setNumLockState setRegView setScrollLockState setStoreCapslockMode setTimer setTitleMatchMode setWinDelay setWorkingDir shutdown singleInstance sleep sort soundBeep soundGet soundGetWaveVolume soundPlay soundSet soundSetWaveVolume splashImage splashTextOff splashTextOn splitPath statusBarGetText statusBarWait stringCaseSense stringGetPos stringLeft stringLen stringLower stringMid stringReplace stringRight stringSplit stringTrimLeft stringTrimRight stringUpper suspend sysGet thread throw toolTip transform trayTip try until URLDownloadToFile useHook warn while winActivate winActivateBottom winActivateForce winClose winGet winGetActiveStats winGetActiveTitle winGetClass winGetPos winGetText winGetTitle winHide winKill winMaximize winMenuSelectItem winMinimize winMinimizeAll winMinimizeAllUndo winMove winRestore winSet winSetTitle winShow winWait winWaitActive winWaitClose winWaitNotActive", False)
+iWord1.AutoCase=False 
+
+Set iWord2=ahk.CreateWord(COLOR_WORD2, "shift lShift rShift alt lAlt rAlt control lControl rControl ctrl lCtrl rCtrl lWin rWin appsKey altDown altUp shiftDown shiftUp ctrlDown ctrlUp lWinDown lWinUp rWinDown rWinUp lButton rButton mButton wheelUp wheelDown wheelLeft wheelRight xButton1 xButton2 joy1 joy2 joy3 joy4 joy5 joy6 joy7 joy8 joy9 joy10 joy11 joy12 joy13 joy14 joy15 joy16 joy17 joy18 joy19 joy20 joy21 joy22 joy23 joy24 joy25 joy26 joy27 joy28 joy29 joy30 joy31 joy32 joyX joyY joyZ joyR joyU joyV joyPOV joyName joyButtons joyAxes joyInfo space enter escape esc backSpace del insert ins pGUP pGDN home end up down printScreen ctrlBreak pause scrollLock capsLock numLock numpad0 numpad1 numpad2 numpad3 numpad4 numpad5 numpad6 numpad7 numpad8 numpad9 numpadMult numpadAdd numpadSub numpadDiv numpadDot numpadDel numpadIns numpadClear numpadUp numpadDown numpadLeft numpadRight numpadHome numpadEnd numpadPgup numpadPgdn numpadEnter f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12 f13 f14 f15 f16 f17 f18 f19 f20 f21 f22 f23 f24 browser_Back browser_Forward browser_Refresh browser_Stop browser_Search browser_Favorites browser_Home volume_Mute volume_Down volume_Up media_Next media_Prev media_Stop media_Play_Pause launch_Mail launch_Media launch_App1 launch_App2 pixel mouse screen relative RGB lTrim rTrim join low belowNormal normal aboveNormal high realtime ahk_id ahk_pid ahk_class ahk_group ahk_exe between contains in integer float integerFast floatFast digit xdigit alpha upper lower alnum time date not or and alwaysOnTop topmost transparent transColor redraw region ID IDLast processName processPath minMax controlList count list capacity statusCD eject lock unlock fileSystem label setLabel serial type status static global local byRef seconds minutes hours days read parse logoff error single tray add rename check unCheck toggleCheck enable disable toggleEnable default noDefault standard noStandard color delete deleteAll icon noIcon tip click show mainWindow noMainWindow useErrorLevel picture pic groupBox button checkbox radio dropDownList dDL comboBox listBox listView dateTime monthCal slider statusBar tab tab2 treeView upDown activeX link custom iconSmall tile report sortDesc noSort noSortHdr grid hdr autoSize range font resize owner submit noHide minimize maximize restore noActivate nA destroy dPIScale margin maxSize minSize ownDialogs guiEscape guiClose guiSize guiContextMenu guiDropFiles onClipboardChange tabStop altSubmit wrap hScroll vScroll border top bottom buttons expand first imageList lines wantCtrlA wantF2 vis visFirst number uppercase lowercase limit multi wantReturn group background bold italic strike underline norm backgroundTrans theme caption delimiter minimizeBox maximizeBox sysMenu toolWindow flash style exStyle check3 checked checkedGray readOnly password hidden left right center noTab section move focus hide choose chooseString text pos enabled disabled visible lastFound lastFoundExist altTab shiftAltTab altTabMenu altTabAndMenu altTabMenuDismiss noTimers interrupt priority waitClose wait exist close blind raw unicode toCodePage fromCodePage deref pow bitNot bitAnd bitOr bitXOr bitShiftLeft bitShiftRight yes no ok cancel abort retry ignore tryAgain on off all HKEY_LOCAL_MACHINE HKEY_USERS HKEY_CURRENT_USER HKEY_CLASSES_ROOT HKEY_CURRENT_CONFIG HKLM HKU HKCU HKCR HKCC REG_SZ REG_EXPAND_SZ REG_MULTI_SZ REG_DWORD REG_BINARY useUnsetLocal useUnsetGlobal useEnv localSameAsGlobal", False)
+iWord2.AutoCase=False
+
+Set iWord3=ahk.CreateWord(COLOR_WORD3, "A_AhkPath A_AhkVersion A_AppData A_AppDataCommon A_AutoTrim A_BatchLines A_CaretX A_CaretY A_ComputerName A_ControlDelay A_Cursor A_DD A_DDD A_DDDD A_DefaultMouseSpeed A_Desktop A_DesktopCommon A_DetectHiddenText A_DetectHiddenWindows A_EndChar A_EventInfo A_ExitReason A_FileEncoding A_FormatFloat A_FormatInteger A_Gui A_GuiEvent A_GuiControl A_GuiControlEvent A_GuiHeight A_GuiWidth A_GuiX A_GuiY A_Hour A_IconFile A_IconHidden A_IconNumber A_IconTip A_Index A_IPAddress1 A_IPAddress2 A_IPAddress3 A_IPAddress4 A_Is64bitOS A_IsAdmin A_IsCompiled A_IsCritical A_IsPaused A_IsSuspended A_IsUnicode A_KeyDelay A_Language A_LastError A_LineFile A_LineNumber A_LoopField A_LoopFileAttrib A_LoopFileDir A_LoopFileExt A_LoopFileFullPath A_LoopFileLongPath A_LoopFileName A_LoopFileShortName A_LoopFileShortPath A_LoopFileSize A_LoopFileSizeKB A_LoopFileSizeMB A_LoopFileTimeAccessed A_LoopFileTimeCreated A_LoopFileTimeModified A_LoopReadLine A_LoopRegKey A_LoopRegName A_LoopRegSubkey A_LoopRegTimeModified A_LoopRegType A_MDAY A_Min A_MM A_MMM A_MMMM A_Mon A_MouseDelay A_MSec A_MyDocuments A_Now A_NowUTC A_NumBatchLines A_OSType A_OSVersion A_PriorHotkey A_PriorKey A_ProgramFiles A_Programs A_ProgramsCommon A_PtrSize A_RegView A_ScreenDPI A_ScreenHeight A_ScreenWidth A_ScriptDir A_ScriptFullPath A_ScriptHwnd A_ScriptName A_Sec A_Space A_StartMenu A_StartMenuCommon A_Startup A_StartupCommon A_StringCaseSense A_Tab A_Temp A_ThisFunc A_ThisHotkey A_ThisLabel A_ThisMenu A_ThisMenuItem A_ThisMenuItemPos A_TickCount A_TimeIdle A_TimeIdlePhysical A_TimeSincePriorHotkey A_TimeSinceThisHotkey A_TitleMatchMode A_TitleMatchModeSpeed A_UserName A_WDay A_WinDelay A_WinDir A_WorkingDir A_YDay A_Year A_YWeek A_YYYY clipboard clipboardAll comSpec errorLevel programFiles true false", False)
+iWord3.AutoCase=False
+
+Set iWord4=ahk.CreateWord(COLOR_WORD4, "__Call __Delete __Get __New __Set abs aCos array asc aSin aTan ceil chr class comObjActive comObjArray comObjConnect comObjCreate comObjEnwrap comObjError comObjFlags comObjGet comObjMissing comObjParameter comObjQuery comObjType comObjUnwrap comObjValue cos delete dllCall Exception Exp extends FileExist fileOpen Floor func getKeyName getKeySC getKeyState getKeyVK IL_Add IL_Create IL_Destroy insertAt inStr isByRef isFunc isLabel isObject Ln Log lTrim LV_Add LV_Delete LV_DeleteCol LV_GetCount LV_GetNext LV_GetText LV_Insert LV_InsertCol LV_Modify LV_ModifyCol LV_SetImageList mod new numGet numPut objAddRef objClone object objGetAddress objGetCapacity objHasKey objInsert objMaxIndex objMinIndex objNewEnum objRelease objRemove objSetCapacity onMessage pop push regExMatch regExReplace registerCallback removeAt round rTrim SB_SetIcon SB_SetParts SB_SetText sin sqrt strGet strLen strPut subStr tan trim TV_Add TV_Delete TV_Get TV_GetChild TV_GetCount TV_GetNext TV_GetParent TV_GetPrev TV_GetSelection TV_GetText TV_Modify TV_SetImageList varSetCapacity winActive winExist minIndex strSplit maxIndex length setCapacity getCapacity getAddress _NewEnum hasKey clone objRawSet ord strReplace format objBindMethod bind", False)
+iWord4.AutoCase=False
+
+Set iOperator=ahk.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.;@\$\[\]]",False )
+'Set iVar=ahk.CreateItem(COLOR_VAR, "test",False)
+Set iVar=ahk.CreateItem(COLOR_VAR, "\%\w+\%",False)
+ahk.AddItem( iVar )
+
+ahk.AddRegion( rComment1 )
+ahk.AddRegion( rComment2 )
+'ahk.AddRegion( rComment3 )
+ahk.AddRegion( rString1 )
+ahk.AddRegion( rString2 )
+
+ahk.AddWord( iWord1 )
+ahk.AddWord( iWord2 )
+ahk.AddWord( iWord3 )
+ahk.AddWord( iWord4 )
+ahk.AddItem( iOperator )
+
+'number
+ahk.AddItem( ahk.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+ahk.AddSnippet( "ahk.snippet" )
+
+'ahk.IndentText "\{\s*\n", False, "}\s*$", False
+ahk.FoldText "\{", False, "\}", False
+ahk.SetPairs( "[]''""{}()" )
+ahk.CommentLine( "; " )
+ahk.CommentBlock "/*", "*/"
+
+ahk.AddCallTip "ahk.ecp", false, " ", ",", ",", "", True
+'ahk.AddCallTip "ahk_funcs.ecp", false, " ", "(", ",", ")", True

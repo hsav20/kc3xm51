@@ -284,7 +284,7 @@ void MDIP_ClearSpectrum();
 void MDIP_NightMode();
 void MDIP_NoiseSignal();
 void MDIP_Fireware();
-void MDIP_DiskInOut(BYTE type);
+void MDIP_ExtrInOut(BYTE type);								// 显示外置音源插入/插出 
 void MDIP_PlayTrack();
 void MDIP_PlayTime();
 BYTE MDIP_GetNextChannel(BYTE index);                       // 测试噪音声道微调获取下一个声道

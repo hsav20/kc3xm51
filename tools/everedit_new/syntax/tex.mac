@@ -1,0 +1,35 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Tex/Latex
+' Maintainer:  www.everedit.net  
+' History:
+'   2013/04/12 Updated
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set tex=CreateParser()
+
+Set iCommand1=tex.CreateItem(COLOR_WORD1, "\\\w+((\{.*?\})*)", False )
+iCommand1.Capture 1, COLOR_WORD2
+
+Set iCommand2=tex.CreateItem(COLOR_WORD1, "\\\w+=([\S]+)", False )
+iCommand2.Capture 1, COLOR_WORD3
+
+Set iCommand3=tex.CreateItem(COLOR_STRING1, "\\[\W]", False )
+
+Set iBlackslash=tex.CreateItem(COLOR_STRING2, "\$\\blackslash\$", False )
+Set iMath1=tex.CreateItem(COLOR_COMMENT1, "\\\(.+?\\\)", False )
+Set iMath2=tex.CreateItem(COLOR_COMMENT2, "\$.+?\$", False )
+
+Set iComment=tex.CreateItem(COLOR_COMMENT1, "%.*$", False )
+
+tex.AddItem( iCommand1 )
+tex.AddItem( iCommand2 )
+tex.AddItem( iCommand3 )
+tex.AddItem( iComment )
+
+tex.AddItem( iMath1 )
+tex.AddItem( iMath2 )
+tex.AddItem( iBlackslash )
+
+tex.SetPairs( "[]''""""{}()" )

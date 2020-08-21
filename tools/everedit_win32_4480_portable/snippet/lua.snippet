@@ -1,0 +1,39 @@
+#title=Lua
+#t=for     for ... then
+#g=for
+for $1 do
+	$0
+end
+#t=fori    for i, v in ipairs()
+#g=fori
+for ${1:i},${2:v} in ipairs(${3:table_name})
+	$0
+end
+#t=forp    for i, v in pairs()
+#g=forp
+for ${1:i},${2:v} in pairs(${3:table_name})
+	$0
+end
+#t=repeat
+#g=repeat
+repeat
+	$1
+until $0
+#t=while
+#g=while
+while $1 do
+	$0
+end
+#t=if
+#g=if
+if $1 then
+	$0
+end
+#t=function
+#g=function
+function ${1:function_name}(${2:})
+	$0
+end
+#t=table.sort
+#g=table.sort
+table.sort(${1:tablename}${2:, sortfunction})

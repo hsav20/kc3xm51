@@ -1,0 +1,46 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Verilog
+' Maintainer:  www.everedit.net  
+' History:
+'   2019/06/04 initial Version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set v=CreateParser()
+v.WordChars="_"
+
+'comment
+Set rLineComment=v.CreateRegion( COLOR_COMMENT1, "+//+", "$", True )
+Set rBlockComment=v.CreateRegion( COLOR_COMMENT2, "+/*+", "+*/+", True )
+v.AddRegion( rLineComment )
+v.AddRegion( rBlockComment )
+
+Set rString2=v.CreateStringRegion( COLOR_STRING2, """", "\", False, "\" )
+v.AddRegion( rString2 )
+
+' unknown directives
+v.AddItem( v.CreateItem(COLOR_HIGHLIGHT1, "^\s*`\w+\b", False) )
+
+'Compiler directives
+v.AddItem( v.CreateItem(COLOR_COMMENT2, "^\s*`(celldefine|default_decay_time|default_nettype|default_trireg_strength|define|delay_mode_distributed|delay_mode_path|delay_mode_unit|delay_mode_zero|else|elsif|endcelldefine|endif|endprotected|file|ifdef|ifndef|include|line|nounconnected_drive|protected|resetall|timescale|unconnected_drive|undef)\b", False) )
+
+' unknown commands
+v.AddItem( v.CreateItem(COLOR_HIGHLIGHT2, "\$\w+\b", False) )
+
+'System tasks and functions, Simulator specific commands
+v.AddItem( v.CreateItem(COLOR_WORD2, "\$(array|bitstoread|bitstoreal|cleartrace|countdrivers|display|displayb|displayh|displayo|dist_chi_square|dist_erlang|dist_exponential|dist_normal|dist_poisson|dist_t|dist_uniform|dumpall|dumpfile|dumpflush|dumplimit|dumpoff|dumpon|dumpportsall|dumpportsflush|dumpportslimit|dumpportsoff|dumpportson|dumpvars|fclose|fdisplay|fdisplayb|fdisplayf|fdisplayh|ferror|fflush|fgetc|fgets|finish|fmonitor|fmonitorb|fmonitorf|fmonitorh|fopen|fread|fscanf|fseek|fsscanf|fstrobe|fstrobebb|fstrobef|fstrobeh|ftel|fullskew|fwrite|fwriteb|fwritef|fwriteh|getpattern|history|hold|incsave|input|itor|key|list|log|monitor|monitorb|monitorh|monitoro|monitoroff|monitoron|nochange|nokey|nolog|nor|or|period|plane|plusargs|printtimescale|q_add|q_exam|q_full|q_initialize|q_remove|random|readmemb|readmemh|realtime|realtobits|recovery|recrem|removal|reset|reset_count|reset_value|restart|rewind|rtoi|save|scale|scope|sdf_annotate|settrace|setup|setuphold|sformat|showscopes|showvariables|showvars|signed|skew|sreadmemb|sreadmemh|sscanf|stime|stop|strobe|strobeb|strobeh|strobeo|swrite|swriteb|swriteh|swriteo|sync|test|time|timeformat|timeskew|ungetc|unsigned|value$plusargs|write|writeb|writeh|writememb|writememh|writeo)\b", False) )
+
+'Reserved words
+v.AddWord( v.CreateWord(COLOR_WORD1, "alias always always_comb always_ff always_latch and assert assign assume automatic before begin bind bins binsof bit break buf bufif0 bufif1 byte case casex casez cell chandle class clocking cmos config const constraint context continue cover covergroup coverpoint cross deassign default defparam design disable dist do edge else end endcase endclass endclocking endconfig endfunction endgenerate endgroup endinterface endmodule endpackage endprimitive endprogram endproperty endspecify endsequence endtable endtask enum event expect export extends extern final first_match for force foreach forever fork forkjoin function generate genvar highz0 highz1 if iff ifnone ignore_bins illegal_bins import incdir include initial inout input inside instance int integer interface intersect join join_any join_none large liblist library local localparam logic longint macromodule matches medium modport module nand negedge new nmos nor noshowcancelled not notif0 notif1 null or output package packed parameter pmos posedge primitive priority program property protected pull0 pull1 pulldown pullup pulsestyle_onevent pulsestyle_ondetect pure rand randc randcase randsequence rcmos real realtime ref reg release repeat return rnmos rpmos rtran rtranif0 rtranif1 scalared sequence shortint shortreal showcancelled signed small solve specify specparam static string strong0 strong1 struct super supply0 supply1 table tagged task this throughout time timeprecision timeunit tran tranif0 tranif1 tri tri0 tri1 triand trior trireg type typedef union unique unsigned use var vectored virtual void wait wait_order wand weak0 weak1 while wildcard wire with within wor xnor xor", True ) )
+
+'operators
+v.AddItem( v.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.,:;\/\[\]]",False ) )
+
+'number
+v.AddItem( v.CreateItem(COLOR_NUMBER, "\b([0-9]+\.?[0-9]*|0x[0-9a-fA-F]+)\b", False) )
+
+v.CommentLine("// ")
+v.CommentBlock "/*", "*/"
+
+v.SetPairs( "[]{}()""""" )

@@ -134,8 +134,12 @@
 #define cMenu_SdRemove                  15                  // 显示SD插出
 #define cMenu_UDiskInsert               16                  // 显示U盘插入
 #define cMenu_UDiskRemove               17                  // 显示U盘插出
-#define cMenu_PlayTrack                 18                  // 显示多媒体文件信息
-#define cMenu_PlayTime                  19                  // 显示多媒体播放时间
+#define cMenu_UsbaInsert               	18                 	// 显示USB声卡插入
+#define cMenu_UsbaRemove               	19                 	// 显示USB声卡插出
+#define cMenu_BtInsert               	20                 	// 显示蓝牙音频插入
+#define cMenu_BtRemove               	21                 	// 显示蓝牙音频插出
+#define cMenu_PlayTrack                 22                  // 显示多媒体文件信息
+#define cMenu_PlayTime                  23                  // 显示多媒体播放时间
 
 
 
@@ -225,6 +229,8 @@ typedef enum {
     INPUT_SWITCH_COA2 = 3,                                  // 3=数码3   
     INPUT_SWITCH_SD = 4,                                    // 4=SD      
     INPUT_SWITCH_UDISK = 5,                                 // 5=UDISK   
+    INPUT_SWITCH_USBA = 6,                                 	// 10=USB声卡
+    INPUT_SWITCH_BT = 7,                                 	// 11=蓝牙音频
     INPUT_SWITCH_HDMI1 = 6,                                 // 6=HDMI1   
     INPUT_SWITCH_HDMI2 = 7,                                 // 7=HDMI2   
     INPUT_SWITCH_HDMI3 = 8,                                 // 8=HDMI3   

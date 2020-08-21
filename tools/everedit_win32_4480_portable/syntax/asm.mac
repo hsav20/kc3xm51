@@ -1,0 +1,44 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    ASM
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/02/15 First Version
+'   2012/04/04 Update AutoCase for Words
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set asm=CreateParser()
+
+Set rLineComment=asm.CreateRegion(COLOR_COMMENT1, ";", "$", True )
+Set rString2=asm.CreateStringRegion( COLOR_STRING1, """", "\", False )
+Set rString1=asm.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+
+asm.AddRegion( rLineComment )
+asm.AddRegion( rString2 )
+asm.AddRegion( rString1 )
+
+'directives
+Set iMacro=asm.CreateItem(COLOR_MACRO, "\.[A-Z0-9]+", False)
+'type
+Set wWordType=asm.CreateWord(COLOR_WORD2, "BYTE SBYTE WORD SWORD DWORD SDWORD FWORD QWORD TBYTE RAL4 REAL8 REAL10 DB DD DW DQ DF DP DT", False)
+'register
+
+wWordType.AutoCase=True
+
+Set wWordRegister=asm.CreateWord(COLOR_WORD3, "EAX AX EBX BX ECX CX EDX DX EBP BP ESI SI EDI DI EIP IP AH AL BH BL CH CL DH DL CS DS SS ES FS GS CF PF AF ZF SF TF IF DF OF IOPL NF RF VM AC", False)
+
+wWordRegister.AutoCase=True
+
+'commands
+Set wWordOP=asm.CreateWord(COLOR_WORD1, "AAA AAD AAM AAS ADC ADD AND ARPL BOUND BSF BSR BSWAP BT BTC BTR BTS CALL CBW CDQ CLC CLD CLI CLTS CMC CMP CMPS CMPXCHG CWD CWDE DAA DAS DEC DIV ENTER ESC HLT IDIV IMUL IN INC INS INT INTO INVD INVLPG  IRET IRETD JA JAE JB JBE JC JCXZ JE JG JGE JL JLE JMP JNA JNAE JNB JNBE JNC JNE JNG JNGE JNL JNLE JNO JNP JNS JNZ JO JP JPE JPO JS JZ  LAHF LAR LDS LEA LEAVE LES LFS LGDT LIDT LGS LLDT LMSW LOCK LODS LOOP LOOPE LOOPZ LOOPNZ LOOPNE LSL LSS LTR MOV MOVS MOVSX MOVZX MUL NEG NOP NOT OR OUT OUTS POP POPA POPAD POPF POPFD PUSH PUSHA PUSHAD PUSHF PUSHFD RCL RCR REP REPE REPZ REPNE REPNZ RET RETF ROL ROR SAHF SAL SHL SAR SBB SCAS SETAE SETNB SETB SETNAE SETBE SETNA SETE SETZ SETNE SETNZ SETL SETNGE SETGE SETNL SETLE SETNG SETG SETNLE SETS SETNS SETC SETNC SETO SETNO SETP SETPE SETNP SETPO SGDT SIDT SHL SHR SHLD SHRD SLDT SMSW STC STD STI STOS STR SUB TEST VERR VERW WAIT FWAIT WBINVD XCHG XLAT XLATB XOR", False)
+
+wWordOP.AutoCase=True
+
+asm.AddItem( iMacro )
+asm.AddWord( wWordRegister )
+asm.AddWord( wWordOP )
+asm.AddWord( wWordType )
+
+asm.SetPairs( "[]{}()""""''" )
+asm.CommentLine(";")

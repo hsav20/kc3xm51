@@ -1,0 +1,64 @@
+decodeURI(string)\nDecodes an encoded URI
+decodeURIComponent(string)\nDecodes an encoded URI component
+encodeURI(string)\nEncodes a string as a URI
+encodeURIComponent(string)\nEncodes a string as a URI component
+escape(string)\nEncodes a string
+eval(string)\nEvaluates a string and executes it as if it was script code
+isFinite(number)\nChecks if a value is a finite number
+isNaN(number)\nChecks if a value is not a number
+parseFloat(string)\nParses a string and returns a floating point number
+parseInt(string, [radix])\nParses a string and returns an integer
+unescape(string)\nDecodes a string encoded by escape()
+Math.abs(x)\nReturns the absolute value of a number
+Math.acos(x)\nReturns the arccosine of a number
+Math.asin(x)\nReturns the arcsine of a number
+Math.atan(x)\nReturns the arctangent of x as a numeric value between -PI/2 and PI/2 radians
+Math.atan2(y, x)\nReturns the angle theta of an (x,y) point as a numeric value between -PI and PI radians
+Math.ceil(x)\nReturns the value of a number rounded upwards to the nearest integer
+Math.cos(x)\nReturns the cosine of a number
+Math.exp(x)\nReturns the value of Ex
+Math.floor(x)\nReturns the value of a number rounded downwards to the nearest integer
+Math.log(x)\nReturns the natural logarithm (base E) of a number
+Math.max(x, y)\nReturns the number with the highest value of x and y
+Math.min(x, y)\nReturns the number with the lowest value of x and y
+Math.pow(x, y)\nReturns the value of x to the power of y
+Math.random()\nReturns a random number between 0 and 1
+Math.round(x)\nRounds a number to the nearest integer
+Math.sin(x)\nReturns the sine of a number
+Math.sqrt(x)\nReturns the square root of a number
+Math.tan(x)\nReturns the tangent of an angle
+Math.toSource()\nRepresents the source code of an object
+Math.valueOf()\nReturns the primitive value of a Math object
+document.close()\nCloses an output stream opened with the document.open() method, and displays the collected data
+document.createAttribute(name)\nCreates an attribute node with the specified name, and returns the new Attr object
+document.createCDATASection(data)\nCreates a CDATA section node
+document.createComment(data)\nCreates a comment node
+document.createDocumentFragment()\nCreates an empty DocumentFragment object, and returns it
+document.createElement(name)\nCreates an element node
+document.createTextNode(text)\nCreates a text node
+document.getElementById(id)\nReturns the element that has an ID attribute with the given value. If no such element exists, it returns null
+document.getElementsByTagName(tagname)\nReturns a NodeList of all elements with a specified name
+document.open([mimetype, [replace]])\nOpens a stream to collect the output from any document.write() or document.writeln() methods
+document.write(s, ...)\nWrites HTML expressions or JavaScript code to a document
+document.writeln(s, ...)\nIdentical to the write() method, with the addition of writing a new line character after each expression
+location.assign(url)\nLoads a new document
+location.reload()\nReloads the current document
+location.replace(url)\nReplaces the current document with a new one
+window.alert(message)\nDisplays an alert box with a message and an OK button
+window.blur()\nRemoves focus from the current window
+window.clearInterval(id)\nCancels a timeout set with setInterval()
+window.clearTimeout(id)\nCancels a timeout set with setTimeout()
+window.close()\nCloses the current window
+window.confirm(message)\nDisplays a dialog box with a message and an OK and a Cancel button
+window.focus()\nSets focus to the current window
+window.moveBy(x, y)\nMoves a window relative to its current position
+window.moveTo(x, y)\nMoves a window to the specified position
+window.open([url, [name, [specs, [replace]]]])\nOpens a new browser window
+window.print()\nPrints the contents of the current window
+window.prompt(message, default)\nDisplays a dialog box that prompts the user for input
+window.resizeBy(width, height)\nResizes a window by the specified pixels
+window.resizeTo(width, height)\nResizes a window to the specified width and height
+window.scrollBy(x, y)\nScrolls the content by the specified number of pixels
+window.scrollTo(x, y)\nScrolls the content to the specified coordinates
+window.setInterval(fn, milisec)\nEvaluates an expression at specified intervals
+window.setTimeout(fn, milisec)\nEvaluates an expression after a specified number of milliseconds

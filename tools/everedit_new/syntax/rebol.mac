@@ -1,0 +1,82 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Rebol
+' Maintainer:  qtxie  
+' History:
+'   2014/11/07 Some small improvements
+'   2013/08/15 Add more standard functions and some small improvements
+'   2013/06/25 Use proper escape char for string and improve number's EX
+'   2012/04/08 Do not highlight Rebol header.
+'   2012/06/19 Create
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set rebol=Parser.CreateParser()
+rebol.WordChars="-*?!"
+
+'comment
+Set rLineComment=rebol.CreateRegion( COLOR_COMMENT1, "+;+", "$", True )
+rebol.AddRegion( rLineComment )
+
+'add todo to comment
+Set iTodo=rebol.CreateItem( COLOR_HIGHLIGHT2, "\b(TODO|FIX|FIXME|TBD)\b", False )
+rLineComment.AddItem( iTodo )
+
+'double quote string
+Set rString1=rebol.CreateStringRegion( COLOR_STRING2, """", "^", False )
+rebol.AddRegion( rString1 )
+
+Set rString2=rebol.CreateRegion( COLOR_DEFAULT, "+{+", "+}+", True )
+rebol.AddRegion( rString2 )
+
+'Functions
+rebol.AddWord( rebol.CreateWord(COLOR_WORD1, "REBOL about ajoin alert also alter any-object? any-path? append apply array as-pair ascii? ask assert attempt bb body-of brightness? build-attach-bodybuild-markup build-tag cause-error cd center-face change-dir charset choose clean-path clear-face clear-fields closure closure? collect collect-words component? confine confirm context cvs-date cvs-version dbug decode-cgi decode-url default deflag-face delete delete-dir deline delta-time desktop dir? dirize dispatch do-boot do-events do-face do-face-alt do-thru does dt dump-face dump-obj dump-pane echo edge-size? editor emailer enline exists-thru? exists? extract find-key-face find-window first+ flag-face flag-face? flash focus foo foo10 foo9 for forall forever forskip found? func funct function get-face get-net-info get-path? get-style has help hide-popup hilight-all hilight-text import-email in-dir in-window? info? inform input insert-event-funcinside? install invalid-utf? join last? latin1? launch-thru layout license link-app? link-relative-pathlink? list-dir load-image load-stock load-stock-block load-thru ls make-dir make-face map-each mod modified? modulo more move net-error notify offset? open-events outside? overlap? parse-email-addrsparse-header parse-header-dateparse-xml path-thru probe protect-system pwd quote read-cgi read-net read-thru reflect reform rejoin remold remove-event-funcrename repend replace request request-color request-date request-dir request-downloadrequest-file request-list request-pass request-text resend reset-face resize-face resolve rm round save-user scalar? screen-offset? scroll-drag scroll-face scroll-para send set-face set-font set-net set-para set-style set-user-name show-popup sign? size? source span? spec-of speed? split-path stylize suffix? swap take throw-error throw-on-error title-of to-binary to-bitset to-block to-char to-closure to-datatype to-date to-decimal to-email to-error to-file to-function to-get-path to-get-word to-hash to-idate to-image to-integer to-issue to-itime to-library to-list to-lit-path to-lit-word to-logic to-map to-money to-none to-pair to-paren to-path to-port to-refinement to-relative-fileto-set-path to-set-word to-string to-tag to-time to-tuple to-typeset to-url to-word true? types-of typeset? undirize unfocus uninstall unlight-text unview upgrade Usage utf? values-of vbug view viewed? viewtop what what-dir win-offset? within? words-of write-user", False, "-?") )
+
+'Natives
+rebol.AddWord( rebol.CreateWord(COLOR_WORD1, "access-os alias all any arccosine arcsine arctangent as-binary as-string bind bind? bound? break browse call caret-to-offset case catch checksum close comment compose compress connected? construct cosine create-link crypt-strength? debase decloak decompress dehex detab dh-compute-key dh-generate-key dh-make-key difference disarm do do-browser draw dsa-generate-key dsa-make-key dsa-make-signature dsa-verify-signature either else enbase encloak entab exclude exit exp foreach form free get get-env get-modes halt hide hsv-to-rgb if in input? intersect launch list-env load local-request-file log-10 log-2 log-e loop lowercase maximum-of minimum-of mold native new-line new-line? not now offset-to-caret open parse prin print protect q query quit read read-io recycle reduce remove-each repeat return reverse rgb-to-hsv rsa-encrypt rsa-generate-key rsa-make-key run save script? secure set set-env set-modes shift show sine size-text square-root stats switch tangent textinfo throw to-hex to-local-file to-rebol-file trace try type? unbind union unique unless unprotect unset until update uppercase use value? wait while write write-io", False, "-?") )
+
+'Actions and Chars
+rebol.AddWord( rebol.CreateWord(COLOR_WORD1, "abs absolute action? add and~ any-block? any-function? any-string? any-type? any-word? at back binary? bitset? block? change char? clear complement copy copy* cp datatype? date? decimal? divide eighth email? empty? equal? error? even? event? fifth file? find first fourth function? get-word? greater-or-equal? greater? hash? head head? image? index? insert integer? issue? last length? lesser-or-equal? lesser? library? list? lit-path? lit-word? logic? make map? max maximum min minimum money? multiply native? negate negative? next ninth none? not-equal? number? object? odd? op? or~ pair? paren? path path? pick poke port? positive? power random refinement? remainder remove routine? same? second select series? set-path? set-word? seventh sixth skip sort strict-equal? strict-not-equal? string? struct? subtract tag? tail tail? tenth third time? to trim tuple? unset? url? word? xor~ zero? backslash backspace bs cr escape lf newline newpage null slash tab true false yes no on off", False, "-?") )
+
+'datatypes
+rebol.AddWord( rebol.CreateWord(COLOR_WORD2, "action! any-block! any-function! any-string! any-type! any-word! binary! bitset! block! char! datatype! date! decimal! email! error! event! file! function! get-word! hash! image! integer! issue! library! list! lit-path! lit-word! logic! money! native! none! number! object! op! pair! paren! path! port! refinement! routine! series! set-path! set-word! string! struct! symbol! tag! time! tuple! unset! url! word!", False, "-!") )
+
+'number
+rebol.AddItem( rebol.CreateItem(COLOR_NUMBER, "(?<!\w)[-+]?\d+(\.\d+)?(E[-+]?[0-9]+)?", False) )
+
+'hex number
+rebol.AddItem( rebol.CreateItem(COLOR_NUMBER, "\b([0-9A-F]{8}|[0-9A-F]{4}|[0-9A-F]{2})h\b", True) )
+
+set typeStr = rebol.CreateItem(COLOR_WORD2, "[^\(\[\s]+!", False)
+rebol.AddItem(typeStr)
+
+'path string
+set pathStr = rebol.CreateItem(COLOR_STRING1, "%[^\]\[\s]+", False)
+rebol.AddItem(pathStr)
+
+'Refinement string
+rebol.AddItem( rebol.CreateItem(COLOR_WORD1, "(?<=(\[|\s+))\/[^(\]\s]+(?![a-zA-Z0-9_\-])", False) )
+
+set litWord = rebol.CreateItem(COLOR_WORD3, "\'[^(\]\[\s]+", False)
+rebol.AddItem(litWord)
+
+'operators
+Set nl_words1=rebol.CreateItem( COLOR_WORD1, "\s(\/\/|\?\?|<<|>>|>>>|<>|<=|>=|==|=\?|[\+\-\*\/%&<>=])\s", False )
+rebol.AddItem(nl_words1)
+
+'macro
+rebol.AddItem( rebol.CreateItem(COLOR_MACRO, "\#\s*if\s+!?defined",False ) )
+rebol.AddItem( rebol.CreateItem(COLOR_MACRO, "\#\s*(if|pragma|else|elif|error|ifndef|define|endif|undef|ifdef|syscall|import|enum|either|switch|verbose|default)\b", False ) )
+
+Set iInclude1=rebol.CreateItem( COLOR_MACRO, "#\s*include\s*(?=%)", False )
+iInclude1.Capture 1, COLOR_STRING2
+rebol.AddItem( iInclude1 )
+
+'folding
+rebol.FoldText "\[", True, "\]", True
+
+rebol.IndentText "\[\s*$", True, "^\s*\]", True
+
+rebol.CommentLine(";")
+
+rebol.SetPairs( "[]{}()""""" )

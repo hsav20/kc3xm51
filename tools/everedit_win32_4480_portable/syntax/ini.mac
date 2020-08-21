@@ -1,0 +1,29 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Ini
+' Maintainer:  www.everedit.net  Morler
+' History:
+'   2012/02/15 First Version
+'   2013/04/24 little update
+'   2014/04/21 Add new comment style with #
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set ini=CreateParser()
+
+Set rComment=ini.CreateRegion(COLOR_COMMENT1, "^\s*;", "$", True )
+Set rCommentSharp=ini.CreateRegion(COLOR_COMMENT1, "^\s*#", "$", True )
+Set iKey=ini.CreateItem( COLOR_DEFAULT, "^(.+?)=(.*)", False )
+iKey.Capture 1, COLOR_WORD1
+
+Set iSection=ini.CreateItem( COLOR_WORD2, "^\s*\[.*\]", False )
+
+ini.AddRegion( rComment )
+ini.AddRegion( rCommentSharp )
+ini.AddItem( iKey )
+ini.AddItem( iSection )
+ini.SetPairs( "[]''""""{}()" )
+
+ini.CommentLine ";"
+ini.FoldingMethod="anytext"
+ini.FoldAnyText 0, "^\s*\[.*?\]$"

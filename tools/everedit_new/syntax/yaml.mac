@@ -1,0 +1,30 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    YAML
+' Maintainer:  www.everedit.net
+' History:
+'   2018/10/122 init version
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set yml=CreateParser()
+
+' comment: # xxxxxx
+Set rComment=yml.CreateRegion(COLOR_COMMENT1, "(^|\s+)#.*$", "$", True )
+yml.AddRegion( rComment )
+
+' block: xxxx:
+yml.AddItem( yml.CreateItem(COLOR_WORD3, "\S.*:\s*$", False) )
+
+' config: xxxx: yyyy
+yml.AddItem( yml.CreateItem( COLOR_WORD1, "^\s*(\S.*):", False ) )
+
+' nmber
+yml.AddItem( yml.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+' array
+yml.AddItem( yml.CreateItem(COLOR_WORD4, "\-\s+\S.*", False) )
+
+yml.SetPairs( "[]''""""{}()" )
+yml.CommentLine "# "
+yml.FoldingMethod="indent"

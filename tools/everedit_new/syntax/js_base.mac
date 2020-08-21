@@ -1,0 +1,49 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:   JScript
+' Maintainer:  www.everedit.net  
+' History:
+'   2012/02/15 First Version
+'   2012/04/11 Separated from main parser
+'	2015/09/27 Added operator highlight
+'	2020/07/15 Added some es6 keywords
+'*******************************************************************************
+
+'comment
+Set rJsLineComment=js_creator.CreateRegion( COLOR_COMMENT1, "+//+", "$", True )
+Set rJsBlockComment=js_creator.CreateRegion( COLOR_COMMENT1, "+/*+", "+*/+", True )
+rJsRegion.AddRegion( rJsLineComment )
+rJsRegion.AddRegion( rJsBlockComment )
+
+Set rJsRegex=js_creator.CreateRegion( COLOR_STRING2, "(?<=(?<![\w\)\]/]\s*)|\*/)/(?=(?:\\\\)+/|.*?(?:[^\\/]/|[^\\](?:\\\\)*(?:\\/)?/))", "(?<=[^\\](?:\\\\)*(?:\\/)?)/", False )
+rJsRegion.AddRegion( rJsRegex )
+
+'string
+Set rJsString2=js_creator.CreateStringRegion( COLOR_STRING2, """", "\", False, "\" )
+Set rJsString1=js_creator.CreateStringRegion( COLOR_STRING1, "'", "\", False )
+rJsRegion.AddRegion( rJsString2 )
+rJsRegion.AddRegion( rJsString1 )
+
+'function
+rJsRegion.AddItem( js_creator.CreateItem(COLOR_FUNCTION, "\b\w+(?=\()", False) )
+
+'Reserved words
+rJsRegion.AddWord( js_creator.CreateWord(COLOR_WORD1, "abstract await async export enum volatile let yield boolean break byte case catch char class const continue default delete do double else extends false final finally float for function goto if implements import in instanceof int interface long native new null package private protected public return short static super switch synchronized this throw throws transient true try typeof var void while with", True ) )
+
+'Built-in objects
+rJsRegion.AddWord( js_creator.CreateWord(COLOR_WORD2, "Anchor anchors call apply bind debugger eval arguments Applet applets Area Array Button constructor Checkbox Date document FileUpload Form forms Frame frames Hidden history Image images Link links Area location Math MimeType mimeTypes navigator options Password Plugin plugins Radio Reset Select String Submit Text Textarea window", True) )
+
+'number
+rJsRegion.AddItem( js_creator.CreateItem(COLOR_NUMBER, "\b\d+\b", False) )
+
+'folding
+rJsRegion.FoldText "\{", False, "\}", False
+rJsRegion.CommentLine("//")
+rJsRegion.CommentBlock "/*", "*/"
+rJsRegion.SetPairs( "[](){}""""''" )
+rJsRegion.IndentText "\{\s*$", False, "^\s*}\)?;?$", False
+
+rJsRegion.AddSnippet "js.snippet"
+rJsRegion.AddCallTip "js.ecp", True, "."
+
+rJsRegion.AddItem( js_creator.CreateItem(COLOR_OPERATOR, "[\{\}\(\)\+\-\*\\=%&\^!~\|<>?\.,:;\/\[\]]",False ) )

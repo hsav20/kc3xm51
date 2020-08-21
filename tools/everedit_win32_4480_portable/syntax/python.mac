@@ -1,0 +1,67 @@
+'*******************************************************************************
+' EverEdit Syntax File
+' Language:    Python
+' Maintainer:  qtxie  
+' History:
+'   2013/08/20 Improve highlight for number
+'   2013/05/01 Set FoldingMethod to [indent]
+'   2013/04/07 Add comment block for '''comment'''
+'   2012/06/22 Create
+'*******************************************************************************
+Include( ".\const.mac" )
+
+Set python=CreateParser()
+
+'comment
+Set rLineComment=python.CreateRegion( COLOR_COMMENT1, "+#+", "$", True )
+Set iLineComment=python.CreateItem( COLOR_COMMENT2, "\#\#.+", False )
+iLineComment.Capture 1, COLOR_COMMENT2
+Set rBlockComment=python.CreateRegion( COLOR_COMMENT2,  "+""""""+", "+""""""+", False )
+Set rBlockComment2=python.CreateRegion( COLOR_COMMENT2,  "+'''+", "+'''+", False )
+rLineComment.AddItem( iLineComment )
+python.AddRegion( rLineComment )
+python.AddRegion( rBlockComment )
+python.AddRegion( rBlockComment2 )
+
+'add todo to comment
+Set iTodo=python.CreateItem( COLOR_HIGHLIGHT2, "\b(TODO|FIX|FIXME)\b", False )
+rLineComment.AddItem( iTodo )
+rBlockComment.AddItem( iTodo )
+
+'integer arithmetic
+python.AddItem( python.CreateItem( COLOR_FUNCTION, "\+|\-|\*|\/|\%|\<|\>|\!|\:|\&|\||\^|\~|\!|\$|\=|\'", False ) )
+
+'double quote string
+Set rString2=python.CreateStringRegion( COLOR_STRING1, """", "\", False )
+python.AddRegion( rString2 )
+
+'single quote string
+Set rString2=python.CreateStringRegion( COLOR_STRING1, "''", "\", False )
+python.AddRegion( rString2 )
+
+'function
+python.AddItem( python.CreateItem(COLOR_FUNCTION, "[\w_]+(?=\()", False) )
+
+'Reserved words
+python.AddWord( python.CreateWord(COLOR_WORD1, "and as assert break continue del elif else except exec finally for from global if import in is lambda not or pass print raise return try while with yield self True False nonlocal None class def", True ) )
+
+'exceptions words
+python.AddWord( python.CreateWord(COLOR_WORD1, "ArithmeticError AssertionError AttributeError BaseException DeprecationWarning EOFError EnvironmentError Exception FloatingPointError FutureWarning GeneratorExit IOError ImportError ImportWarning IndentationError IndexError KeyError KeyboardInterrupt LookupError MemoryError NameError NotImplemented NotImplementedError OSError OverflowError PendingDeprecationWarning ReferenceError RuntimeError RuntimeWarning StandardError StopIteration SyntaxError SyntaxWarning SystemError SystemExit TabError TypeError UnboundLocalError UnicodeDecodeError UnicodeEncodeError UnicodeError UnicodeTranslateError UnicodeWarning UserWarning ValueError Warning ZeroDivisionError BufferError BytesWarning WindowsError", True ) )
+
+'built-ins words
+python.AddWord( python.CreateWord(COLOR_WORD1, "abs all any apply basestring bool buffer callable chr classmethod cmp coerce compile complex copyright credits delattr dict dir divmod enumerate eval execfile exit file filter float frozenset getattr globals hasattr hash help hex id input int intern isinstance issubclass iter len license list locals long map max min object oct open ord pow property quit range raw_input reduce reload repr reversed round set setattr slice sorted staticmethod str sum super tuple type unichr unicode vars xrange zip bin bytearray bytes format memoryview next printEllipsis __debug__ __doc__ __import__ __name__ __package__", True ) )
+
+'single quote char
+python.AddItem( python.CreateItem(COLOR_STRING2, "'.'", False) )
+
+'number
+python.AddItem( python.CreateItem(COLOR_NUMBER, "(?<!\w)[-+]?\d+(\.\d+)?(E[-+]?[0-9]+)?", False) )
+
+'folding
+python.FoldingMethod="indent"
+
+python.IndentText "\S+:$", False 
+python.SetPairs "[]{}()""""''"
+python.CommentLine "#"
+python.CommentBlock """""""", """"""""
+python.AddSnippet "py.snippet"

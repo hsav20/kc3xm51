@@ -1,0 +1,173 @@
+#title=Rails
+#t=Add Column
+#g=mac
+add_column "${1:table}", "${2:column}", :${3:string}
+#t=assert_redirected_to
+#g=art
+assert_redirected_to :action => "${1:index}"
+#t=assert_response
+#g=asre
+assert_response :${1:success}
+#t=belongs_to
+#g=bt
+belongs_to :${1:object}, :${2:class_name} => "${3:ClassName}", :foreign_key => "${4:id}"
+#t=Create Column
+#g=mcc
+t.column "${1:title}", :${2:string}$0
+#t=Create Column Continue
+#g=mccc
+t.column :${1:title}, :${2:string}
+$0
+#t=Create Table
+#g=mct
+create_table "${1:table}" do |t|
+    $0
+end
+#t=Drop and Create Table
+#g=mdct
+drop_table "${1:table}"${2: [press tab twice to generate create_table]}
+#t=Drop Table
+#g=mdt
+drop_table "${1:table}"
+$0
+#t=flash[…]
+#g=flash
+flash[:${1:notice}] = "${2:Successfully created...}"$0
+#t=for … in … end
+#g=for
+<% for ${1:item} in ${2:@items} %>
+	<%= ${1:item}.${0:name} %>
+<% end %>
+#t=form_tag
+#g=ft
+<%= form_tag :action => "${1:update}" %>
+#t=has_many
+#g=hm
+has_many :${1:objects}, :${2:class_name} => "${3:ClassName}", :foreign_key => "${4:id}"
+#t=has_one
+#g=ho
+has_one :${1:object}, :${2:class_name => "${3:ClassName}", :foreign_key => "${4:id}"
+#t=link_to (action)
+#g=lia
+<%= link_to "${1:link text...}", :action => "${2:index}" %>
+#t=link_to (action, id)
+#g=liai
+<%= link_to "${1:link text...}", :action => "${2:edit}", :id => ${3:@item} %>
+#t=link_to (controller)
+#g=lic
+<%= link_to "${1:link text...}", :controller => "${2:items}" %>
+#t=link_to (controller, action)
+#g=lica
+<%= link_to "${1:link text...}", :controller => "${2:items}", :action => "${3:index}" %>
+#t=link_to (controller, action, id)
+#g=licai
+<%= link_to "${1:link text...}", :controller => "${2:items}", :action => "${3:edit}", :id => ${4:@item} %>
+#t=logger.debug
+#g=ldb
+logger.debug "${1:message}"
+#t=logger.info
+#g=logi
+logger.info "${1:Current value is...}"
+#t=params[…]
+#g=params
+params[:${1:id}]
+#t=RAILS_DEFAULT_LOGGER.debug
+#g=rdb
+RAILS_DEFAULT_LOGGER.debug "${1:message}"
+#t=redirect_to (action)
+#g=rea
+redirect_to :action => "${1:index}"
+#t=redirect_to (action, id)
+#g=reai
+redirect_to :action => "${1:show}", :id => ${0:@item}
+#t=redirect_to (controller)
+#g=rec
+redirect_to :controller => "${1:items}"
+#t=redirect_to (controller, action)
+#g=reca
+redirect_to :controller => "${1:items}", :action => "${2:list}"
+#t=redirect_to (controller, action, id)
+#g=recai
+redirect_to :controller => "${1:items}", :action => "${2:show}", :id => ${0:@item}
+#t=redirect_to :controller => "${1:items}", :action => "${2:show}", :id => ${0:@item}
+#g=mrac
+remove_column "${1:table}", "${2:column}"${3: [press tab twice to generate add_column]}
+#t=Remove Column
+#g=mrc
+remove_column "${1:table}", "${2:column}"
+#t=render (action)
+#g=ra
+render :action => "${1:action}"
+#t=render (action, layout)
+#g=ral
+render :action => "${1:action}", :layout => "${2:layoutname}"
+#t=render (file)
+#g=rf
+render :file => "${1:filepath}"
+#t=render (file, use_full_path)
+#g=rfu
+render :file => "${1:filepath}", :use_full_path => ${2:false}
+#t=render (inline)
+#g=ri
+render :inline => "${1:<%= 'hello' %>}"
+#t=render (inline, locals)
+#g=ril
+render :inline => "${1:<%= 'hello' %>}", :locals => { ${2::name} => "${3:value}"$4 }
+#t=render (inline, type)
+#g=rit
+render :inline => "${1:<%= 'hello' %>}", :type => ${2::rxml}
+#t=render (layout)
+#g=rl
+render :layout => "${1:layoutname}"
+#t=render (nothing)
+#g=rn
+render :nothing => ${1:true}
+#t=render (nothing, status)
+#g=rns
+render :nothing => ${1:true}, :status => ${2:401}
+#t=render (partial)
+#g=rp
+render :partial => "${1:item}"
+#t=render (partial, collection)
+#g=rpc
+render :partial => "${1:item}", :collection => ${2:items}
+#t=render (partial, locals)
+#g=rpl
+render :partial => "${1:item}", :locals => { :${2:name} => "${3:value}"$4 }
+#t=render (partial, object)
+#g=rpo
+render :partial => "${1:item}", :object => ${2:object}
+#t=render (partial, status)
+#g=rps
+render :partial => "${1:item}", :status => ${2:500}
+#t=render (text)
+#g=rn
+render :text => "${1:text to render...}"
+#t=render (text, layout => true)
+#g=rtlt
+render :text => "${1:text to render...}", :layout => ${2:true}
+#t=render (text, layout)
+#g=rtl
+render :text => "${1:text to render...}", :layout => "${2:layoutname}"
+#t=render (text, status)
+#g=rts
+render :text => "${1:text to render...}", :status => ${2:401}
+#t=render_component (action)
+#g=rcea
+render_component :action => "${1:index}"
+#t=render_component (controller)
+#g=rcec
+render_component :controller => "${1:items}"
+#t=render_component (controller, action)
+#g=rceca
+render_component :controller => "${1:items}", :action => "${2:index}"
+#t=session[…]
+#g=session
+session[:${1:user}]
+#t=verify — redirect
+#g=verify
+verify :only => [:$1], :session => :user, :params => :id, :redirect_to => {:action => '${2:index}'}
+
+#t=verify — render
+#g=verify
+verify :only => [:$1], :method => :post, :render => {:status => 500, :text => "use HTTP-POST"}
