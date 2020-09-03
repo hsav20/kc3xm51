@@ -9,37 +9,16 @@
 
 void MAUD_Initialize(){										// 按键模块初始化  	
 }	  
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MAUD_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
-    return;
+    if (gRemoveTimer && ++gRemoveTimer > 200){			// 大约2秒后 
+		INPUT_SWITCH select = MKCM_ReadRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO);	// 自动输入的恢复
+    	MLOG("gRemoveTimer %d\r\n", (u32)select);
+		gDIP_MenuSelect = cMenu_Restore;				// 菜单即刻进入输入的恢复 
+		MAUD_InputSelect(select);
+    	gRemoveTimer = 0;
+    }
 }
-void MAUD_MixInputSource(BYTE index){
-    DIP_SURROUND_OFF();
-    DIP_SRC_FORMAT_OFF();
-	MAUD_AutoCanclMute();
-	MAUD_AutoCanclTestTone();
-	
-	if (gDIP_MenuSelect == cMenu_Restore || gDIP_MenuSelect == cMenu_InputSource){	// 只有菜单已经换到cMenu_Restore后，才可以改变当前的输入
-		if (index == INPUT_SWITCH_NONE){                    // 循环方式
-			if (++mINPUT_SWITCH > INPUT_SWITCH_H_ARC){
-				mINPUT_SWITCH = INPUT_SWITCH_AUX;
-			}
-		}
-		else {
-            gSUB_SrcAuto = INPUT_SWITCH_NONE;               // 自动选择失效
-			mINPUT_SWITCH = index;
-		}
-		MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
-		MLOG("MixInputSource:%d R:%02x\r\n", (u32)index, (u32)MKCM_ReadRegister(KCM_INPUT_SOURCE));
-	}else {
-		MLOG("MixInputSourceB:%d R:%d\r\n", (u32)gDIP_MenuSelect, (u32)cMenu_Restore);
-	}
-	
-	MDIP_MenuSelect(cMenu_InputSource, MENU_NORMAL);
-}
+
 void MAUD_MixMasterVolume(BYTE directUp){
 	BYTE value;
 
@@ -154,3 +133,197 @@ void MAUD_AutoCanclMute(){
 		FSYS_MuteEnable = 0;
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 音源输入选择及抢占式处理  //////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MAUD_InputSelect(INPUT_SWITCH select){
+    DIP_SURROUND_OFF();
+    DIP_SRC_FORMAT_OFF();
+	MAUD_AutoCanclMute();
+	MAUD_AutoCanclTestTone();
+	
+	if (gDIP_MenuSelect == cMenu_Restore || gDIP_MenuSelect == cMenu_InputSource){	// 只有菜单已经换到cMenu_Restore后，才可以改变当前的输入
+		mINPUT_SWITCH = select;
+		MAUD_InputWrite(mINPUT_SWITCH, mINPUT_SWITCH);
+	}
+	MDIP_MenuNormal(cMenu_InputSource);
+}
+void MAUD_Preemptible(){							// 抢占式输入选择 
+	MLOG("MKCM_Preemptible:%d %d/%d\r\n", (u32)gPreemptibleIn[gPreemptibleStep], (u32)gPreemptibleStep, (u32)gPreemptibleQty);
+	if (gPreemptibleQty){
+		MAUD_InputSelect(gPreemptibleIn[gPreemptibleStep]);
+		if (++gPreemptibleStep >= gPreemptibleQty){
+			gPreemptibleStep = 0;
+		}
+	}else {
+		MAUD_InputSelect(mINPUT_SWITCH);
+	}
+}
+CONST_CHAR TabInputOneKey[] = {
+	INPUT_SWITCH_AUX,                                   // 0=模拟输入
+    INPUT_SWITCH_OPTIC,                                 // 1=数码1   
+    INPUT_SWITCH_COA1,                                  // 2=数码2   
+    INPUT_SWITCH_COA2,                                  // 3=数码3   
+};
+void MAUD_InputOneKey(){								// 所有输入用一个按键选择 
+	gDIP_MenuSelect = cMenu_Restore;					// 菜单即刻进入输入的恢复 
+	if (gWithHdmiQty && gWithHdmiStep < gWithHdmiQty){	 // 循环方式
+		MAUD_InputSelect(gPreemptibleIn[gWithHdmiStep]);
+	}else {
+		MAUD_InputSelect(TabInputOneKey[gWithHdmiStep - gWithHdmiQty]);
+	}
+	if (++gWithHdmiStep >= (sizeof(TabInputOneKey) + gWithHdmiQty)){
+		gWithHdmiStep = 0;
+	}
+}
+void MAUD_InputWrite(INPUT_SWITCH select, INPUT_SWITCH last){
+	MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, select));
+    MLOG("InputSource:%d last:%02x %02x\r\n", (u32)select, (u32)last, (u32)MKCM_ReadRegister(KCM_INPUT_SOURCE));
+	if (last <= INPUT_SWITCH_COA2){ 								// 如果原来不是抢占式输入
+	    MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO, last);	// 自动输入的恢复
+		MLOG("InputSourceB:%d last:%02x\r\n", (u32)select, (u32)MKCM_ReadRegister(KCM_INPUT_SOURCE));
+//		return;
+	}
+}
+CONST_WORD TabSrcValid[] = {
+	KCM_SRC_VALID_SD, KCM_SRC_VALID_UDISK,
+	KCM_SRC_VALID_USBA, KCM_SRC_VALID_BT,
+	KCM_SRC_VALID_HDMI1, KCM_SRC_VALID_HDMI2, KCM_SRC_VALID_HDMI3
+}; 
+CONST_CHAR TabValidSwitch[] = {
+	INPUT_SWITCH_SD, INPUT_SWITCH_UDISK,
+	INPUT_SWITCH_USBA, INPUT_SWITCH_BT,
+	INPUT_SWITCH_HDMI1, INPUT_SWITCH_HDMI2, INPUT_SWITCH_HDMI3,
+};
+void MAUD_MakePreemptible(WORD g2Local_1){			// 生成抢占式输入选择 
+    if (g2Local_1){									// 有抢占式输入 
+    	BYTE qty = 0;
+    	BYTE index;
+    	WORD flag;
+    	for (index = 0; index < sizeof(TabSrcValid)/2; index++){
+        	flag = TabSrcValid[index];
+        	if (g2Local_1 & flag){    				// 有非抢占式
+        		if (flag == KCM_SRC_VALID_SD){
+	    			if (!g2SdQty){
+			    		continue;	
+		    		} 
+	        	}else if (flag == KCM_SRC_VALID_UDISK){
+	    			if (g2SdQty){
+			    		continue;	
+		    		} 
+	        	}
+				gPreemptibleIn[qty++] = TabValidSwitch[index];
+        	}
+    	}
+		if (gWithHdmiQty != qty){						// 带HDMI的抢占式输入  
+			gWithHdmiStep = 0;
+			gWithHdmiQty = qty;
+		}
+		for (index = 0; index < gWithHdmiQty; index++){
+			if (gPreemptibleIn[index] >= INPUT_SWITCH_HDMI1 && gPreemptibleIn[index] <= INPUT_SWITCH_H_ARC){
+				break;
+			}
+		}
+		if (gPreemptibleQty != index){						// 不带HDMI的抢占式输入  
+			gPreemptibleStep = 0;
+			gPreemptibleQty = qty;
+		}
+  	  	MLOG("KCM_SRC_VALID E %d %d\r\n", (u32)gPreemptibleQty, (u32)gWithHdmiQty);  
+    }else {												// 没有了抢占式输入
+		gPreemptibleQty = 0;
+		gWithHdmiQty = 0; 
+		gPreemptibleStep = 0;
+		gWithHdmiStep = 0;
+		g2SdQty = 0;
+		g2UDiskQty = 0;
+    }
+    g2AUD_SrcValid = g2Local_1;
+}
+
+void MKCM_ReadSrcValid(){
+	WORD g2Local_1 = MKCM_Read2Byte(KCM_SRC_VALID);         // 本次的有效音源
+//if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
+    if (g2AUD_SrcValid != g2Local_1){                       // 本次与上次的有效音源改变
+		BYTE index;
+    	WORD flag;
+    	BOOL found = 0;
+
+        MLOG("KCM_SRC_VALID:%04x Last:%04x\r\n", (u32)g2Local_1, (u32)g2AUD_SrcValid);
+
+        for (index = 0; index < sizeof(TabSrcValid)/2; index++){
+        	flag = TabSrcValid[index];
+        	if ((g2Local_1 & flag) && !(g2AUD_SrcValid & flag)){    // 本次有及上次没有非抢占式
+		       	found = 1;
+	        	switch (flag){
+	            case KCM_SRC_VALID_SD:
+		            g2SdQty = MKCM_Read2Byte(KCM_RD_SD_QTY);
+		            if (g2SdQty){								// 有播放文件 
+			            g2PlayIndex = 0;
+	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
+            		}else {
+		            	MDIP_MenuNormal(cMenu_SdInsert); 
+		            	found = 0;								// 没有播放文件 
+		            }
+					break;	
+	            case KCM_SRC_VALID_UDISK: 
+					g2UDiskQty = MKCM_Read2Byte(KCM_RD_UDISK_QTY);
+					if (g2UDiskQty){								// 有播放文件 
+			            g2PlayIndex = 0;
+	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
+            		}else {										// 没有播放文件 
+		            	MDIP_MenuNormal(cMenu_UDiskInsert); 
+		            	found = 0;
+		            }
+					break;	
+      			}
+      			if (found){
+					MAUD_InputWrite(TabValidSwitch[index], mINPUT_SWITCH);
+					mINPUT_SWITCH = TabValidSwitch[index];
+					gDIP_MenuSelect = cMenu_Restore;				// 菜单即刻进入输入的恢复 
+					MDIP_MenuNormal(cMenu_InputSource);
+					gRemoveTimer = 0;					// 取消拔出恢复到非抢占式插入
+			    }
+	        	break;									// 只处理一个抢占式插入
+        	}
+        }
+        if (!found){									// 没有非抢占式插入
+			for (index = 0; index < sizeof(TabSrcValid)/2; index++){
+	        	flag = TabSrcValid[index];
+	    //MLOG("KCM_SRC_VALID C %d %04x\r\n", (u32)index, (u32)flag);  
+				if (!(g2Local_1 & flag) && (g2AUD_SrcValid & flag)){    // 本次没有及上次有非抢占式
+		            switch (flag){
+		            case KCM_SRC_VALID_SD:
+						g2SdQty = 0; 
+						MDIP_PlaySymbol(0);
+						MDIP_MenuNormal(cMenu_SdRemove); 
+						break;	
+		            case KCM_SRC_VALID_UDISK: 
+						g2UDiskQty = 0;
+						MDIP_PlaySymbol(0);
+						MDIP_MenuNormal(cMenu_UDiskRemove); 
+						break;	
+		            case KCM_SRC_VALID_USBA: 
+						MDIP_MenuNormal(cMenu_UsbaRemove); 
+						break;	
+		            case KCM_SRC_VALID_BT: 
+						MDIP_MenuNormal(cMenu_BtRemove); 
+						break;	
+		            case KCM_SRC_VALID_HDMI1: 
+		            case KCM_SRC_VALID_HDMI2: 
+		            case KCM_SRC_VALID_HDMI3: 
+			            break;
+		            }
+					if (mINPUT_SWITCH == TabValidSwitch[index]){	// 有抢占式拔出而且是当前的输入
+						gRemoveTimer = 1;					// 大约2秒后 
+			        }					
+		            break;									// 只处理一个抢占式拔出
+	        	}
+	        }
+        }
+		MAUD_MakePreemptible(g2Local_1);					// 生成抢占式输入选择 
+    }else {
+        MLOG("KCM_SRC_VALID = Last:%04x\r\n", (u32)g2Local_1);
+    }
+}
+

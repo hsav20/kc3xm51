@@ -77,8 +77,7 @@ void TBascTimer(void) interrupt 1 {
 				}
 				else if ((gDIP_Brightness == 1) && (gBrightnessTimer == 4)){
 					HAL_DIP_LED(0);
-				}
-				if ((gDIP_Brightness == 2) && (gBrightnessTimer == 8)){
+				}else if ((gBrightnessTimer == 8)){		// (gDIP_Brightness == 2) && 
 					HAL_DIP_LED(0);
 				}
 			}

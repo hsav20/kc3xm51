@@ -18,6 +18,7 @@ typedef unsigned short u16;
 typedef unsigned long u32;
 
 typedef unsigned char code CONST_CHAR;
+typedef unsigned short code CONST_WORD;
     
 sfr IOP1                        = 0x90;
 sfr IOP3                        = 0xb0;

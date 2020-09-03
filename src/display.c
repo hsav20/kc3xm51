@@ -54,16 +54,16 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			return;
 		}
 		if (FSYS_MuteEnable && (gDIP_MenuTimer == 0)){
-			MDIP_MenuSelect(cMenu_AudioMute, 0);
+			MDIP_MenuNormal(cMenu_AudioMute);
 		}
 		if (!FSYS_Standby && gDIP_MenuTimer){				// 100ms»Áπ˚≤Àµ•¥Úø™
 			if (--gDIP_MenuTimer == 0) {					// ≤Àµ•º∆ ±	
             	if (!FSYS_TestTone){
-					MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+					MDIP_MenuNormal(cMenu_Restore);
 				}
 				else {                                      // ≤‚ ‘‘Î“Ù¥Úø™÷Æ÷–
 					BYTE channel = MDIP_GetNextChannel(gDIP_MenuSelect - cMenu_TToneFL);
-					MDIP_MenuSelect(channel + cMenu_TToneFL, MENU_NORMAL);
+					MDIP_MenuNormal(channel + cMenu_TToneFL);
                     MAUD_TestToneChannel(channel);
 //MDEBUG(0xc7);MDEBUG(gDIP_MenuSelect);MDEBUG(gDIP_MenuTimer);
 				}
@@ -71,7 +71,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			else if (FDIP_MenuTwinkle){						// ≤Àµ•–Ë“™…¡À∏
 				if ((gDIP_MenuTimer % 5) == 0){	  			// √ø0.5√Î÷”…¡À∏
 					BYTE twinkle = (gDIP_MenuTimer / 5);
-					MDIP_MenuSelect(gDIP_MenuSelect, (twinkle & 0x01) ? 2 : 1);
+					MDIP_MenuSelect(gDIP_MenuSelect, (twinkle & 0x01) ? MENU_TWINKLE_OFF : MENU_TWINKLE_ON);
 				}
 			}
         }
@@ -83,7 +83,10 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	}
     return;
 }
-void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò
+void MDIP_MenuNormal(BYTE index){							// ≤Àµ•—°‘Ò“ª∞„ƒ£ Ω 
+	MDIP_MenuSelect(index, MENU_NORMAL);					// ≤Àµ•—°‘Ò
+}
+void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À∏œ®√ 3µ˜’˚- 4µ˜’˚+ 
 	if (mode == MENU_NORMAL){								// ’˝≥£µƒœ‘ æƒ£ Ω
 		gDIP_MenuTimer = 20;
 		FDIP_MenuTwinkle = 0;
@@ -161,14 +164,13 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò
 		MDIP_Fireware();
 		break;
     case cMenu_SdInsert:                                   // œ‘ æSD≤Â»Î
-    case cMenu_SdRemove:                                   // œ‘ æSD≤Â≥ˆ
     case cMenu_UDiskInsert:                                // œ‘ æU≈Ã≤Â»Î
-    case cMenu_UDiskRemove:                                // œ‘ æU≈Ã≤Â≥ˆ
-    case cMenu_UsbaInsert:               	               // œ‘ æUSB…˘ø®≤Â»Î
-    case cMenu_UsbaRemove:               	               // œ‘ æUSB…˘ø®≤Â≥ˆ
-    case cMenu_BtInsert:               	                 	// œ‘ æ¿∂—¿“Ù∆µ≤Â»Î
-    case cMenu_BtRemove:               	                 	// œ‘ æ¿∂—¿“Ù∆µ≤Â≥ˆ
-		MDIP_ExtrInOut(index - cMenu_SdInsert);				// œ‘ æÕ‚÷√“Ù‘¥≤Â»Î/≤Â≥ˆ 
+    case cMenu_SdRemove:                                   // œ‘ æSD∞Œ≥ˆ 
+    case cMenu_UDiskRemove:                                // œ‘ æU≈Ã∞Œ≥ˆ
+    case cMenu_UsbaRemove:               	               // œ‘ æUSB…˘ø®∞Œ≥ˆ
+    case cMenu_HdmiRemove:                                 // œ‘ æHDMI∞Œ≥ˆ 
+    case cMenu_BtRemove:               	                 	// œ‘ æ¿∂—¿“Ù∆µ∞Œ≥ˆ
+		MDIP_InsertRemove(index - cMenu_SdInsert);			// œ‘ æÕ‚÷√“Ù‘¥≤Â»Î/∞Œ≥ˆ
 		break;
     case cMenu_PlayTrack:                                  // œ‘ æ∂‡√ΩÃÂŒƒº˛–≈œ¢
         MDIP_PlayTrack();
@@ -531,25 +533,23 @@ void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 
 
 CONST_CHAR Tab_DIP_InputSwitch[] = {
-	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB-HDMI-1HDMI-2HDMI-3HDMI-A"
-//	 ++++++------++++++------++++++------++++++------++++++------
+	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC- -BT-  HDMI-1HDMI-2HDMI-3HDMI-A"
+//	 ++++++------++++++------++++++------++++++------++++++------++++++------
 };
 
 void MDIP_InputSource(){
-	BYTE index = (gSUB_SrcAuto == INPUT_SWITCH_NONE) ? mINPUT_SWITCH : gSUB_SrcAuto;
-    MLOG("InSource:%d %d %d\r\n", (u32)index, (u32)gSUB_SrcAuto, (u32)mINPUT_SWITCH);
-	if (index == INPUT_SWITCH_SD || index == INPUT_SWITCH_UDISK){
+	if (mINPUT_SWITCH >= INPUT_SWITCH_SD && mINPUT_SWITCH <= INPUT_SWITCH_BT){
 		g2DIP_ShowBuffer[6] |= 0x0020;	
 	}
 	else {
 		g2DIP_ShowBuffer[6] &= ~0x0020;	
 	}
-
-	MDIP_WriteString((char*)&Tab_DIP_InputSwitch[index * 6]);
+//MLOG("MDIP_InputSource: %02x\r\n", (u32)g2DIP_ShowBuffer[6]);
+	MDIP_WriteString((char*)&Tab_DIP_InputSwitch[mINPUT_SWITCH * 6]);
 }
 void MDIP_VideoSrc(){
-	MDIP_WriteString("VIDE0 ");
-	MDIP_SingleChar(5, (gAUD_AutoInputSrc >> 5) + '1');
+//	MDIP_WriteString("VIDE0 ");
+//	MDIP_SingleChar(5, (gAUD_AutoInputSrc >> 5) + '1');
 }
 
 
@@ -711,11 +711,11 @@ void MDIP_Fireware(){
 
 
 CONST_CHAR Tab_DIP_ExtrInOut[] = {
-	"SD-IN SD-OUTUD-IN UD-OUTPC-IN PC-OUTBT-IN BT-OUT"
-//	 ++++++------++++++------++++++------++++++------
+	"SD-IN UD-IN SD-OUTUD-OUTPC-OUTBT-OUTHD-OUT"
+//	 ++++++------++++++------++++++------++++++
 };
 
-void MDIP_ExtrInOut(BYTE type){						// œ‘ æÕ‚÷√“Ù‘¥≤Â»Î/≤Â≥ˆ 
+void MDIP_InsertRemove(BYTE type){						// œ‘ æÕ‚÷√“Ù‘¥≤Â»Î/≤Â≥ˆ 
 	gDIP_MenuTimer = 50;
 //MDEBUG(0xd9);MDEBUG(type);
     MDIP_WriteString((char*)&Tab_DIP_ExtrInOut[type * 6]);

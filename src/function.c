@@ -14,7 +14,7 @@ void MKCM_Initialize(){										// KCM模块初始化
 }	  
 void MKCM_SetPowerOn(){ 									// KCM开机
 	MKCM_WriteRegister(KCM_POWER_ON, 1);
-    MDIP_MenuSelect(cMenu_PowerOn, MENU_NORMAL);
+    MDIP_MenuNormal(cMenu_PowerOn);
 	gDIP_MenuLock = 100;									// 暂时锁定显示10秒
     MLOG("KCM_POWER_ON\r\n");
 }	  
@@ -33,7 +33,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			return;
 		}
 		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// 不是多媒体播放时间改变
-        	MLOG("KCM_READ_IRQ %02x\r\n", (u32)gLocal_1);
+//        	MLOG("KCM_READ_IRQ %02x\r\n", (u32)gLocal_1);
 		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// 模式初始化完成中断，需要写入"KCM_POWER_ON"寄存器，
             MKCM_RestoreMemory();
@@ -44,7 +44,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
             gAUD_BpsRate = MKCM_ReadRegister(KCM_BPS_RATE);
 			if (gDIP_MenuLock == 0){						// 
 				if (!FSYS_TestTone){						// 没有打开噪音测试
-					MDIP_MenuSelect(cMenu_SrcFormat, MENU_NORMAL);
+					MDIP_MenuNormal(cMenu_SrcFormat);
 				}
 			}
 			if (gAUD_SrcFormat == 0){
@@ -62,20 +62,20 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
 			gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);     // 读取当前音量值
 			if (gDIP_MenuSelect == cMenu_MasterVolume){
-				MDIP_MenuSelect(cMenu_MasterVolume, 0);
+				MDIP_MenuNormal(cMenu_MasterVolume);
 			}
 		}
         if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             	// 固件更新，需要读取"KCM_RD_INFO"寄存器
-            MDIP_MenuSelect(cMenu_Fireware, MENU_NORMAL);
+            MDIP_MenuNormal(cMenu_Fireware);
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           		// 多媒体播放时间改变
             g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
             if (g2PlayTime){                                	// 播放时间改变 
 				if (gDIP_MenuSelect != cMenu_InputSource){
-	                MDIP_MenuSelect(cMenu_PlayTime, MENU_NORMAL);
+	                MDIP_MenuNormal(cMenu_PlayTime);
 				}
             }else {                                         	// 播放完成了
-                MDIP_MenuSelect(cMenu_PlayTrack, MENU_NORMAL);
+                MDIP_MenuNormal(cMenu_PlayTrack);
             }
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_STATUS) > 0){           // 多媒体文件播放状态改变
@@ -92,7 +92,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MDIP_WifiSymbol(0xff);	    	 
 		}
     }
-    return;
+    
 }
 	  
 
@@ -147,15 +147,29 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	BYTE gLocal_1;
     BYTE temp[10];
 
-	// 输入端口选择：使用KCM_INPUT寄存器的记忆值
-	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
+	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
+	MKCM_ReadXByte(KCM_EXTR_MEMORY, 4, temp);               // 用户记忆
 	if (FKCM_I2C_Error){									// 读取KCM出错
-		MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+		MDIP_MenuNormal(cMenu_Restore);						// 已经出错，就不做 
 		return;
 	}
+	gDIP_Surround[0] = temp[MEM_SURROUND_2CH];              // 环绕声模式立体声
+	gDIP_Surround[1] = temp[MEM_SURROUND_8CH];              // 环绕声模式多声道
+	gDIP_Select2Ch = temp[MEM_SELECT_2CH];                  // 选择为立体声
+	gDIP_Brightness = temp[MEM_BRIGHTNESS];                 // 显示屏亮度
+
+	// 输入端口选择：使用KCM_INPUT寄存器的记忆值
+	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
 	gSYS_ModelType = MKCM_ReadRegister(KCM_RD_INFO);
-	mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
-//MDEBUG(0xf8);MDEBUG(value);MDEBUG(mINPUT_SWITCH);
+	gLocal_1 = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
+	MLOG("INPUT_SWITCH %02x %d\r\n", (u32)value, (u32)gLocal_1, (u32)temp[MEM_SOURCE_AUTO]);
+	if (gLocal_1 >= INPUT_SWITCH_SD && gLocal_1 <= INPUT_SWITCH_BT){	// SD/UDISK/USB声卡/蓝牙音频
+		mINPUT_SWITCH = temp[MEM_SOURCE_AUTO];  			// 自动输入的恢复 
+	}else{
+		mINPUT_SWITCH = gLocal_1;							// 使用KCM记忆的输入端口选择
+	}
+	
+
 	// 音量：使用KCM_VOLUME寄存器的记忆值
 	gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);	// 记忆的音量值
 	// 音效处理通道：使用KCM_EQ_SELECT及各自的寄存器的记忆值
@@ -191,13 +205,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	gLocal_1 = MKCM_ReadRegister(KCM_SPK_CONFIG);			// 记忆的喇叭设置
 	MKCM_FromRegister(KCM_SPK_CONFIG, gLocal_1);
 
-	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
-	MKCM_ReadXByte(KCM_EXTR_MEMORY, 4, temp);               // 用户记忆
-	gDIP_Surround[0] = temp[MEM_SURROUND_2CH];              // 环绕声模式立体声
-	gDIP_Surround[1] = temp[MEM_SURROUND_8CH];              // 环绕声模式多声道
-	gDIP_Select2Ch = temp[MEM_SELECT_2CH];                  // 选择为立体声
-	gDIP_Brightness = temp[MEM_BRIGHTNESS];                 // 显示屏亮度
-    MDIP_Brightness(0, gDIP_Brightness);
+    
 //MDEBUG(0xf9);MDEBUG(gDIP_Surround[0]);MDEBUG(gDIP_Surround[1]);MDEBUG(gDIP_Select2Ch);
 
 	MKCM_WriteRegister(KCM_VOLUME_MAX, 80);                 // 80 设置音量最大值
@@ -236,20 +244,19 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	gAUD_SrcFormat = 0;
     gAUD_BpsRate = 0;
     gPlayStatus = 0;
-    g2SUB_SrcValid = 0;
-    gSUB_SrcAuto = INPUT_SWITCH_NONE;                       // 自动选择失效
-    g2SUB_SrcValid = 0;                                     // 重新开始检测
 	FSYS_Standby = 0;
 	FSYS_TestTone = 0;
 	FSYS_MuteEnable = 0;
+	gRemoveTimer = 0;
+	MAUD_MakePreemptible(0x0000);							// 生成抢占式输入选择 
 
-    MDIP_MenuSelect(cMenu_PowerOn, 0);
+    MDIP_MenuNormal(cMenu_PowerOn);
 	gDIP_MenuLock = 10;										// 可以退出暂时锁定显示了
     MDIP_SurroundSymbol();
     MDIP_SrcFormatSymbol();
 	MDIP_WifiSymbol(0xff);	    	 
 	MDIP_PlaySymbol(gPlayStatus);
-    return;
+	MDIP_Brightness(0, gDIP_Brightness);
 }
 
 void MKCM_FactorySet(){										// 出厂设置
@@ -267,11 +274,12 @@ void MKCM_FactorySet(){										// 出厂设置
 	} while (++gLocal_1 < 100);
 
 	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
+	gLocal_Buffer[MEM_SOURCE_AUTO] = 0;                    	// 自动输入的恢复
 	gLocal_Buffer[MEM_SURROUND_2CH] = 0;                    // 环绕声模式立体声
 	gLocal_Buffer[MEM_SURROUND_8CH] = 0;                    // 环绕声模式多声道
 	gLocal_Buffer[MEM_SELECT_2CH] = 0;                      // 选择为立体声
 	gLocal_Buffer[MEM_BRIGHTNESS] = 2;                      // 显示屏亮度
-	MKCM_WriteXByte(KCM_EXTR_MEMORY, 4, gLocal_Buffer);
+	MKCM_WriteXByte(KCM_EXTR_MEMORY, 5, gLocal_Buffer);
 
 	MKCM_WriteRegister(KCM_VOLUME_CTRL, 39); 				// 音量值
 
@@ -283,159 +291,10 @@ void MKCM_FactorySet(){										// 出厂设置
 
 	MKCM_WriteRegister(KCM_SPK_CONFIG, 0xab);				// 后置大、环绕大、中置大、前置大、有超低音
 	MKCM_WriteRegister(KCM_POWER_ON, 1);
-    MDIP_MenuSelect(cMenu_PowerOn, 0);
+    MDIP_MenuNormal(cMenu_PowerOn);
 	gDIP_MenuLock = 30;										// 暂时锁定显示3秒
     return;
 }
-
-char MKCM_HdmiInsert(WORD flag, WORD g2Local_1){            // 检查HDMI插入，有插入返回1
-    if (g2Local_1 & flag){                                  // 本次有本次的HDMI
-        if (!(g2SUB_SrcValid & flag)){                      // 上次没有本次的HDMI
-            if (mINPUT_SWITCH < INPUT_SWITCH_HDMI1 && mINPUT_SWITCH > INPUT_SWITCH_H_ARC){ // 如果原来不是选择HDMI
-                if (mINPUT_SWITCH != INPUT_SWITCH_SD && mINPUT_SWITCH != INPUT_SWITCH_UDISK){ // 如果原来不是选择SD/U盘
-                    gSUB_SrcAuto = mINPUT_SWITCH;           // 保存原来的选择
-                }
-            }
-            if (flag == KCM_SRC_VALID_HDMI1){
-                mINPUT_SWITCH = INPUT_SWITCH_HDMI1;         // 自动换到HDMI1
-            }else if (flag == KCM_SRC_VALID_HDMI2){
-                mINPUT_SWITCH = INPUT_SWITCH_HDMI2;         // 自动换到HDMI2
-            }else {
-                mINPUT_SWITCH = INPUT_SWITCH_HDMI3;         // 自动换到HDMI3
-            }
-            //MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));  
-			gDIP_MenuSelect = cMenu_Restore;				// 不管菜单在哪里，都需要马上动作
-            MAUD_MixInputSource(mINPUT_SWITCH);
-//            MLOG("HdmiInsertB:%d %02x\r\n", (u32)mINPUT_SWITCH, (u32)MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
-            return 1;
-        }
-    }
-    return 0;
-}
-char MKCM_HdmiRemove(WORD flag, WORD g2Local_1){            // 检查HDMI拔出，有拔出返回1
-    if (!(g2Local_1 & flag)){                               // 本次没有HDMI
-        if (g2SUB_SrcValid & flag){                         // 上次有HDMI
-            if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // 不是自动选择失效
-                MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  // 恢复原来的输入
-                MLOG("MKCM_HdmiRemove:%d\r\n", gSUB_SrcAuto);
-            }
-            return 1;
-        }
-    }
-    return 0;
-}
-
-char MKCM_SdUdiskInsert(WORD flag, WORD g2Local_1){         // 检查SD/U盘插入，有插入返回1
-    if (g2Local_1 & flag){                                  // 本次有SD/U盘
-        if (!(g2SUB_SrcValid & flag)){                      // 上次没有SD/U盘
-            WORD track = MKCM_Read2Byte((flag == KCM_SRC_VALID_SD) ? KCM_RD_SD_QTY : KCM_RD_UDISK_QTY);
-    //MDEBUG(0xe8);MDEBUG(total);
-            if (track){                                     // 找到文件
-                if (mINPUT_SWITCH != INPUT_SWITCH_SD && mINPUT_SWITCH != INPUT_SWITCH_UDISK){ // 如果原来不是选择SD/U盘
-                    gSUB_SrcAuto = mINPUT_SWITCH;           // 保存原来的选择
-                }
-                if (flag == KCM_SRC_VALID_SD){
-                    mINPUT_SWITCH = INPUT_SWITCH_SD;
-                    g2SdQty = track;
-                }else {
-                    mINPUT_SWITCH = INPUT_SWITCH_UDISK;
-                    g2UDiskQty = track;
-                }
-                MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
-                g2PlayIndex = 0;
-//g2PlayIndex = 15;                
-                MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首
-            }else {
-                MDIP_MenuSelect((flag == KCM_SRC_VALID_SD) ? cMenu_SdInsert : cMenu_UDiskInsert, 0);     // 显示SD/U盘插入
-            }
-            return 1;
-        }
-    }
-    return 0;
-}
-char MKCM_SdUdiskRemove(WORD flag, WORD g2Local_1){         // 检查SD/U盘拔出，有拔出返回1
-    if (!(g2Local_1 & flag)){                               // 本次没有SD/U盘
-        if (g2SUB_SrcValid & flag){                         // 上次有SD/U盘
-            if (flag == KCM_SRC_VALID_SD){
-                g2SdQty = 0;
-            }else {
-                g2UDiskQty = 0;
-            }
-            MDIP_PlaySymbol(0);
-            if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // 不是自动选择失效
-                MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  // 恢复原来的输入
-            }else {
-                MDIP_MenuSelect((flag == KCM_SRC_VALID_SD) ? cMenu_UDiskRemove : cMenu_UDiskRemove, 0);         // 显示SD/U盘插出
-            }
-            return 1;
-        }
-    }
-    return 0;
-}
-char MKCM_UsbaBtInsert(WORD flag, WORD g2Local_1){         	// 检查USB声卡/蓝牙音频插入，有插入返回1
-	if (g2Local_1 & flag){                   				// 本次有USB声卡/蓝牙音频
-    	if (!(g2SUB_SrcValid & flag)){       				// 上次没有USB声卡/蓝牙音频
-	    	if (mINPUT_SWITCH != INPUT_SWITCH_USBA && mINPUT_SWITCH != INPUT_SWITCH_BT){ // 如果原来不是选择USB声卡/蓝牙音频
-                gSUB_SrcAuto = mINPUT_SWITCH;           // 保存原来的选择
-            }
-            if (flag == KCM_SRC_VALID_USBA){
-                mINPUT_SWITCH = INPUT_SWITCH_USBA;
-            }else if (flag == KCM_SRC_VALID_BT){
-                mINPUT_SWITCH = INPUT_SWITCH_BT;
-            }
-            MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, mINPUT_SWITCH));
-            MDIP_MenuSelect((flag == KCM_SRC_VALID_USBA) ? cMenu_UsbaInsert : cMenu_BtInsert, 0);     // 显示SD/U盘插入
-		    return 1;
-	   	}
-    }
-    return 0;
-}
-char MKCM_UsbaBtRemove(WORD flag, WORD g2Local_1){         // 检查USB声卡/蓝牙音频拔出，有拔出返回1
-    if (!(g2Local_1 & flag)){                               // 本次没有USB声卡/蓝牙音频
-        if (g2SUB_SrcValid & flag){                         // 上次有USB声卡/蓝牙音频
-            if (gSUB_SrcAuto != INPUT_SWITCH_NONE){         // 不是自动选择失效
-                MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, gSUB_SrcAuto));  // 恢复原来的输入
-            }
-            MDIP_MenuSelect((flag == KCM_SRC_VALID_USBA) ? cMenu_UsbaRemove : cMenu_BtRemove, 0);        // 显示USB声卡/蓝牙音频插出
-            return 1;
-        }
-    }
-    return 0;
-}
-void MKCM_ReadSrcValid(){
-	WORD g2Local_1 = MKCM_Read2Byte(KCM_SRC_VALID);         // 本次的有效音源
-//if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
-    if (g2SUB_SrcValid != g2Local_1){                       // 本次与上次的有效音源改变
-        MLOG("KCM_SRC_VALID:%04x Last:%04x\r\n", (u32)g2Local_1, (u32)g2SUB_SrcValid);
-        if (!MKCM_HdmiInsert(KCM_SRC_VALID_HDMI1, g2Local_1)){         // 检查HDMI1插入，没有才检查HDMI2插入
-            if (!MKCM_HdmiInsert(KCM_SRC_VALID_HDMI2, g2Local_1)){     // 检查HDMI2插入，没有才检查HDMI3插入
-                MKCM_HdmiInsert(KCM_SRC_VALID_HDMI3, g2Local_1);       // 检查HDMI3插入
-            }
-        }
-        MKCM_HdmiRemove(KCM_SRC_VALID_HDMI1, g2Local_1);
-        MKCM_HdmiRemove(KCM_SRC_VALID_HDMI2, g2Local_1);
-        MKCM_HdmiRemove(KCM_SRC_VALID_HDMI3, g2Local_1);
-
-        if (!MKCM_SdUdiskInsert(KCM_SRC_VALID_UDISK, g2Local_1)){   // 检查U盘插入，没有才检查SD插入
-            MKCM_SdUdiskInsert(KCM_SRC_VALID_SD, g2Local_1);    	// 检查SD插入
-        }
-        MKCM_SdUdiskRemove(KCM_SRC_VALID_SD, g2Local_1);
-        MKCM_SdUdiskRemove(KCM_SRC_VALID_UDISK, g2Local_1);
-
-        if (!MKCM_UsbaBtInsert(KCM_SRC_VALID_USBA, g2Local_1)){   // 检查USB声卡插入，没有才检查蓝牙音频插入
-            MKCM_UsbaBtInsert(KCM_SRC_VALID_BT, g2Local_1);    	// 检查蓝牙音频插入
-        }
-        MKCM_UsbaBtRemove(KCM_SRC_VALID_USBA, g2Local_1);
-        MKCM_UsbaBtRemove(KCM_SRC_VALID_BT, g2Local_1);
-
-        
-        
-        g2SUB_SrcValid = g2Local_1;
-    }else {
-        MLOG("KCM_SRC_VALID = Last:%04x\r\n", (u32)g2Local_1);
-    }
-}
-
 void MKCM_WifiCommand(BYTE regNumber, BYTE value){		// 收到远程APP的指令
 //MDEBUG(0xa9);MDEBUG(regNumber);MDEBUG(value);
 	switch (regNumber){
@@ -452,7 +311,7 @@ void MKCM_WifiCommand(BYTE regNumber, BYTE value){		// 收到远程APP的指令
 		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
 		MAUD_AutoCanclMute();
 		MAUD_AutoCanclTestTone();
-		MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+		MDIP_MenuNormal(cMenu_Restore);
 		break;
 	}
 }

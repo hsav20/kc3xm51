@@ -9,9 +9,20 @@
 
 
 void MKEY_Initialize(){										  
-}	  
+}
+char aaaa;	  
 void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
 	MPKey_Scan();
+/*if(baseTimer&0x08){
+	if (aaaa){
+		aaaa=0;
+		g2DIP_ShowBuffer[6] |= 0x0020;	
+	}
+	else {
+		aaaa=1;
+		g2DIP_ShowBuffer[6] &= ~0x0020;	
+	}	
+}*/
 	if (gDIP_MenuLock > 0){
 		if (!FSYS_Standby){									// 不是在待机模式
 			if ((baseTimer & 0x02) > 0){					// 100ms时间
@@ -39,22 +50,21 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	}
    	if (FPKeyDecodeDone){
 		FPKeyDecodeDone = 0;
-//		FDirectUp = 0;
 		FPKeyStep = 1;
 //MDEBUG(0xaa);MDEBUG(GPKeyData);
 
 		switch (GPKeyData){
 		case cPanKey_InputSource:
-			MAUD_MixInputSource(INPUT_SWITCH_NONE);         // 循环方式
+			MAUD_InputOneKey();         					// 所有输入用一个按键选择 
 			break;
 		case cPanKey_Stereo:
-			MDIP_MenuSelect(cMenu_Surround2Ch, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_Surround2Ch);
 			break;
 		case cPanKey_SurroundMode:
-			MDIP_MenuSelect(cMenu_Surround8Ch, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_Surround8Ch);
 			break;
  		case cPanKey_SoundEffect:
-			MDIP_MenuSelect(cMenu_SoundEffect, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_SoundEffect);
 			break;
 
 		case cPanKey_PlayPause:
@@ -66,7 +76,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 
   		case cPanKey_AudioMute: 							// MUTE
 			if (gDIP_MenuSelect >= cMenu_MasterVolume && gDIP_MenuSelect <= cMenu_MicReverb){		// 已经在JOG菜单 
-				MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+				MDIP_MenuNormal(cMenu_Restore);
 			}
 			else {
 				MKEY_AudioMute();
@@ -76,13 +86,13 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
   		case cPanKey_JogMenu:								// JOG
 			
 			if (gDIP_MenuSelect < cMenu_MasterVolume || gDIP_MenuSelect > cMenu_MicVolume2){		// 还没有进入JOG菜单 
-				MDIP_MenuSelect(cMenu_MasterVolume, MENU_NORMAL);
+				MDIP_MenuNormal(cMenu_MasterVolume);
 			}
 			else {
 				if (++gDIP_MenuSelect > cMenu_MicVolume2){
 					gDIP_MenuSelect = cMenu_MasterVolume;
 				}
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_NORMAL);
+				MDIP_MenuNormal(gDIP_MenuSelect);
 			}
 			break;
 		}
@@ -100,11 +110,11 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_Standby:
 			FSYS_Standby = ~FSYS_Standby;
 			if (FSYS_Standby){
-				MDIP_MenuSelect(cMenu_Standby, MENU_NORMAL);
+				MDIP_MenuNormal(cMenu_Standby);
 			}
 			else {
 				MKCM_WriteRegister(KCM_POWER_ON, 1);
-			    MDIP_MenuSelect(cMenu_PowerOn, MENU_NORMAL);
+			    MDIP_MenuNormal(cMenu_PowerOn);
 				gDIP_MenuLock = 30;							// 暂时锁定显示3秒
 			}
 			break;
@@ -120,12 +130,12 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_MicCtrl:
 			if (CUSTOM_CODE != 0x44443000){			// 不是这个版本，旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
 				if (gDIP_MenuSelect < cMenu_MicVolume1){	    // 还没有进入Mic菜单 
-					MDIP_MenuSelect(cMenu_MicVolume1, MENU_NORMAL);
+					MDIP_MenuNormal(cMenu_MicVolume1);
 				}else {
 					if (++gDIP_MenuSelect > cMenu_MicReverb){
 						gDIP_MenuSelect = cMenu_MicVolume1;
 					}
-					MDIP_MenuSelect(gDIP_MenuSelect, MENU_NORMAL);
+					MDIP_MenuNormal(gDIP_MenuSelect);
 				}
 			}
 			break;
@@ -184,10 +194,10 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 		case cRmKey_MeunCtrl:
 			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
-				MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+				MDIP_MenuNormal(cMenu_Restore);
 			}
 			else {
-				MDIP_MenuSelect(cMenu_LipSync, MENU_NORMAL);
+				MDIP_MenuNormal(cMenu_LipSync);
 			}
 			break;
 		case cRmKey_MeunUp:
@@ -211,7 +221,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				if (gDIP_MenuSelect > cMenu_SpeakFilter){
 					gDIP_MenuSelect = cMenu_LipSync;
 				}
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_NORMAL);
+				MDIP_MenuNormal(gDIP_MenuSelect);
 				gDIP_MenuTimer = 50;
 			}
 //MDEBUG(0xa9);MDEBUG(gDIP_MenuSelect);
@@ -238,7 +248,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				if (gDIP_MenuSelect < cMenu_LipSync){
 					gDIP_MenuSelect = cMenu_SpeakFilter;
 				}
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_NORMAL);
+				MDIP_MenuNormal(gDIP_MenuSelect);
 				gDIP_MenuTimer = 50;
 			}
 //MDEBUG(0xa8);MDEBUG(gDIP_MenuSelect);
@@ -246,24 +256,24 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_MeunLeft:
 			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
 				gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, 3);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_DOWN);
 			}
 			break;
 		case cRmKey_MeunRight:
 			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
 				gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, 4);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_UP);
 			}
 			break;
 		case cRmKey_TrimCtrl:                               // 声道微调
 			if (gDIP_MenuSelect < cMenu_ChTrimFL || gDIP_MenuSelect > cMenu_ChTrimSL){	    // 还没有进入声道微调菜单 
             	MAUD_AutoCanclTestTone();
-				MDIP_MenuSelect(cMenu_ChTrimFL, MENU_NORMAL);   // 进入声道微调菜单 
+				MDIP_MenuNormal(cMenu_ChTrimFL);   			// 进入声道微调菜单 
 			}else {                                         // 已经进入声道微调菜单 
                 BYTE next = MDIP_GetNextChannel(gDIP_MenuSelect - cMenu_ChTrimFL);    
 //MDEBUG(0xee);MDEBUG(gDIP_MenuSelect - cMenu_ChTrimFL);MDEBUG(next);//MDEBUG(gDIP_SpeakSetup[1]);MDEBUG(gDIP_SpeakSetup[2]);MDEBUG(gDIP_SpeakSetup[3]);MDEBUG(gDIP_SpeakSetup[4]);MDEBUG(gDIP_MenuSelect);MDEBUG(cMenu_ChTrimFL);
                 gDIP_MenuSelect = next + cMenu_ChTrimFL;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_NORMAL);
+				MDIP_MenuNormal(gDIP_MenuSelect);
 			}
 			break;
 		case cRmKey_Record:                                        // 录音及暂停功能，现在暂时用来测试I2C总线读取
@@ -274,7 +284,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			// }else {
 			// 	MDIP_SurroundSymbol();
 			// 	MDIP_SrcFormatSymbol();
-			// 	MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+			// 	MDIP_MenuNormal(cMenu_Restore);
 			// }
 			break;
 		case cRmKey_Random:
@@ -315,51 +325,51 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_UP);  // 多媒体播放前一首
 			break;
 		case cRmKey_SoundEffect:
-			MDIP_MenuSelect(cMenu_SoundEffect, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_SoundEffect);
 			break;
 		case cRmKey_NightMode:
-			MDIP_MenuSelect(cMenu_NightMode, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_NightMode);
 			break;
 		case cRmKey_NoiseSignal:
-			MDIP_MenuSelect(cMenu_NoiseSignal, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_NoiseSignal);
 			break;
 		case cRmKey_MediaType:
 			break;
 		case cRmKey_Stereo:
-			MDIP_MenuSelect(cMenu_Surround2Ch, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_Surround2Ch);
 			break;
 		case cRmKey_Surround:
-			MDIP_MenuSelect(cMenu_Surround8Ch, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_Surround8Ch);
 			break;
 		case cRmKey_VideoSrc:
 			MKEY_VideoSelect();
 			break;
 		case cRmKey_InputNet:
-			MAUD_MixInputSource(INPUT_SWITCH_UDISK);
+			MAUD_Preemptible();							// 抢占式输入选择 
 			break;
 		case cRmKey_InputHdmi1:
-			MAUD_MixInputSource(INPUT_SWITCH_HDMI1);
+			MAUD_InputSelect(INPUT_SWITCH_HDMI1);
 			break;
 		case cRmKey_InputHdmi2:
-			MAUD_MixInputSource(INPUT_SWITCH_HDMI2);
+			MAUD_InputSelect(INPUT_SWITCH_HDMI2);
 			break;
 		case cRmKey_InputHdmi3:
-			MAUD_MixInputSource(INPUT_SWITCH_HDMI3);
+			MAUD_InputSelect(INPUT_SWITCH_HDMI3);
 			break;
 		case cRmKey_InputHdmiArc:
-			MAUD_MixInputSource(INPUT_SWITCH_H_ARC);
+			MAUD_InputSelect(INPUT_SWITCH_H_ARC);
 			break;
 		case cRmKey_InputOptica:
-			MAUD_MixInputSource(INPUT_SWITCH_OPTIC);
+			MAUD_InputSelect(INPUT_SWITCH_OPTIC);
 			break;
 		case cRmKey_InputCoaxal1:
-			MAUD_MixInputSource(INPUT_SWITCH_COA1);
+			MAUD_InputSelect(INPUT_SWITCH_COA1);
 			break;
 		case cRmKey_InputCoaxal2:
-			MAUD_MixInputSource(INPUT_SWITCH_COA2);
+			MAUD_InputSelect(INPUT_SWITCH_COA2);
 			break;
 		case cRmKey_InputAux:
-			MAUD_MixInputSource(INPUT_SWITCH_AUX);
+			MAUD_InputSelect(INPUT_SWITCH_AUX);
 			break;
 
 		}
@@ -367,10 +377,10 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	if (FKeyJogSwOK){
 		FKeyJogSwOK = 0;
 		if (gDIP_MenuSelect >= cMenu_MasterVolume && gDIP_MenuSelect <= cMenu_MicVolume2){		// 已经进入JOG菜单 
-			MDIP_MenuSelect(gDIP_MenuSelect, FKeyJogUp ? 4 : 3);
+			MDIP_MenuSelect(gDIP_MenuSelect, FKeyJogUp ? MENU_ADJ_UP : MENU_ADJ_DOWN);
 		}
 		else {
-			MDIP_MenuSelect(cMenu_MasterVolume, MENU_NORMAL);
+			MDIP_MenuNormal(cMenu_MasterVolume);
 		}
 	}
     return;
@@ -381,7 +391,7 @@ void MKEY_AudioMute(){
 	gLocal_1 = FSYS_MuteEnable ? 4 : 3;
 	MDIP_MenuSelect(cMenu_AudioMute, gLocal_1);
 	if (!FSYS_MuteEnable){									// 解除静音
-		MDIP_MenuSelect(cMenu_MasterVolume, MENU_NORMAL);
+		MDIP_MenuNormal(cMenu_MasterVolume);
 	}
     MAUD_AutoCanclTestTone();
     return;
@@ -390,13 +400,13 @@ void MKEY_TestTone(){                                       // MENU_MODE mode
 	FSYS_TestTone = ~FSYS_TestTone;
 
 	if (FSYS_TestTone){										// 打开噪音测试
-		MDIP_MenuSelect(cMenu_TToneFL, MENU_NORMAL);
+		MDIP_MenuNormal(cMenu_TToneFL);
         MAUD_TestToneChannel(0);
 //MDEBUG(0x99);MDEBUG(gDIP_MenuSelect);MDEBUG(gDIP_MenuTimer);MDEBUG(FSYS_TestTone);
 
 	}
 	else {													// 关闭噪音测试
-		MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
+		MDIP_MenuNormal(cMenu_Restore);
 		MAUD_TestToneChannel(0xff);
 	}
     return;
@@ -406,7 +416,7 @@ CONST_CHAR Tab_VideoSelect[] = {
 	0x01,0x02,0x04,
 };
 void MKEY_VideoSelect(){
-	if (mINPUT_SWITCH < INPUT_SWITCH_HDMI1){
+	/*if (mINPUT_SWITCH < INPUT_SWITCH_HDMI1){
 		BYTE gLocal_1 = gAUD_AutoInputSrc >> 5;					// B7:B5为选择的视频
 		BYTE gLocal_2 = gAUD_AutoInputSrc & 0x07;				// B4:B0为插入的视频位
 		BYTE gLocal_3 = 0;
@@ -419,11 +429,11 @@ void MKEY_VideoSelect(){
 			    return;
 			}
 		} while (++gLocal_3 < 3);
-	    MDIP_MenuSelect(cMenu_VideoSrc, MENU_NORMAL);
+	    MDIP_MenuNormal(cMenu_VideoSrc);
 	}
 	else {
-		MDIP_MenuSelect(cMenu_Restore, MENU_NORMAL);
-	}
+		MDIP_MenuNormal(cMenu_Restore);
+	}*/
     return;
 }
 

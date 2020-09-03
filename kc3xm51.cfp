@@ -16,15 +16,19 @@
 	<File>src\KcmI2c.h</File>
 	<File>src\Kc3xType.h</File>
 	<File>src\const.h</File>
+	<File>tools\c51tiny.h</File>
 </Folder>
 <Folder name="Other Files">
 </Folder>
-<Attribute topline="7" x="2" y="14">src\main.c</Attribute>
-<Attribute topline="1" x="6" y="11">src\key.c</Attribute>
-<Attribute topline="385" x="14" y="398">src\function.c</Attribute>
-<Attribute topline="156" x="10" y="168">src\display.c</Attribute>
-<Attribute topline="278" x="65" y="287">src\main.h</Attribute>
-<Attribute topline="221" x="61" y="232">src\const.h</Attribute>
+<Attribute topline="63" x="60" y="75">src\main.c</Attribute>
+<Attribute topline="47" x="20" y="58">src\key.c</Attribute>
+<Attribute topline="31" x="23" y="48">src\KcmI2c.c</Attribute>
+<Attribute topline="147" x="17" y="159">src\function.c</Attribute>
+<Attribute topline="699" x="47" y="715">src\display.c</Attribute>
+<Attribute topline="267" x="45" y="285">src\audio.c</Attribute>
+<Attribute topline="247" x="68" y="258">src\main.h</Attribute>
+<Attribute topline="124" x="24" y="13">src\KcmI2c.h</Attribute>
+<Attribute topline="199" x="19" y="215">src\const.h</Attribute>
 <FolderState>111</FolderState>
 <DefConfig>mingw5</DefConfig>
 <Builder name="mingw5" type="MinGW" version="1.0" changed="1">

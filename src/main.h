@@ -118,12 +118,10 @@ EXTR BOOL FSeekAuto;
 
 
 EXTR BOOL FAUD_MasterVolume;
-EXTR xdata BYTE gAUD_AutoInputSrc;
 EXTR xdata BYTE gAUD_MasterVolume;
 EXTR xdata BYTE gAUD_SrcFormat;
 EXTR xdata BYTE gAUD_BpsRate;
-EXTR xdata WORD g2SUB_SrcValid;
-EXTR xdata BYTE gSUB_SrcAuto;
+EXTR xdata WORD g2AUD_SrcValid;
 EXTR xdata BYTE gPlayOperate;
 EXTR xdata WORD g2SdQty;
 EXTR xdata WORD g2UDiskQty;
@@ -143,6 +141,7 @@ EXTR BOOL FSYS_TestTone;
 EXTR BOOL FDIP_FreqSymbol;
 EXTR xdata BYTE gDIP_Brightness;
 EXTR xdata INPUT_SWITCH mINPUT_SWITCH;
+EXTR xdata BYTE gRemoveTimer;                     
 EXTR xdata BYTE gDIP_SoundEffect;                     
 EXTR xdata BYTE gDIP_TestToneChannel;
 EXTR xdata BYTE gDIP_Select2Ch;         // 选择为立体声
@@ -186,8 +185,11 @@ EXTR xdata BYTE gDIP_Spectrum[5];
 EXTR xdata BYTE gDIP_Buffer[32];
 EXTR xdata WORD g2DIP_ShowBuffer[13]; 
 
-
-
+EXTR xdata BYTE gPreemptibleIn[8];
+EXTR xdata BYTE gPreemptibleStep;
+EXTR xdata BYTE gPreemptibleQty;
+EXTR xdata BYTE gWithHdmiStep;
+EXTR xdata BYTE gWithHdmiQty;
 
 void MUSDELAY(BYTE gLocal_1);                
 BYTE MKEY_FirstPress(BYTE gLocal_0);
@@ -203,7 +205,6 @@ void MPowerCtrl();
 
 
 void MAUD_VolumeSend();
-void MAUD_10msTimer(BYTE baseTimer);   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
 void MSUR_TEST_TONE();
 void MDSP_INPUT();
 
@@ -249,7 +250,13 @@ void MDIPSpectrum(						// 频谱
 					BYTE gLocal_3);		// 顶点频谱	 
 
 void MKEY_CheckJop();
-void MAUD_MixInputSource(BYTE index);
+void MAUD_10msTimer(BYTE baseTimer);   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
+void MAUD_InputOneKey();								// 所有输入用一个按键选择 
+void MAUD_Preemptible();
+void MAUD_InputSelect(INPUT_SWITCH select);
+void MAUD_InputWrite(INPUT_SWITCH select, INPUT_SWITCH last);
+void MAUD_MakePreemptible(WORD g2Local_1);			// 生成抢占式输入选择 
+
 void MAUD_MixSoundEffect();
 void MAUD_MixMasterVolume(BYTE directUp);
 void MAUD_MixTrimAdjust(BYTE menuMic, BYTE directUp);
@@ -257,7 +264,6 @@ void MAUD_MixMicAdjust(BYTE menuMic, BYTE directUp);
 void MAUD_AutoCanclMute();
 void MAUD_TestToneChannel(BYTE channel);					// 噪音测试
 void MAUD_AutoCanclTestTone();
-void MAUD_InputSource(BYTE source);
 void MAUD_SurroundMode(BYTE mode);
 BYTE MAUD_GetInputSource(BYTE memory);
 
@@ -284,7 +290,7 @@ void MDIP_ClearSpectrum();
 void MDIP_NightMode();
 void MDIP_NoiseSignal();
 void MDIP_Fireware();
-void MDIP_ExtrInOut(BYTE type);								// 显示外置音源插入/插出 
+void MDIP_InsertRemove(BYTE type);							// 显示外置音源插入/插出 
 void MDIP_PlayTrack();
 void MDIP_PlayTime();
 BYTE MDIP_GetNextChannel(BYTE index);                       // 测试噪音声道微调获取下一个声道
@@ -299,7 +305,8 @@ void MKCM_RestoreMemory();									// 开机，从KCM之中恢复记忆
 void MKCM_FactorySet();
 void MKCM_ReadSrcValid();
 void MAPI_COPY_BUFF8(BYTE length, BYTE* in_data, BYTE* out_data);
-void MDIP_MenuSelect(BYTE index, MENU_MODE mode);			// mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 
+void MDIP_MenuNormal(BYTE index);							// 菜单选择一般模式 
+void MDIP_MenuSelect(BYTE index, MENU_MODE mode);			// 菜单选择高级模式，mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 
 BYTE MDIP_GetSpeakerChar(BYTE index);						// 0前置 1中置 2超低音 3环绕 4后置
 void MDIP_AdjDelayTime(BYTE index, BYTE mode);				// 0=LINSYNC 1前置 2中置 3环绕 4后置 
 

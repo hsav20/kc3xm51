@@ -131,15 +131,14 @@
 #define cMenu_NoiseSignal               12
 #define cMenu_Fireware                  13                  // 显示固件升级
 #define cMenu_SdInsert                  14                  // 显示SD插入
-#define cMenu_SdRemove                  15                  // 显示SD插出
-#define cMenu_UDiskInsert               16                  // 显示U盘插入
-#define cMenu_UDiskRemove               17                  // 显示U盘插出
-#define cMenu_UsbaInsert               	18                 	// 显示USB声卡插入
-#define cMenu_UsbaRemove               	19                 	// 显示USB声卡插出
-#define cMenu_BtInsert               	20                 	// 显示蓝牙音频插入
-#define cMenu_BtRemove               	21                 	// 显示蓝牙音频插出
-#define cMenu_PlayTrack                 22                  // 显示多媒体文件信息
-#define cMenu_PlayTime                  23                  // 显示多媒体播放时间
+#define cMenu_UDiskInsert               15                  // 显示U盘插入
+#define cMenu_SdRemove                  16                  // 显示SD拔出
+#define cMenu_UDiskRemove               17                  // 显示U盘拔出
+#define cMenu_UsbaRemove               	18                 	// 显示USB声卡拔出
+#define cMenu_BtRemove               	19                 	// 显示蓝牙音频拔出
+#define cMenu_HdmiRemove                20                  // 显示HDMI拔出 
+#define cMenu_PlayTrack                 21                  // 显示多媒体文件信息
+#define cMenu_PlayTime                  22                  // 显示多媒体播放时间
 
 
 
@@ -209,10 +208,11 @@ typedef enum {
 } SPKER_SETUP;
 
 typedef enum {
-    MEM_SURROUND_2CH = 0,                                   // 环绕声模式立体声
-    MEM_SURROUND_8CH = 1,                                   // 环绕声模式多声道
-    MEM_SELECT_2CH = 2,                                     // 选择为立体声
-    MEM_BRIGHTNESS = 3                                      // 显示屏亮度
+    MEM_SOURCE_AUTO = 0,                                   	// 自动输入的恢复 
+    MEM_SURROUND_2CH = 1,                                   // 环绕声模式立体声
+    MEM_SURROUND_8CH = 2,                                   // 环绕声模式多声道
+    MEM_SELECT_2CH = 3,                                     // 选择为立体声
+    MEM_BRIGHTNESS = 4                                      // 显示屏亮度
 } MEMORY_USER;                                              // 用户记忆
 
 
@@ -229,13 +229,13 @@ typedef enum {
     INPUT_SWITCH_COA2 = 3,                                  // 3=数码3   
     INPUT_SWITCH_SD = 4,                                    // 4=SD      
     INPUT_SWITCH_UDISK = 5,                                 // 5=UDISK   
-    INPUT_SWITCH_USBA = 6,                                 	// 10=USB声卡
-    INPUT_SWITCH_BT = 7,                                 	// 11=蓝牙音频
-    INPUT_SWITCH_HDMI1 = 6,                                 // 6=HDMI1   
-    INPUT_SWITCH_HDMI2 = 7,                                 // 7=HDMI2   
-    INPUT_SWITCH_HDMI3 = 8,                                 // 8=HDMI3   
-    INPUT_SWITCH_H_ARC = 9,                                 // 9=HDMI-ARC
-    INPUT_SWITCH_NONE = 10                                  // 循环方式或还没有选择    
+    INPUT_SWITCH_USBA = 6,                                 	// 6=USB声卡
+    INPUT_SWITCH_BT = 7,                                 	// 7=蓝牙音频
+    INPUT_SWITCH_HDMI1 = 8,                                 // 8=HDMI1   
+    INPUT_SWITCH_HDMI2 = 9,                                 // 9=HDMI2   
+    INPUT_SWITCH_HDMI3 = 10,                                 // 10=HDMI3   
+    INPUT_SWITCH_H_ARC = 11,                                 // 11=HDMI-ARC
+    INPUT_SWITCH_NONE = 12                                  // 循环方式或还没有选择    
 } INPUT_SWITCH;
 
 #define cDIP_SURR_STEREO               	0
