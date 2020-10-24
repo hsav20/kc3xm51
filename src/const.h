@@ -75,7 +75,7 @@
 #define cRmKey_SkipDown             	0x14
 #define cRmKey_SkipUp             		0x17
 
-#define cRmKey_SoundEffect    			0x4e
+#define cRmKey_EqSelect    			    0x4e
 #define cRmKey_NightMode         		0x4c
 #define cRmKey_NoiseSignal         		0x0c
 #define cRmKey_MediaType                0x0F
@@ -98,7 +98,7 @@
 #define cPanKey_InputSource	    		0x18				// 输入音源选择
 #define cPanKey_Stereo    				0x14				// 立体声
 #define cPanKey_SurroundMode    		0x12
-#define cPanKey_SoundEffect    			0x11
+#define cPanKey_EqSelect    			0x11
 #define cPanKey_SkipDown   				0x01
 #define cPanKey_SkipUp    				0x02
 #define cPanKey_PlayPause    			0x04
@@ -116,78 +116,96 @@
 #define cSURTestTone_SLch                4   
 #define cSURTestTone_SWch                5
 
-#define cMenu_Restore                   0
-#define cMenu_InputSource               1
-#define cMenu_PowerOn               	2
-#define cMenu_Surround2Ch               3
-#define cMenu_Surround8Ch               4
-#define cMenu_SoundEffect               5
-#define cMenu_VideoSrc               	6
-#define cMenu_SrcFormat                 7
-#define cMenu_Standby                 	8
-#define cMenu_Brightness                9
-#define cMenu_AudioMute                 10
-#define cMenu_NightMode                 11
-#define cMenu_NoiseSignal               12
-#define cMenu_Fireware                  13                  // 显示固件升级
-#define cMenu_SdInsert                  14                  // 显示SD插入
-#define cMenu_UDiskInsert               15                  // 显示U盘插入
-#define cMenu_SdRemove                  16                  // 显示SD拔出
-#define cMenu_UDiskRemove               17                  // 显示U盘拔出
-#define cMenu_UsbaRemove               	18                 	// 显示USB声卡拔出
-#define cMenu_BtRemove               	19                 	// 显示蓝牙音频拔出
-#define cMenu_HdmiRemove                20                  // 显示HDMI拔出 
-#define cMenu_PlayTrack                 21                  // 显示多媒体文件信息
-#define cMenu_PlayTime                  22                  // 显示多媒体播放时间
-
-
-
-#define cMenu_TToneFL                   36                  // 测试噪音前置左声道
-#define cMenu_TToneCE                   37                  // 测试噪音中置声道
-#define cMenu_TToneSW                   38                  // 测试噪音超低音声道
-#define cMenu_TToneFR                   39                  // 测试噪音前置右声道
-#define cMenu_TToneSR                   40                  // 测试噪音环绕右声道
-#define cMenu_TToneBR                   41                  // 测试噪音后置右声道
-#define cMenu_TToneBL                   42                  // 测试噪音后置左声道
-#define cMenu_TToneSL                   43                  // 测试噪音环绕左声道
-
-#define cMenu_ChTrimFL                  46                  // 声道微调前置左声道
-#define cMenu_ChTrimCE                  47                  // 声道微调中置声道
-#define cMenu_ChTrimSW                  48                  // 声道微调超低音声道
-#define cMenu_ChTrimFR                  49                  // 声道微调前置右声道
-#define cMenu_ChTrimSR                  50                  // 声道微调环绕右声道
-#define cMenu_ChTrimBR                  51                  // 声道微调后置右声道
-#define cMenu_ChTrimBL                  52                  // 声道微调后置左声道
-#define cMenu_ChTrimSL                  53                  // 声道微调环绕左声道
-
-#define cMenu_MasterVolume              56
-#define cMenu_MicVolume1                57                  // 话筒1音量
-#define cMenu_MicVolume2                58                  // 话筒2音量
-#define cMenu_MicEcho                   59                  // 话筒回声比例
-#define cMenu_MicRepeat                 60                  // 话筒重复比例
-#define cMenu_MicDelay                  61                  // 话筒延迟时间
-#define cMenu_MicReverb                 62                  // 话筒混响比例
-
-
-#define cMenu_LipSync           		70
-#define cMenu_DelayFront           		71
-#define cMenu_DelayCenter          		72					// 菜单中置声道延迟时间调整
-#define cMenu_DelaySurround        		73					// 菜单环绕声道延迟时间调整
-#define cMenu_DelayBack           		74					// 菜单后置声道延迟时间调整
-#define cMenu_SpeakFront           		75
-#define cMenu_SpeakCenter          		76
-#define cMenu_SpeakWoofer          		77
-#define cMenu_SpeakSurround        		78
-#define cMenu_SpeakBack           		79
-#define cMenu_SpeakFilter          		80
 
 typedef enum {
-    MENU_NORMAL = 0,                                        // 正常的显示模式
-    MENU_TWINKLE_ON = 1,                                    // 闪烁点亮
-    MENU_TWINKLE_OFF = 2,                                   // 闪烁熄灭
-    MENU_ADJ_DOWN = 3,                                      // 调整-
-    MENU_ADJ_UP = 4                                         // 调整+
-} MENU_MODE;
+    MENU_RESTORE = 0,                                       // 菜单恢复状态
+    MENU_INPUT_SOURCE = 1,                                  // 菜单状态:输入音源选择
+    MENU_POWER_ON = 2,                                      // 菜单状态:电源打开
+
+    MENU_LISTEN_MODE = 0x03,				                // 菜单聆听模式选择
+    MENU_EQ_SELECT = 0x05,                                   // 菜单EQ均衡器选择
+
+    cMenu_VideoSrc = 6,
+    cMenu_SrcFormat = 7,
+    cMenu_Standby = 8,
+    cMenu_Brightness = 9,
+    cMenu_AudioMute = 10,
+    cMenu_NightMode = 11,
+    cMenu_NoiseSignal = 12,
+    cMenu_Fireware = 13,                  // 显示固件升级
+    cMenu_SdInsert = 14,                  // 显示SD插入
+    cMenu_UDiskInsert = 15,                  // 显示U盘插入
+    cMenu_SdRemove = 16,                  // 显示SD拔出
+    cMenu_UDiskRemove = 17,                  // 显示U盘拔出
+    cMenu_UsbaRemove = 18,                 	// 显示USB声卡拔出
+    cMenu_BtRemove = 19,                 	// 显示蓝牙音频拔出
+    cMenu_HdmiRemove = 20,                  // 显示HDMI拔出 
+    cMenu_PlayTrack = 21,                  // 显示多媒体文件信息
+    cMenu_PlayTime = 22,                  // 显示多媒体播放时间
+
+
+
+    cMenu_TToneFL = 36,                  // 测试噪音前置左声道
+    cMenu_TToneCE = 37,                  // 测试噪音中置声道
+    cMenu_TToneSW = 38,                  // 测试噪音超低音声道
+    cMenu_TToneFR = 39,                  // 测试噪音前置右声道
+    cMenu_TToneSR = 40,                  // 测试噪音环绕右声道
+    cMenu_TToneBR = 41,                  // 测试噪音后置右声道
+    cMenu_TToneBL = 42,                  // 测试噪音后置左声道
+    cMenu_TToneSL = 43,                  // 测试噪音环绕左声道
+
+    cMenu_ChTrimFL = 46,                  // 声道微调前置左声道
+    cMenu_ChTrimCE = 47,                  // 声道微调中置声道
+    cMenu_ChTrimSW = 48,                  // 声道微调超低音声道
+    cMenu_ChTrimFR = 49,                  // 声道微调前置右声道
+    cMenu_ChTrimSR = 50,                  // 声道微调环绕右声道
+    cMenu_ChTrimBR = 51,                  // 声道微调后置右声道
+    cMenu_ChTrimBL = 52,                  // 声道微调后置左声道
+    cMenu_ChTrimSL = 53,                  // 声道微调环绕左声道
+
+    cMenu_MasterVolume = 56,
+    cMenu_MicVolume1 = 57,                  // 话筒1音量
+    cMenu_MicVolume2 = 58,                  // 话筒2音量
+    cMenu_MicEcho = 59,                  // 话筒回声比例
+    cMenu_MicRepeat = 60,                  // 话筒重复比例
+    cMenu_MicDelay = 61,                  // 话筒延迟时间
+    cMenu_MicReverb = 62,                  // 话筒混响比例
+
+
+    cMenu_LipSync = 70,
+    cMenu_DelayFront = 71,
+    cMenu_DelayCenter = 72,					// 菜单中置声道延迟时间调整
+    cMenu_DelaySurround = 73,					// 菜单环绕声道延迟时间调整
+    cMenu_DelayBack = 74,					// 菜单后置声道延迟时间调整
+    cMenu_SpeakFront = 75,
+    cMenu_SpeakCenter = 76,
+    cMenu_SpeakWoofer = 77,
+    cMenu_SpeakSurround = 78,
+    cMenu_SpeakBack = 79,
+    cMenu_SpeakFilter = 80
+
+
+} MENU_STATE;
+
+
+typedef enum {
+    MENU_SET_NORMAL = 0,                                        // 正常的显示模式
+    MENU_SET_TWINKLE_ON = 1,                                    // 闪烁点亮
+    MENU_SET_TWINKLE_OFF = 2,                                   // 闪烁熄灭
+    MENU_SET_ADJ_DOWN = 3,                                      // 调整-
+    MENU_SET_ADJ_UP = 4                                         // 调整+
+} MENU_SET;
+
+
+typedef enum {
+    LISTEN_MODE_HIFI = 0,                                   // 聆听模式：立体声HIFI
+    LISTEN_MODE_2_1CH = 1,                                  // 聆听模式：立体声2.1CH
+    LISTEN_MODE_SURROUND1 = 2,				                // 聆听模式：多声道源码模式，没有任何多声道算法
+    LISTEN_MODE_SURROUND2 = 3,				                // 聆听模式：多声道模式算法0
+    LISTEN_MODE_SURROUND3 = 4,				                // 聆听模式：多声道模式算法1
+    LISTEN_MODE_SURROUND4 = 5				                // 聆听模式：多声道音效
+} LISTEN_MODE_STATE;
+
 
 
 typedef enum {

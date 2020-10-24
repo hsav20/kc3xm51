@@ -57,14 +57,14 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cPanKey_InputSource:
 			MAUD_InputOneKey();         					// 所有输入用一个按键选择 
 			break;
-		case cPanKey_Stereo:
-			MDIP_MenuNormal(cMenu_Surround2Ch);
+		case cPanKey_Stereo:                                // 面板立体声按键
+			MKEY_ListenMode(1);                             // 按键聆听模式选择    
 			break;
-		case cPanKey_SurroundMode:
-			MDIP_MenuNormal(cMenu_Surround8Ch);
+		case cPanKey_SurroundMode:                          // 面板环绕声按键
+			MKEY_ListenMode(0);                             // 按键聆听模式选择
 			break;
- 		case cPanKey_SoundEffect:
-			MDIP_MenuNormal(cMenu_SoundEffect);
+ 		case cPanKey_EqSelect:                              // 面板EQ均衡器选择
+			MKEY_EqSelect();                                // 按键EQ均衡器选择
 			break;
 
 		case cPanKey_PlayPause:
@@ -76,7 +76,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 
   		case cPanKey_AudioMute: 							// MUTE
 			if (gDIP_MenuSelect >= cMenu_MasterVolume && gDIP_MenuSelect <= cMenu_MicReverb){		// 已经在JOG菜单 
-				MDIP_MenuNormal(cMenu_Restore);
+				MDIP_MenuNormal(MENU_RESTORE);
 			}
 			else {
 				MKEY_AudioMute();
@@ -114,12 +114,12 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
 			else {
 				MKCM_WriteRegister(KCM_POWER_ON, 1);
-			    MDIP_MenuNormal(cMenu_PowerOn);
+			    MDIP_MenuNormal(MENU_POWER_ON);             // 菜单状态:电源打开
 				gDIP_MenuLock = 30;							// 暂时锁定显示3秒
 			}
 			break;
 		case cRmKey_Brightness:
-			gLocal_1 = (gDIP_MenuSelect == cMenu_Brightness) ? MENU_ADJ_UP : MENU_NORMAL;
+			gLocal_1 = (gDIP_MenuSelect == cMenu_Brightness) ? MENU_SET_ADJ_UP : MENU_SET_NORMAL;
 			MDIP_MenuSelect(cMenu_Brightness, gLocal_1);
 			break;
 		case cRmKey_FactorySet:
@@ -142,26 +142,26 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_TrimUp:
             if (gDIP_MenuSelect >= cMenu_ChTrimFL && gDIP_MenuSelect <= cMenu_ChTrimSL){	// 已经进入声道微调菜单 
                 gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_UP);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
             }else if (gDIP_MenuSelect >= cMenu_TToneFL && gDIP_MenuSelect <= cMenu_TToneSL){	// 已经进入测试噪音菜单 
 				gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_UP);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
 			}
 			break;
 		case cRmKey_TrimDown:
             if (gDIP_MenuSelect >= cMenu_ChTrimFL && gDIP_MenuSelect <= cMenu_ChTrimSL){	// 已经进入声道微调菜单 
                 gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_DOWN);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
             }else if (gDIP_MenuSelect >= cMenu_TToneFL && gDIP_MenuSelect <= cMenu_TToneSL){	// 已经进入测试噪音菜单 
 				gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_DOWN);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
 			}
 			break;
 		case cRmKey_MicUp:
 			if (CUSTOM_CODE != 0x44443000){			// 不是这个版本，旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
 				if (gDIP_MenuSelect >= cMenu_MicVolume1 && gDIP_MenuSelect <= cMenu_MicReverb){	// 已经进入Mic菜单 
 					gRmKeyContinCanclTm = 1;
-					MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_UP);
+					MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
 				}
 			}
 			break;
@@ -169,19 +169,19 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			if (CUSTOM_CODE != 0x44443000){			// 不是这个版本，旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
 				if (gDIP_MenuSelect >= cMenu_MicVolume1 && gDIP_MenuSelect <= cMenu_MicReverb){	// 已经进入Mic菜单 
 					gRmKeyContinCanclTm = 1;
-					MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_DOWN);
+					MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
 				}
 			}
 			break;
 		case cRmKey_VolumeUp:
 			gRmKeyContinCanclTm = 1;
-			gLocal_1 = (gDIP_MenuSelect == cMenu_MasterVolume) ? MENU_ADJ_UP : MENU_NORMAL;
+			gLocal_1 = (gDIP_MenuSelect == cMenu_MasterVolume) ? MENU_SET_ADJ_UP : MENU_SET_NORMAL;
 			MDIP_MenuSelect(cMenu_MasterVolume, gLocal_1);
 			break;
 		case cRmKey_VolumeDown:
 			if (!FSYS_MuteEnable){
 				gRmKeyContinCanclTm = 1;
-				gLocal_1 = (gDIP_MenuSelect == cMenu_MasterVolume) ? MENU_ADJ_DOWN : MENU_NORMAL;
+				gLocal_1 = (gDIP_MenuSelect == cMenu_MasterVolume) ? MENU_SET_ADJ_DOWN : MENU_SET_NORMAL;
 				MDIP_MenuSelect(cMenu_MasterVolume, gLocal_1);
 			}
 			break;
@@ -194,7 +194,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 		case cRmKey_MeunCtrl:
 			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
-				MDIP_MenuNormal(cMenu_Restore);
+				MDIP_MenuNormal(MENU_RESTORE);
 			}
 			else {
 				MDIP_MenuNormal(cMenu_LipSync);
@@ -256,13 +256,13 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_MeunLeft:
 			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
 				gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_DOWN);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
 			}
 			break;
 		case cRmKey_MeunRight:
 			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
 				gRmKeyContinCanclTm = 1;
-				MDIP_MenuSelect(gDIP_MenuSelect, MENU_ADJ_UP);
+				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
 			}
 			break;
 		case cRmKey_TrimCtrl:                               // 声道微调
@@ -284,7 +284,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			// }else {
 			// 	MDIP_SurroundSymbol();
 			// 	MDIP_SrcFormatSymbol();
-			// 	MDIP_MenuNormal(cMenu_Restore);
+			// 	MDIP_MenuNormal(MENU_RESTORE);
 			// }
 			break;
 		case cRmKey_Random:
@@ -324,8 +324,9 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_SkipUp:
 			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_UP);  // 多媒体播放前一首
 			break;
-		case cRmKey_SoundEffect:
-			MDIP_MenuNormal(cMenu_SoundEffect);
+		case cRmKey_EqSelect:
+			//MDIP_MenuNormal(cMenu_EqSelect);
+            MKEY_EqSelect();                                // 按键EQ均衡器选择
 			break;
 		case cRmKey_NightMode:
 			MDIP_MenuNormal(cMenu_NightMode);
@@ -335,11 +336,11 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 		case cRmKey_MediaType:
 			break;
-		case cRmKey_Stereo:
-			MDIP_MenuNormal(cMenu_Surround2Ch);
+		case cRmKey_Stereo:                                 // 面板立体声按键
+            MKEY_ListenMode(1);                             // 按键聆听模式选择
 			break;
-		case cRmKey_Surround:
-			MDIP_MenuNormal(cMenu_Surround8Ch);
+		case cRmKey_Surround:                               // 面板环绕声按键
+            MKEY_ListenMode(0);                             // 按键聆听模式选择
 			break;
 		case cRmKey_VideoSrc:
 			MKEY_VideoSelect();
@@ -377,7 +378,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	if (FKeyJogSwOK){
 		FKeyJogSwOK = 0;
 		if (gDIP_MenuSelect >= cMenu_MasterVolume && gDIP_MenuSelect <= cMenu_MicVolume2){		// 已经进入JOG菜单 
-			MDIP_MenuSelect(gDIP_MenuSelect, FKeyJogUp ? MENU_ADJ_UP : MENU_ADJ_DOWN);
+			MDIP_MenuSelect(gDIP_MenuSelect, FKeyJogUp ? MENU_SET_ADJ_UP : MENU_SET_ADJ_DOWN);
 		}
 		else {
 			MDIP_MenuNormal(cMenu_MasterVolume);
@@ -396,7 +397,7 @@ void MKEY_AudioMute(){
     MAUD_AutoCanclTestTone();
     return;
 }
-void MKEY_TestTone(){                                       // MENU_MODE mode
+void MKEY_TestTone(){                                       // MENU_SET mode
 	FSYS_TestTone = ~FSYS_TestTone;
 
 	if (FSYS_TestTone){										// 打开噪音测试
@@ -406,7 +407,7 @@ void MKEY_TestTone(){                                       // MENU_MODE mode
 
 	}
 	else {													// 关闭噪音测试
-		MDIP_MenuNormal(cMenu_Restore);
+		MDIP_MenuNormal(MENU_RESTORE);
 		MAUD_TestToneChannel(0xff);
 	}
     return;
@@ -432,7 +433,7 @@ void MKEY_VideoSelect(){
 	    MDIP_MenuNormal(cMenu_VideoSrc);
 	}
 	else {
-		MDIP_MenuNormal(cMenu_Restore);
+		MDIP_MenuNormal(MENU_RESTORE);
 	}*/
     return;
 }
@@ -529,4 +530,37 @@ void MKEY_CheckJop(){										// 旋转按钮 旋转
         FKeyJopSta01 = 0;
     }
     return;
+}
+CONST_CHAR Tab_ListenModeRegister[] = {
+    0x00, 0x01, 0x10, 0x20, 0x21, 0x30,
+};
+
+void MKEY_ListenMode(BYTE stereo){                          // 按键聆听模式选择
+    BYTE value = MKCM_ReadRegister(KCM_LISTEN_MODE);        // 聆听模式选择
+    if (gDIP_MenuSelect == MENU_LISTEN_MODE){               // 只有进入对应的菜单才改变模式
+        LISTEN_MODE_STATE state = GetListenModeIndex(value);
+        if (stereo){                                        // 选择立体声
+            state = (state == LISTEN_MODE_HIFI) ? LISTEN_MODE_2_1CH : LISTEN_MODE_HIFI;
+        }else {
+            if (state < LISTEN_MODE_SURROUND1){                                // 只有在立体声才直接换到MODE1
+                state = LISTEN_MODE_SURROUND1;
+            }else if (++state > LISTEN_MODE_SURROUND4){
+                state = LISTEN_MODE_SURROUND1;
+            }
+        }
+        value = Tab_ListenModeRegister[state];
+        MKCM_WriteRegister(KCM_LISTEN_MODE, value);
+    }
+    MDIP_ListenMode(value);
+}
+
+void MKEY_EqSelect(){                                       // 按键EQ均衡器选择
+    BYTE value = MKCM_ReadRegister(KCM_EQ_SELECT);          // 多路均衡音效处理选择
+    if (gDIP_MenuSelect == MENU_EQ_SELECT){                 // 只有进入对应的菜单才改变模式
+        if (++value > 4){                                   // 1至4分别为4组预置音效高低音音调或多段EQ均衡器。
+            value = 0;                                      // 0为停止使用音效
+        }
+        MKCM_WriteRegister(KCM_EQ_SELECT, value);
+    }
+    MDIP_EqSelect(value);
 }

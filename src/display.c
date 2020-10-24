@@ -59,7 +59,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if (!FSYS_Standby && gDIP_MenuTimer){				// 100ms»Áπ˚≤Àµ•¥Úø™
 			if (--gDIP_MenuTimer == 0) {					// ≤Àµ•º∆ ±	
             	if (!FSYS_TestTone){
-					MDIP_MenuNormal(cMenu_Restore);
+					MDIP_MenuNormal(MENU_RESTORE);
 				}
 				else {                                      // ≤‚ ‘‘Î“Ù¥Úø™÷Æ÷–
 					BYTE channel = MDIP_GetNextChannel(gDIP_MenuSelect - cMenu_TToneFL);
@@ -71,7 +71,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			else if (FDIP_MenuTwinkle){						// ≤Àµ•–Ë“™…¡À∏
 				if ((gDIP_MenuTimer % 5) == 0){	  			// √ø0.5√Î÷”…¡À∏
 					BYTE twinkle = (gDIP_MenuTimer / 5);
-					MDIP_MenuSelect(gDIP_MenuSelect, (twinkle & 0x01) ? MENU_TWINKLE_OFF : MENU_TWINKLE_ON);
+					MDIP_MenuSelect(gDIP_MenuSelect, (twinkle & 0x01) ? MENU_SET_TWINKLE_OFF : MENU_SET_TWINKLE_ON);
 				}
 			}
         }
@@ -84,12 +84,22 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
     return;
 }
 void MDIP_MenuNormal(BYTE index){							// ≤Àµ•—°‘Ò“ª∞„ƒ£ Ω 
-	MDIP_MenuSelect(index, MENU_NORMAL);					// ≤Àµ•—°‘Ò
+	MDIP_MenuSelect(index, MENU_SET_NORMAL);					// ≤Àµ•—°‘Ò
 }
-void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À∏œ®√ 3µ˜’˚- 4µ˜’˚+ 
-	if (mode == MENU_NORMAL){								// ’˝≥£µƒœ‘ æƒ£ Ω
-		gDIP_MenuTimer = 20;
-		FDIP_MenuTwinkle = 0;
+void MDIP_SetNormal(){                                      // …Ë÷√≤Àµ•“ª∞„ƒ£ Ωœ‘ æµƒ ±º‰
+	gDIP_MenuTimer = 20;
+	FDIP_MenuTwinkle = 0;
+}
+void MDIP_SetState(MENU_STATE state){                       // …Ë÷√≤Àµ•◊¥Ã¨
+    gDIP_MenuSelect = state;
+    MDIP_SetNormal();
+}
+
+void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À∏œ®√ 3µ˜’˚- 4µ˜’˚+ 
+	if (mode == MENU_SET_NORMAL){								// ’˝≥£µƒœ‘ æƒ£ Ω
+		MDIP_SetNormal();
+		//gDIP_MenuTimer = 20;
+		//FDIP_MenuTwinkle = 0;
 	}
 	FDIP_FreqSymbol = 0;
     HAL_DIP_LED(0);
@@ -99,7 +109,7 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“
 	
 //g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);
 	switch (index){
-	case cMenu_Restore:
+	case MENU_RESTORE:                                      // ≤Àµ•ª÷∏¥◊¥Ã¨
 		if (!FKCM_I2C_Error){
 			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
 				MDIP_PlayTime();
@@ -114,13 +124,13 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“
 		gDIP_MenuTimer = 0;
 		FDIP_FreqSymbol = 1;
 		break;
-	case cMenu_InputSource:
+	case MENU_INPUT_SOURCE:
 		MDIP_InputSource();
 		break;
 	case cMenu_Standby:
 		MDIP_WriteString(" -OFF-");
 		break;
-	case cMenu_PowerOn:
+	case MENU_POWER_ON:                                     // ≤Àµ•◊¥Ã¨:µÁ‘¥¥Úø™
 		MDIP_WriteString(" HELLO");
 		MDIP_ScreenUpdata();
 		gDIP_MenuTimer = 10;
@@ -135,7 +145,7 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“
 		}
 		MDIP_Brightness(1, gDIP_Brightness);
 		break;
-	case cMenu_Surround2Ch:
+	/*case cMenu_Surround2Ch:
         MAUD_AutoCanclTestTone();
 		MDIP_SurroundMode(cMenu_Surround2Ch, mode);
 		break;
@@ -147,6 +157,7 @@ void MDIP_MenuSelect(BYTE index, MENU_MODE mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“
         MAUD_AutoCanclTestTone();
 		MDIP_SoundEffect(4);
 		break;
+        */
 	case cMenu_VideoSrc:
 		gDIP_MenuTimer = 50;
 		MDIP_VideoSrc();
@@ -332,22 +343,22 @@ CONST_CHAR Tab_DIP_TToneShow[] = {
 //	 ++++----++++----++++----++++----
 };
 
-void MDIP_TestTone(BYTE index, MENU_MODE mode){             // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
-	if (mode >= MENU_ADJ_DOWN){							    // MENU_ADJ_DOWNªÚMENU_ADJ_UP 
+void MDIP_TestTone(BYTE index, MENU_SET mode){             // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
+	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWNªÚMENU_SET_ADJ_UP 
 		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
-		    MAUD_MixTrimAdjust(index - cMenu_TToneFL, (mode == MENU_ADJ_UP) ? 1 : 0); 	
+		    MAUD_MixTrimAdjust(index - cMenu_TToneFL, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	
 			gDIP_MenuTimer = 80;
 		}
 	}
     index -= cMenu_TToneFL;                             // ¥”…˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿ø™ º
     MDIP_WriteString((char*)&Tab_DIP_TToneShow[index * 4]);
-	if (mode == MENU_TWINKLE_OFF){							// MENU_TWINKLE_OFF…¡À∏œ®√
+	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFF…¡À∏œ®√
 		MDIP_SingleChar(4, ' ');
 		MDIP_SingleChar(5, ' ');
 	}
-	else {											        // MENU_NORMALªÚMENU_TWINKLE_ON…¡À∏µ„¡¡
+	else {											        // MENU_SET_NORMALªÚMENU_SET_TWINKLE_ON…¡À∏µ„¡¡
     	BYTE value = gDIP_TrimCtrl[index];
-//if(mode!=MENU_TWINKLE_ON&&mode!=MENU_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(value);}
+//if(mode!=MENU_SET_TWINKLE_ON&&mode!=MENU_SET_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(value);}
         if (value < 9){
             MDIP_SingleChar(4, '-');
             MDIP_SingleChar(5, (9 - value) + '0');
@@ -363,22 +374,22 @@ CONST_CHAR Tab_DIP_TrimShow[] = {
 	"FLTrCETrSWTrFRTrSRTrBRTrBLTrSLTr"
 //	 ++++----++++----++++----++++----
 };
-void MDIP_TrimControl(BYTE index, MENU_MODE mode){          // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
-	if (mode >= MENU_ADJ_DOWN){							    // MENU_ADJ_DOWNªÚMENU_ADJ_UP 
+void MDIP_TrimControl(BYTE index, MENU_SET mode){          // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
+	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWNªÚMENU_SET_ADJ_UP 
 		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
-            MAUD_MixTrimAdjust(index - cMenu_ChTrimFL, (mode == MENU_ADJ_UP) ? 1 : 0); 	
+            MAUD_MixTrimAdjust(index - cMenu_ChTrimFL, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	
 			gDIP_MenuTimer = 80;
 		}
 	}
     index -= cMenu_ChTrimFL;                            // ¥”…˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿ø™ º
     MDIP_WriteString((char*)&Tab_DIP_TrimShow[index * 4]);
-	if (mode == MENU_TWINKLE_OFF){							// MENU_TWINKLE_OFF…¡À∏œ®√
+	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFF…¡À∏œ®√
 		MDIP_SingleChar(4, ' ');
 		MDIP_SingleChar(5, ' ');
 	}
-	else {											        // MENU_NORMALªÚMENU_TWINKLE_ON…¡À∏µ„¡¡
+	else {											        // MENU_SET_NORMALªÚMENU_SET_TWINKLE_ON…¡À∏µ„¡¡
     	BYTE value = gDIP_TrimCtrl[index];
-//if(mode!=MENU_TWINKLE_ON&&mode!=MENU_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(value);}
+//if(mode!=MENU_SET_TWINKLE_ON&&mode!=MENU_SET_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(value);}
         if (value < 9){
             MDIP_SingleChar(4, '-');
             MDIP_SingleChar(5, (9 - value) + '0');
@@ -386,7 +397,7 @@ void MDIP_TrimControl(BYTE index, MENU_MODE mode){          // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
             MDIP_SingleChar(4, ' ');
             MDIP_SingleChar(5, (value - 9) + '0');
         }
-		if (mode == MENU_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
+		if (mode == MENU_SET_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
 			gDIP_MenuTimer = 80;
 			FDIP_MenuTwinkle = 1;
 		}
@@ -398,11 +409,11 @@ CONST_CHAR Tab_DIP_MicShow[] = {
 	"MIC1MIC2ECHOREPTDELYREVB"
 //	 ++++----++++----++++----
 };
-void MDIP_MicControl(BYTE index, MENU_MODE mode){
-//if(mode!=MENU_TWINKLE_ON&&mode!=MENU_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(mode);}
-	if (mode >= MENU_ADJ_DOWN){							    // MENU_ADJ_DOWNªÚMENU_ADJ_UP 
+void MDIP_MicControl(BYTE index, MENU_SET mode){
+//if(mode!=MENU_SET_TWINKLE_ON&&mode!=MENU_SET_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(mode);}
+	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWNªÚMENU_SET_ADJ_UP 
 		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
-			MAUD_MixMicAdjust(index, (mode == MENU_ADJ_UP) ? 1 : 0); 	
+			MAUD_MixMicAdjust(index, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	
 			gDIP_MenuTimer = 80;
 		}
 	}
@@ -410,13 +421,13 @@ void MDIP_MicControl(BYTE index, MENU_MODE mode){
 	MDIP_WriteString((char*)&Tab_DIP_MicShow[index * 4]);
     MDIP_SingleChar(4, ' ');
 
-	if (mode == MENU_TWINKLE_OFF){							// MENU_TWINKLE_OFF…¡À∏œ®√
+	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFF…¡À∏œ®√
 		MDIP_SingleChar(5, ' ');
 	}
-	else {											        // MENU_NORMALªÚMENU_TWINKLE_ON…¡À∏µ„¡¡
+	else {											        // MENU_SET_NORMALªÚMENU_SET_TWINKLE_ON…¡À∏µ„¡¡
     	BYTE gLocal_1 = gDIP_MicCtrl[index];
         MDIP_SingleChar(5, gLocal_1 + '0');
-		if (mode == MENU_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
+		if (mode == MENU_SET_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
 			gDIP_MenuTimer = 80;
 			FDIP_MenuTwinkle = 1;
 		}
@@ -553,7 +564,62 @@ void MDIP_VideoSrc(){
 }
 
 
+CONST_CHAR Tab_DIP_Surround[] = {
+	"  HIFI 2+1CHMODE  "
+//	 ++++++------++++++
+};
 
+LISTEN_MODE_STATE GetListenModeIndex(BYTE value){
+    switch (value & 0x30){                                  // B5:4Œ™ÒˆÃ˝ƒ£ Ω¿‡–Õ—°‘Ò
+    case 0x00: return (value & 1) ? LISTEN_MODE_2_1CH : LISTEN_MODE_HIFI;   // —°‘ÒŒ™À´…˘µ¿¡¢ÃÂ…˘£¨B0Œ™0πÿ±’≥¨µÕ“Ù£ªŒ™1¥Úø™≥¨µÕ“Ù
+    case 0x10: return LISTEN_MODE_SURROUND1;                // —°‘ÒŒ™∂‡…˘µ¿‘¥¬Îƒ£ Ω£¨√ª”–»Œ∫Œ∂‡…˘µ¿À„∑®
+    case 0x20: return (value & 1) ? LISTEN_MODE_SURROUND3 : LISTEN_MODE_SURROUND2;  // —°‘Ò∂‡…˘µ¿ƒ£ Ω£¨B1:0Œ™∏˜÷÷≤ªÕ¨À„∑®µƒ∂‡…˘µ¿ƒ£ Ω
+    }
+    return LISTEN_MODE_SURROUND4;                           // —°‘Ò∂‡…˘µ¿“Ù–ß£¨B1:0Œ™∏˜÷÷≤ªÕ¨À„∑®µƒ∂‡…˘µ¿“Ù–ß
+}
+void MDIP_ListenMode(BYTE value){                           // œ‘ æÒˆÃ˝ƒ£ Ω
+	LISTEN_MODE_STATE state = GetListenModeIndex(value);
+	
+//	MDIP_SurroundSymbol();                                          
+
+    DIP_SURROUND_OFF();
+    if (state < LISTEN_MODE_SURROUND1){
+        MDIP_WriteString((char*)&Tab_DIP_Surround[state * 6]);
+		g2DIP_ShowBuffer[6] |= 0x0001;	
+    }else {
+        MDIP_WriteString((char*)&Tab_DIP_Surround[LISTEN_MODE_SURROUND1 * 6]);
+        MDIP_SingleChar(5, (state-LISTEN_MODE_SURROUND1) + '1');
+    	switch (value){
+    	case LISTEN_MODE_SURROUND1 :
+    		g2DIP_ShowBuffer[6] |= 0x0002;	
+    		break;
+    	case LISTEN_MODE_SURROUND2 :
+    		g2DIP_ShowBuffer[6] |= 0x0080;	
+    		break;
+    	case LISTEN_MODE_SURROUND3 :
+    		g2DIP_ShowBuffer[6] |= 0x0040;	
+    		break;
+    	case LISTEN_MODE_SURROUND4 :
+    		g2DIP_ShowBuffer[6] |= 0x0010;	
+    		break;
+    	}
+    }
+    MDIP_SetNormal();
+    MDIP_SetState(MENU_LISTEN_MODE);
+}
+CONST_CHAR Tab_DIP_EqMode[] = {
+	" FLAT SOUND "
+//	 ++++++------
+};
+void MDIP_EqSelect(BYTE value){                               // œ‘ æEQæ˘∫‚∆˜—°‘Ò
+    MDIP_WriteString((char*)&Tab_DIP_EqMode[value ? 6 : 0]);
+    if (value){
+        MDIP_SingleChar(5, value + '0');
+    }
+    MDIP_SetState(MENU_EQ_SELECT);
+}
+
+/*
 CONST_CHAR Tab_DIP_Surround2Ch[] = {
 	"  HIFI 2+1CH"
 //	 ++++++------
@@ -561,12 +627,33 @@ CONST_CHAR Tab_DIP_Surround2Ch[] = {
 CONST_CHAR Tab_DIP_Surround8Ch[] = {
 	"MODE"
 };
-void MDIP_SurroundMode(BYTE index, MENU_MODE mode){
+
+void MDIP_SoundEffect(BYTE mode){
+	if (mode >= 3){
+		if (gDIP_MenuSelect == cMenu_SoundEffect){      
+			MAUD_MixSoundEffect();
+		}
+	}
+    if (gDIP_SoundEffect == 0){
+    	MDIP_WriteString(" FLAT ");
+    }else {
+    	MDIP_WriteString("SOUND");
+    	MDIP_SingleChar(5, gDIP_SoundEffect + '0');
+    }
+}
+
+
+
+void MDIP_SurroundMode(BYTE index, MENU_SET mode){
 	// [6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:‘∆  B4:DSP B3:ATMOS B2:DD  B1:AUTO B0:ST
 //MDEBUG(0x99);MDEBUG(change);MDEBUG(gDIP_MenuSelect);MDEBUG(index);
     if (index == gDIP_MenuSelect){                          // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
         if (index == cMenu_Surround2Ch){                    // ¡¢ÃÂ…˘
-    		gDIP_Surround[0] ^= 1;
+    		if (gDIP_Surround[0]){                          // »Áπ˚¥Úø™≥¨µÕ“Ù
+                gDIP_Surround[0] = 0;                       // πÿ±’≥¨µÕ“Ù
+            }else {
+                gDIP_Surround[0] = 1;                       // ¥Úø™≥¨µÕ“Ù
+            }
         	MKCM_WriteRegister(KCM_LISTEN_MODE, gDIP_Surround[0]);
 
             MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SURROUND_2CH, gDIP_Surround[0]);
@@ -579,8 +666,10 @@ void MDIP_SurroundMode(BYTE index, MENU_MODE mode){
                 gDIP_Surround[1] = 0;
             }
 //MDEBUG(0x99);MDEBUG(gDIP_Surround[1]);
-            if (gDIP_Surround[1] < 3){
-                MKCM_WriteRegister(KCM_LISTEN_MODE, 0x10 | gDIP_Surround[1]);
+            if (gDIP_Surround[1] == 0){
+                MKCM_WriteRegister(KCM_LISTEN_MODE, 0x10);  // ‘≠ º∂‡…˘µ¿ƒ£ Ω
+            }else if (gDIP_Surround[1] < 3){
+                MKCM_WriteRegister(KCM_LISTEN_MODE, 0x20 | gDIP_Surround[1]);   // —°‘Ò∂‡…˘µ¿ƒ£ Ω£¨B1:0Œ™∏˜÷÷≤ªÕ¨À„∑®µƒ∂‡…˘µ¿ƒ£ Ω
             }else {
                 MKCM_WriteRegister(KCM_LISTEN_MODE, 0x30);  // —°‘Ò∂‡…˘µ¿“Ù–ß£¨B1:0Œ™∏˜÷÷≤ªÕ¨À„∑®µƒ∂‡…˘µ¿“Ù–ß
             }
@@ -612,7 +701,7 @@ void MDIP_SurroundMode(BYTE index, MENU_MODE mode){
         MDIP_SingleChar(5, gDIP_Surround[1] + '1');
     }
 	MDIP_SurroundSymbol();
-}
+} */
 
 CONST_CHAR Tab_DIP_SRC_CH[] = {
 	"2/01/02/03/02/13/12/23/23/33/42/32/4"
@@ -672,19 +761,7 @@ BYTE MDIP_GetSpeakerChar(BYTE index){						// 0«∞÷√ 1÷–÷√ 2≥¨µÕ“Ù 3ª∑»∆ 4∫Û÷√
 }
 
 
-void MDIP_SoundEffect(BYTE mode){
-	if (mode >= 3){
-		if (gDIP_MenuSelect == cMenu_SoundEffect){      
-			MAUD_MixSoundEffect();
-		}
-	}
-    if (gDIP_SoundEffect == 0){
-    	MDIP_WriteString(" FLAT ");
-    }else {
-    	MDIP_WriteString("SOUND");
-    	MDIP_SingleChar(5, gDIP_SoundEffect + '0');
-    }
-}
+
 void MDIP_NightMode(){
 	BYTE gLocal_1 = MKCM_ReadRegister(KCM_DYN_COMPRES);
 
@@ -807,6 +884,7 @@ void MDIP_AdjDelayTime(BYTE index, BYTE mode){				// 0=LINSYNC 1«∞÷√ 2÷–÷√ 3ª∑»∆
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MDIP_SurroundSymbol(){
+    /*
     BYTE surround = gDIP_Select2Ch ? gDIP_Surround[0] : (2 + gDIP_Surround[1]);
 	//g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);	
     DIP_SURROUND_OFF();
@@ -829,6 +907,7 @@ void MDIP_SurroundSymbol(){
 		break;
 	}
 	FDIP_ScreenUpdata = 1;
+    */
 }
 void MDIP_SrcFormatSymbol(){
 	DIP_SRC_FORMAT_OFF();

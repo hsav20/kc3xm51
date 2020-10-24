@@ -19,26 +19,27 @@ typedef enum {
 	KCM_SRC_VALID = 0x1c,				// 有效的音源输入改变，16位寄存器
 	KCM_SRC_DETECT = 0x1f,				// 检测所有有效的音源一次
 
-	KCM_INPUT_SOURCE = 0x20,			// 输入音源选择（带上电记忆）
-	KCM_INPUT_VIDEO = 0x21,				// 输入视频源选择（带上电记忆）
-	KCM_DYN_COMPRES = 0x23,				// 杜比数码动态压缩（带上电记忆）
-	KCM_SPK_CONFIG = 0x24,				// 喇叭设置（带上电记忆）
-	KCM_LPF_FREQ = 0x25,				// 超低音通道LPF低通滤波器频率（带上电记忆）
-	KCM_HPF_FREQ = 0x26,				// 主声道小喇叭HPF高通滤波器频率（带上电记忆）
-	KCM_LIP_SYNC_SET = 0x28,			// 齿音同步延迟时间，修正对画面与声音不同步（带上电记忆）
-	KCM_LIP_SYNC_MAX = 0x29,			// 齿音同步最大的延迟时间（带上电记忆）
-	KCM_LISTEN_MODE = 0x2b,				// 聆听模式选择（带上电记忆）
-	KCM_EQ_SELECT = 0x2c,				// 多路均衡音效处理选择（带上电记忆）
-	KCM_VOLUME_MAX = 0x2e,				// 设置音量最大值（带上电记忆）
-	KCM_VOLUME_CTRL = 0x2f,				// 音量值设置（带上电记忆）
-	KCM_FL_TRIM = 0x30,					// 前置左声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_FR_TRIM = 0x31,					// 前置右声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_CE_TRIM = 0x32,					// 中置声道微调	  B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_SW_TRIM = 0x33,					// 超低音声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_SL_TRIM = 0x34,					// 环绕左声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_SR_TRIM = 0x35,					// 环绕右声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_BL_TRIM = 0x36,					// 后置左声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
-	KCM_BR_TRIM = 0x37,					// 后置右声道微调 B4=1为减dB B3-B0为dB数值（带上电记忆）
+	// 以下为带上电记忆的寄存器
+	KCM_INPUT_SOURCE = 0x20,			// 输入音源选择
+	KCM_INPUT_VIDEO = 0x21,				// 输入视频源选择
+	KCM_DYN_COMPRES = 0x23,				// 杜比数码动态压缩
+	KCM_SPK_CONFIG = 0x24,				// 喇叭设置
+	KCM_LPF_FREQ = 0x25,				// 超低音通道LPF低通滤波器频率
+	KCM_HPF_FREQ = 0x26,				// 主声道小喇叭HPF高通滤波器频率
+	KCM_LIP_SYNC_SET = 0x28,			// 齿音同步延迟时间，修正对画面与声音不同步
+	KCM_LIP_SYNC_MAX = 0x29,			// 齿音同步最大的延迟时间
+	KCM_LISTEN_MODE = 0x2b,				// 聆听模式选择
+	KCM_EQ_SELECT = 0x2c,				// 多路均衡音效处理选择
+	KCM_VOLUME_MAX = 0x2e,				// 设置音量最大值
+	KCM_VOLUME_CTRL = 0x2f,				// 音量值设置
+	KCM_FL_TRIM = 0x30,					// 前置左声道微调 B4=1为减dB B3-B0为dB数值
+	KCM_FR_TRIM = 0x31,					// 前置右声道微调 B4=1为减dB B3-B0为dB数值
+	KCM_CE_TRIM = 0x32,					// 中置声道微调	  B4=1为减dB B3-B0为dB数值
+	KCM_SW_TRIM = 0x33,					// 超低音声道微调 B4=1为减dB B3-B0为dB数值
+	KCM_SL_TRIM = 0x34,					// 环绕左声道微调 B4=1为减dB B3-B0为dB数值
+	KCM_SR_TRIM = 0x35,					// 环绕右声道微调 B4=1为减dB B3-B0为dB数值
+	KCM_BL_TRIM = 0x36,					// 后置左声道微调 B4=1为减dB B3-B0为dB数值
+	KCM_BR_TRIM = 0x37,					// 后置右声道微调 B4=1为减dB B3-B0为dB数值
 	KCM_MIC_DELAY = 0x38,				// 话筒延迟时间，每步20毫秒
 	KCM_MIC_VOLUME = 0x39,				// 话筒1及话筒2音量比例
 	KCM_MIC_ECHO_EQ = 0x3a,				// 话筒回声比例及话筒多段EQ均衡音效处理选择
@@ -65,22 +66,20 @@ typedef enum {
 	KCM_RD_SD_QTY = 0x96,				// 读取多媒体文件正在播放的时间，共2字节单位秒
 	KCM_RD_UDISK_QTY = 0x97,			// 读取多媒体文件正在播放的时间，共2字节单位秒
 	KCM_RD_FILE_TIME = 0x99,			// 读取多媒体文件正在播放的总时间，共2字节单位秒
-	KCM_COMMAND_RCV = 0xa0,				// 云通讯指令接收，0xa8-0xaf共8字节
-	KCM_COMMAND_SEND = 0xa1				// 云通讯指令发送，0xb0-0xbf共16字节
+	KCM_APP_COMMAND = 0xa0				// 手机/远程APP控制指令，多字节
 } KC3X_REGISTER;
 
 typedef enum {
 	KCM_IRQ_SYSTEM_INIT = 0x0001,       // 模式初始化完成中断，需要写入"KCM_POWER_ON"寄存器，
 	KCM_IRQ_FORMAT_INFO = 0x0002,       // 输入信号格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
-	KCM_IRQ_VOLUME = 0x0004,            // 音量调节改变中断，需要读取"VOLUME_CTRL"寄存器获取更新的音量值
+	KCM_IRQ_VOLUME = 0x0004,            // 音量调节改变中断，需要读取"KCM_VOLUME_CTRL"寄存器获取更新的音量值
 	KCM_IRQ_SRC_VALID = 0x0008,        	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
 
-	KCM_IRQ_FIRMWARE = 0x0010,        	// 固件更新，需要读取"KCM_RD_INFO"寄存器
-	KCM_IRQ_PLAY_STATUS = 0x0020,       // 多媒体文件播放状态改变，需要读取"KCM_PLAY_STATUS	"寄存器
+	KCM_IRQ_FIRMWARE = 0x10,        	// 固件更新，需要读取"KCM_RD_INFO"寄存器
+	KCM_IRQ_PLAY_STATUS = 0x0020,       // 多媒体文件播放状态改变，需要读取"KCM_PLAY_STATUS"寄存器
 	KCM_IRQ_PLAY_TIME = 0x0040,        	// 多媒体播放时间改变，需要读取"KCM_PLAY_TIME"寄存器
+	KCM_IRQ_APP_COMMAND = 0x0080,  		// 收到手机/远程APP控制指令，需要读取"KCM_APP_COMMAND"寄存器
 
-	KCM_IRQ_WIFI_RCV = 0x0100,          // 接收到WIFI指令中断，需要读取"KCM_COMMAND_RCV"寄存器获取更新的音量值
-	KCM_IRQ_WIFI_STATUS = 0x0200,		// WIFI状态指示变化扩展中断，需要读取"KCM_WIFI_STATUS"寄存器
 	KCM_IRQ_EX_FONT = 0x0400			// 字库读取完成中断
 } KC3X_IRQ_TYPE;
 
@@ -106,8 +105,19 @@ typedef enum {
 typedef enum {
 	KCM_INPUT_ANALOG = 0x00,			// 音源选择模拟输入
 	KCM_INPUT_DIGITAL = 0x10,			// 音源选择数码输入
+	KCM_INPUT_RX1 = 0x10,				// 音源选择RX1输入
+	KCM_INPUT_RX2 = 0x11,				// 音源选择RX2输入
+	KCM_INPUT_RX3 = 0x12,				// 音源选择RX3输入
 	KCM_INPUT_HDMI = 0x20,				// 音源选择HDMI输入
+	KCM_INPUT_HDMI1 = 0x20,				// 音源选择HDMI1输入
+	KCM_INPUT_HDMI2 = 0x21,				// 音源选择HDMI2输入
+	KCM_INPUT_HDMI3 = 0x22,				// 音源选择HDMI3输入
+	KCM_INPUT_ARC = 0x24,				// 音源选择HDMI ARC输入
 	KCM_INPUT_MEDIA = 0x30,				// 音源选择U盘、TF卡、蓝牙、WIFI、USB声卡、网络等输入
+	KCM_INPUT_SD = 0x30,				// 音源选择SD/TF卡输入
+	KCM_INPUT_UDISK = 0x31,				// 音源选择U盘输入
+	KCM_INPUT_PC = 0x32,				// 音源选择USB声卡输入
+	KCM_INPUT_BT = 0x33,				// 音源选择蓝牙输入
 	KCM_INPUT_SIGNAL = 0x40				// 音源选择内部产生信号
 } KC3X_INPUT_TYPE;
 
@@ -150,7 +160,6 @@ typedef enum {
 	KCM_FREQ_176K = 0x0e,				// 信号源频率176.4KHz
 	KCM_FREQ_192K = 0x0f				// 信号源频率192KHz
 } KC3X_INPUT_FREQ;
-
 
 typedef enum {
 	KCM_MODEL_32C = 0x31,				// 模块型号KC32C

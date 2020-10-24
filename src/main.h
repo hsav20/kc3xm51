@@ -44,13 +44,20 @@ void MKCM_Write2Byte(										// Write 2 bytes to DA32C. 写入2个字节
 void MKCM_WriteXByte(										// Write buffer to DA32C. 写入多个字节
 					BYTE address,      						// Index. 寄存器索引值
 					WORD length,      						// Length. 长度
-					BYTE* in_data);   						// Buffer address. 数据缓冲
+					BYTE* inData);   						// Buffer address. 数据缓冲
 WORD MKCM_Read2Byte(										// Read word from DA32C. 读取16位的寄存器
 					BYTE address);      					// Index. 寄存器索引值
-void MKCM_ReadXByte(										// Read buffer from DA32C. 读取多个字节
+void MKCM_ReadXByte(	                                    // Read buffer from DA32C. 读取多个字节
 					BYTE address,      						// Index. 寄存器索引值
-					WORD length,    						// Length. 长度
-					BYTE* out_data);      					// Buffer 数据缓冲
+					WORD length,      						// Length. 长度
+					BYTE* outData);   						// Buffer address. 数据缓冲
+WORD MKCM_ReadAutoByte(	                                    // 读取由字节指示长度的多字节
+					BYTE address,      						// Index. 寄存器索引值
+					WORD limit,      						// limit. 最大输出长度
+					BYTE* outData);   						// Buffer address. 数据缓冲
+
+
+void MKCM_MutilRead(WORD length, BYTE* outData);
 
 
 
@@ -142,10 +149,10 @@ EXTR BOOL FDIP_FreqSymbol;
 EXTR xdata BYTE gDIP_Brightness;
 EXTR xdata INPUT_SWITCH mINPUT_SWITCH;
 EXTR xdata BYTE gRemoveTimer;                     
-EXTR xdata BYTE gDIP_SoundEffect;                     
+//EXTR xdata BYTE gDIP_SoundEffect;                     
 EXTR xdata BYTE gDIP_TestToneChannel;
-EXTR xdata BYTE gDIP_Select2Ch;         // 选择为立体声
-EXTR xdata BYTE gDIP_Surround[2];       // 0立体声 1多声道
+//EXTR xdata BYTE gDIP_Select2Ch;         // 选择为立体声
+//EXTR xdata BYTE gDIP_Surround[2];       // 0立体声 1多声道
 EXTR xdata BYTE gDIP_SpeakSetup[5];		// 0前置 1中置 2超低音 3环绕 4后置
 EXTR xdata BYTE gDIP_DelayTime[5];		// 0=LINSYNC 1前置 2中置 3环绕 4后置
 
@@ -267,18 +274,29 @@ void MAUD_AutoCanclTestTone();
 void MAUD_SurroundMode(BYTE mode);
 BYTE MAUD_GetInputSource(BYTE memory);
 
+void MDIP_SetState(MENU_STATE state);                       // 设置菜单状态
+
+void MKEY_ListenMode(BYTE stereo);                          // 按键聆听模式选择
+void MKEY_EqSelect();                                       // 按键EQ均衡器模式
+
+void MDIP_EqSelect(BYTE value);                             // 显示EQ均衡器模式
+
+BYTE GetListenModeIndex(BYTE value);
+
 void MDIP_SourceFormat();
 void MDIP_InputSource();
 void MDIP_VideoSrc();
-void MDIP_SurroundMode(BYTE index, MENU_MODE mode);
+void MDIP_ListenMode(BYTE value);                           // 显示聆听模式
+
+void MDIP_SurroundMode(BYTE index, MENU_SET mode);
 void MDIP_SurroundSymbol();
 void MDIP_SrcFormatSymbol();
 void MDIP_PlaySymbol(BYTE status);
 void MDIP_WifiSymbol(BYTE turnOn);
 void MDIP_SoundEffect(BYTE mode);
-void MDIP_TestTone(BYTE index, MENU_MODE mode);             // 声道微调参数调节
-void MDIP_TrimControl(BYTE index, MENU_MODE mode);          // 声道微调参数调节
-void MDIP_MicControl(BYTE index, MENU_MODE mode);           // 话筒各种参数调节
+void MDIP_TestTone(BYTE index, MENU_SET mode);             // 声道微调参数调节
+void MDIP_TrimControl(BYTE index, MENU_SET mode);          // 声道微调参数调节
+void MDIP_MicControl(BYTE index, MENU_SET mode);           // 话筒各种参数调节
 void MDIP_SpeakSetup(BYTE index, BYTE mode);				// mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+  
 void MDIP_DelayTime(BYTE index, BYTE mode);					// mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+  
 BYTE MDIP_WriteDec(BYTE number, WORD value);                // 显示十进制数，返回下一个字开始的位置
@@ -306,7 +324,7 @@ void MKCM_FactorySet();
 void MKCM_ReadSrcValid();
 void MAPI_COPY_BUFF8(BYTE length, BYTE* in_data, BYTE* out_data);
 void MDIP_MenuNormal(BYTE index);							// 菜单选择一般模式 
-void MDIP_MenuSelect(BYTE index, MENU_MODE mode);			// 菜单选择高级模式，mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 
+void MDIP_MenuSelect(BYTE index, MENU_SET mode);			// 菜单选择高级模式，mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 
 BYTE MDIP_GetSpeakerChar(BYTE index);						// 0前置 1中置 2超低音 3环绕 4后置
 void MDIP_AdjDelayTime(BYTE index, BYTE mode);				// 0=LINSYNC 1前置 2中置 3环绕 4后置 
 
@@ -320,5 +338,7 @@ void MKEY_AudioMute();
 void MKEY_TestTone();
 void MKEY_VideoSelect();
 void MDIP_Brightness(BYTE show, BYTE bright);
+
+void MKCM_AppCommand();
 void MKCM_WifiCommand(BYTE regNumber, BYTE value);			// 收到远程APP的指令
 

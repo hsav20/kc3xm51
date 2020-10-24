@@ -83,26 +83,50 @@ WORD MKCM_Read2Byte(										// Read word from DA32C. 读取16位的寄存器
 	return g2Local_1;
 }
 
-void MKCM_ReadXByte(										// Read buffer from DA32C. 读取多个字节
-					BYTE address,   						// Index. 寄存器索引值
-					WORD length,    						// Length. 长度
-					BYTE* out_data){      					// Buffer 数据缓冲
-	MI2C_Bus_Start();										// I2C Start
-	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
-	MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
 
-	MI2C_Bus_Start();									// I2C Start
-	MI2C_Bus_Write(cI2C_ADDRESS+1);						// KCM I2C read address
+void MKCM_MutilRead(WORD length, BYTE* outData){
 	if (length > 1){									// 防止只有一次时g2Local_1变为0产生跨界错误
 		length = length - 1;							// Counter. 做少一次，最后的字节使用MI2C_Bus_Read(1);
 	}
 	do {													
-	    *out_data++ = MI2C_Bus_Read(0);					// Read 1 byte 
+	    *outData++ = MI2C_Bus_Read(0);					// Read 1 byte 
 	} while (--length != 0);
-    *out_data = MI2C_Bus_Read(1);						// Read last byte 
+    *outData = MI2C_Bus_Read(1);						// Read last byte 
 	MI2C_Bus_Stop();										// I2C Stop
+}
+
+void MKCM_ReadXByte(										// Read buffer from DA32C. 读取多个字节
+					BYTE address,      						// Index. 寄存器索引值
+					WORD length,      						// Length. 长度
+					BYTE* outData){   						// Buffer address. 数据缓冲
+	MI2C_Bus_Start();										// I2C Start
+	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
+	MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
+
+	MI2C_Bus_Start();									    // I2C Start
+	MI2C_Bus_Write(cI2C_ADDRESS+1);						    // KCM I2C read address
+    MKCM_MutilRead(length, outData);
 	return;
 }
+WORD MKCM_ReadAutoByte(										// 读取由字节指示长度的多字节
+					BYTE address,      						// Index. 寄存器索引值
+					WORD limit,      						// limit. 最大输出长度
+					BYTE* outData){   						// Buffer address. 数据缓冲
+	WORD length;
+	MI2C_Bus_Start();										// I2C Start
+	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
+	MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
+
+	MI2C_Bus_Start();									    // I2C Start
+	MI2C_Bus_Write(cI2C_ADDRESS+1);						    // KCM I2C read address
+	length = MI2C_Bus_Read(0);
+    if (length > limit){
+        length = limit;
+    }
+    MKCM_MutilRead(length, outData);
+	return length;
+}
+
     
 void MI2C_Bus_Write(BYTE gLocal_1){      					// 往I2C总线写入一个字节，gLocal为待写数据
     BOOL FLocal_1;											// 返回成功/失败标志

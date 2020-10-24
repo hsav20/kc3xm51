@@ -13,7 +13,7 @@ void MAUD_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
     if (gRemoveTimer && ++gRemoveTimer > 200){			// 大约2秒后 
 		INPUT_SWITCH select = MKCM_ReadRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO);	// 自动输入的恢复
     	MLOG("gRemoveTimer %d\r\n", (u32)select);
-		gDIP_MenuSelect = cMenu_Restore;				// 菜单即刻进入输入的恢复 
+		gDIP_MenuSelect = MENU_RESTORE;				        // 菜单即刻进入输入的恢复 
 		MAUD_InputSelect(select);
     	gRemoveTimer = 0;
     }
@@ -46,6 +46,7 @@ void MAUD_TestToneChannel(BYTE channel){					// 噪音测试
 		MKCM_WriteRegister(KCM_TEST_TONE, 0);				// 噪音测试关闭
 	}
 }
+/*
 void MAUD_MixSoundEffect(){
 	MAUD_AutoCanclMute();
 	MAUD_AutoCanclTestTone();
@@ -55,6 +56,7 @@ void MAUD_MixSoundEffect(){
 	MKCM_WriteRegister(KCM_EQ_SELECT, gDIP_SoundEffect);	// 选择需要的音效处理通道
 //MDEBUG(0xa7);MDEBUG(gDIP_SoundEffect);
 }
+*/
 void MAUD_MixTrimAdjust(BYTE index, BYTE directUp){
     BYTE address;
     BYTE value;
@@ -143,11 +145,11 @@ void MAUD_InputSelect(INPUT_SWITCH select){
 	MAUD_AutoCanclMute();
 	MAUD_AutoCanclTestTone();
 	
-	if (gDIP_MenuSelect == cMenu_Restore || gDIP_MenuSelect == cMenu_InputSource){	// 只有菜单已经换到cMenu_Restore后，才可以改变当前的输入
+	if (gDIP_MenuSelect == MENU_RESTORE || gDIP_MenuSelect == MENU_INPUT_SOURCE){	// 只有菜单已经换到MENU_RESTORE后，才可以改变当前的输入
 		mINPUT_SWITCH = select;
 		MAUD_InputWrite(mINPUT_SWITCH, mINPUT_SWITCH);
 	}
-	MDIP_MenuNormal(cMenu_InputSource);
+	MDIP_MenuNormal(MENU_INPUT_SOURCE);                    // 菜单状态:输入音源选择
 }
 void MAUD_Preemptible(){							// 抢占式输入选择 
 	MLOG("MKCM_Preemptible:%d %d/%d\r\n", (u32)gPreemptibleIn[gPreemptibleStep], (u32)gPreemptibleStep, (u32)gPreemptibleQty);
@@ -167,7 +169,7 @@ CONST_CHAR TabInputOneKey[] = {
     INPUT_SWITCH_COA2,                                  // 3=数码3   
 };
 void MAUD_InputOneKey(){								// 所有输入用一个按键选择 
-	gDIP_MenuSelect = cMenu_Restore;					// 菜单即刻进入输入的恢复 
+	gDIP_MenuSelect = MENU_RESTORE;					// 菜单即刻进入输入的恢复 
 	if (gWithHdmiQty && gWithHdmiStep < gWithHdmiQty){	 // 循环方式
 		MAUD_InputSelect(gPreemptibleIn[gWithHdmiStep]);
 	}else {
@@ -280,8 +282,8 @@ void MKCM_ReadSrcValid(){
       			if (found){
 					MAUD_InputWrite(TabValidSwitch[index], mINPUT_SWITCH);
 					mINPUT_SWITCH = TabValidSwitch[index];
-					gDIP_MenuSelect = cMenu_Restore;				// 菜单即刻进入输入的恢复 
-					MDIP_MenuNormal(cMenu_InputSource);
+					gDIP_MenuSelect = MENU_RESTORE;				// 菜单即刻进入输入的恢复 
+					MDIP_MenuNormal(MENU_INPUT_SOURCE);     // 菜单状态:输入音源选择
 					gRemoveTimer = 0;					// 取消拔出恢复到非抢占式插入
 			    }
 	        	break;									// 只处理一个抢占式插入

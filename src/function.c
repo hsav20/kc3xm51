@@ -14,7 +14,7 @@ void MKCM_Initialize(){										// KCM模块初始化
 }	  
 void MKCM_SetPowerOn(){ 									// KCM开机
 	MKCM_WriteRegister(KCM_POWER_ON, 1);
-    MDIP_MenuNormal(cMenu_PowerOn);
+    MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 100;									// 暂时锁定显示10秒
     MLOG("KCM_POWER_ON\r\n");
 }	  
@@ -33,7 +33,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			return;
 		}
 		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// 不是多媒体播放时间改变
-//        	MLOG("KCM_READ_IRQ %02x\r\n", (u32)gLocal_1);
+// MLOG("KCM_READ_IRQ %02x\r\n", (u32)gLocal_1);
 		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// 模式初始化完成中断，需要写入"KCM_POWER_ON"寄存器，
             MKCM_RestoreMemory();
@@ -71,7 +71,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
         if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           		// 多媒体播放时间改变
             g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
             if (g2PlayTime){                                	// 播放时间改变 
-				if (gDIP_MenuSelect != cMenu_InputSource){
+				if (gDIP_MenuSelect != MENU_INPUT_SOURCE){
 	                MDIP_MenuNormal(cMenu_PlayTime);
 				}
             }else {                                         	// 播放完成了
@@ -83,14 +83,9 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MLOG("KCM_IRQ_PLAY_STATUS %02x\r\n", (u32)gPlayStatus);
         	MDIP_PlaySymbol(gPlayStatus);
         }
-		if ((gLocal_1 & KCM_IRQ_WIFI_RCV) > 0){
-		    WORD g2Local_1 = MKCM_Read2Byte(KCM_COMMAND_RCV);
-			MKCM_WifiCommand(g2Local_1, g2Local_1 >> 8);
-			gSYS_WifiCommand = 7;
-		}
-		if ((gLocal_1 & KCM_IRQ_WIFI_STATUS) > 0){
-			MDIP_WifiSymbol(0xff);	    	 
-		}
+		if ((gLocal_1 & KCM_IRQ_APP_COMMAND) > 0){          // 收到手机/远程APP控制指令，需要读取"KCM_APP_COMMAND"寄存器
+            MKCM_AppCommand();
+        }
     }
     
 }
@@ -150,13 +145,13 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
 	MKCM_ReadXByte(KCM_EXTR_MEMORY, 4, temp);               // 用户记忆
 	if (FKCM_I2C_Error){									// 读取KCM出错
-		MDIP_MenuNormal(cMenu_Restore);						// 已经出错，就不做 
+		MDIP_MenuNormal(MENU_RESTORE);						// 已经出错，就不做 
 		return;
 	}
-	gDIP_Surround[0] = temp[MEM_SURROUND_2CH];              // 环绕声模式立体声
-	gDIP_Surround[1] = temp[MEM_SURROUND_8CH];              // 环绕声模式多声道
-	gDIP_Select2Ch = temp[MEM_SELECT_2CH];                  // 选择为立体声
-	gDIP_Brightness = temp[MEM_BRIGHTNESS];                 // 显示屏亮度
+//	gDIP_Surround[0] = temp[MEM_SURROUND_2CH] & 0x01;       // 聆听模式立体声
+//	gDIP_Surround[1] = temp[MEM_SURROUND_8CH] & 0x03;       // 聆听模式多声道
+	//gDIP_Select2Ch = temp[MEM_SELECT_2CH] & 0x01;           // 选择为立体声
+	gDIP_Brightness = temp[MEM_BRIGHTNESS] & 0x03;          // 显示屏亮度
 
 	// 输入端口选择：使用KCM_INPUT寄存器的记忆值
 	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
@@ -173,7 +168,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	// 音量：使用KCM_VOLUME寄存器的记忆值
 	gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);	// 记忆的音量值
 	// 音效处理通道：使用KCM_EQ_SELECT及各自的寄存器的记忆值
-	gDIP_SoundEffect = MKCM_ReadRegister(KCM_EQ_SELECT);			// 记忆的音效处理通道选择
+//	gDIP_SoundEffect = MKCM_ReadRegister(KCM_EQ_SELECT);			// 记忆的音效处理通道选择
 
 	for (counter = 0; counter < sizeof(gDIP_TrimCtrl); counter++){ // 声道微调：使用KCM_FL_TRIM等寄存器的记忆值
 		gLocal_1 = MKCM_FromRegister(KCM_TEST_TONE, counter);	// 测试噪音的顺序
@@ -250,7 +245,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	gRemoveTimer = 0;
 	MAUD_MakePreemptible(0x0000);							// 生成抢占式输入选择 
 
-    MDIP_MenuNormal(cMenu_PowerOn);
+    MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 10;										// 可以退出暂时锁定显示了
     MDIP_SurroundSymbol();
     MDIP_SrcFormatSymbol();
@@ -291,29 +286,52 @@ void MKCM_FactorySet(){										// 出厂设置
 
 	MKCM_WriteRegister(KCM_SPK_CONFIG, 0xab);				// 后置大、环绕大、中置大、前置大、有超低音
 	MKCM_WriteRegister(KCM_POWER_ON, 1);
-    MDIP_MenuNormal(cMenu_PowerOn);
+    MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 30;										// 暂时锁定显示3秒
     return;
 }
-void MKCM_WifiCommand(BYTE regNumber, BYTE value){		// 收到远程APP的指令
-//MDEBUG(0xa9);MDEBUG(regNumber);MDEBUG(value);
-	switch (regNumber){
-	case KCM_VOLUME_MUTE:									// 音频静音及音量加减控制
-		if (FSYS_MuteEnable != (value & 0x01)){				// MUTE改变
-			MKEY_AudioMute();
-		}
-		else if (value & 0x04){								// 音量加或减
-			gDIP_MenuSelect = cMenu_MasterVolume;
-			MKCM_WriteRegister(KCM_VOLUME_MUTE, value);
-		}
-		break;
-	case KCM_INPUT_SOURCE:										// 输入音源选择
-		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
-		MAUD_AutoCanclMute();
-		MAUD_AutoCanclTestTone();
-		MDIP_MenuNormal(cMenu_Restore);
-		break;
-	}
+void MKCM_AppCommand(){
+    BYTE inData[8];
+    BYTE length = MKCM_ReadAutoByte(KCM_APP_COMMAND, 8, inData);
+    if (length == 2){
+        MKCM_WriteRegister(inData[0], inData[1]);
+    	switch (inData[0]){
+    	case KCM_VOLUME_CTRL:									// 音频静音及音量加减控制
+            MLOG("KCM_VOLUME_CTRL %d\r\n", (u32)inData[1]);
+            gAUD_MasterVolume = inData[1];
+            MDIP_MenuNormal(cMenu_MasterVolume);
+    		break;
+    	case KCM_INPUT_SOURCE:									// 输入音源选择
+            MLOG("KCM_INPUT_SOURCE %02x\r\n", (u32)inData[1]);
+    		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, inData[1]);	// 通过寄存器反向将选择的数值恢复
+    		MAUD_AutoCanclMute();
+    		MAUD_AutoCanclTestTone();
+    		MDIP_MenuNormal(MENU_RESTORE);
+    		break;
+	    case KCM_LISTEN_MODE:				                    // 聆听模式选择
+            MLOG("KCM_LISTEN_MODE %02x\r\n", (u32)inData[1]);
+            MDIP_ListenMode(inData[1]);
+            break;
+	    case KCM_EQ_SELECT:				                        // 多路均衡音效处理选择
+            MLOG("KCM_LISTEN_MODE %02x\r\n", (u32)inData[1]);
+            MDIP_EqSelect(inData[1]);
+            break;
+
+    	case KCM_VOLUME_MUTE:									// 音频静音及音量加减控制
+    		if (FSYS_MuteEnable != (inData[1] & 0x01)){			// MUTE改变
+    			MKEY_AudioMute();
+    		}
+    		else if (inData[1] & 0x04){							// 音量加或减
+    			gDIP_MenuSelect = cMenu_MasterVolume;
+    			MKCM_WriteRegister(KCM_VOLUME_MUTE, inData[1]);
+    		}
+    		break;
+    	default :
+        MLOG("AppCommand %02x %02x %02x\r\n", (u32)length, (u32)inData[0], (u32)inData[1]);
+    	    break;
+    	}
+    }
+    MDIP_WifiSymbol(1);
 }
 
 
