@@ -294,7 +294,7 @@ void MKCM_AppCommand(){
     BYTE inData[8];
     BYTE length = MKCM_ReadAutoByte(KCM_APP_COMMAND, 8, inData);
     if (length == 2){
-        MKCM_WriteRegister(inData[0], inData[1]);
+//        MKCM_WriteRegister(inData[0], inData[1]);
     	switch (inData[0]){
     	case KCM_VOLUME_CTRL:									// 音频静音及音量加减控制
             MLOG("KCM_VOLUME_CTRL %d\r\n", (u32)inData[1]);
@@ -319,14 +319,16 @@ void MKCM_AppCommand(){
 
     	case KCM_VOLUME_MUTE:									// 音频静音及音量加减控制
     		if (FSYS_MuteEnable != (inData[1] & 0x01)){			// MUTE改变
-    			MKEY_AudioMute();
+    			//MKEY_AudioMute();
     		}
     		else if (inData[1] & 0x04){							// 音量加或减
     			gDIP_MenuSelect = cMenu_MasterVolume;
-    			MKCM_WriteRegister(KCM_VOLUME_MUTE, inData[1]);
+    			//MKCM_WriteRegister(KCM_VOLUME_MUTE, inData[1]);
     		}
     		break;
     	default :
+            if (inData[0] >= KCM_FL_TRIM && inData[0] <= KCM_BR_TRIM){    // 各声道的微调
+            }
         MLOG("AppCommand %02x %02x %02x\r\n", (u32)length, (u32)inData[0], (u32)inData[1]);
     	    break;
     	}

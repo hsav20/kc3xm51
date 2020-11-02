@@ -280,6 +280,7 @@ void MKEY_ListenMode(BYTE stereo);                          // 按键聆听模式选择
 void MKEY_EqSelect();                                       // 按键EQ均衡器模式
 
 void MDIP_EqSelect(BYTE value);                             // 显示EQ均衡器模式
+void MDIP_ChannelTrim(SPKER_CHANNEL channel, BYTE value);   // 显示通道微调
 
 BYTE GetListenModeIndex(BYTE value);
 

@@ -63,10 +63,10 @@ typedef enum {
 	KCM_RD_SPECTRUM = 0x8f,				// 频谱数值读取
 	KCM_WR_FLASH = 0x90,				// 写入512字节FLASH掉电记忆空间，不可以单独写入
 	KCM_RD_FLASH = 0x91,				// 读取512字节FLASH掉电记忆空间，不可以单独读取
-	KCM_RD_SD_QTY = 0x96,				// 读取多媒体文件正在播放的时间，共2字节单位秒
-	KCM_RD_UDISK_QTY = 0x97,			// 读取多媒体文件正在播放的时间，共2字节单位秒
+	KCM_RD_SD_QTY = 0x96,				// 读取SD卡多媒体文件总数量，共2字节
+	KCM_RD_UDISK_QTY = 0x97,			// 读取U盘多媒体文件总数量，共2字节
 	KCM_RD_FILE_TIME = 0x99,			// 读取多媒体文件正在播放的总时间，共2字节单位秒
-	KCM_APP_COMMAND = 0xa0				// 手机/远程APP控制指令，多字节
+	KCM_APP_COMMAND = 0xa0				// 读取手机/远程APP控制指令，多字节
 } KC3X_REGISTER;
 
 typedef enum {
