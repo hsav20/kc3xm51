@@ -944,13 +944,13 @@ void MDIP_PlaySymbol(BYTE status){
 	BYTE flag = status & 0x03;
 //	MLOG("MDIP_PlaySymbol %02x\r\n", (u32)status);
 	DIP_PLAY_OFF();
-	if (flag == KC3X_STATUS_PLAY_PAUSE){
+	if (flag == KC3X_STATE_PLAY_PAUSE){
 		g2DIP_ShowBuffer[7] |= 0x08;
-	}else if (status == KC3X_STATUS_PLAY_PLAY){
+	}else if (status == KC3X_STATE_PLAY_PLAY){
 		g2DIP_ShowBuffer[7] |= 0x04;
 	}
-	if (status & KC3X_STATUS_REPEAT_ALL){						// 设置了重复
-		if ((status & KC3X_STATUS_REPEAT_ALL) == KC3X_STATUS_REPEAT_ALL){	// 重复所有文件
+	if (status & KC3X_STATE_REPEAT_ALL){						// 设置了重复
+		if ((status & KC3X_STATE_REPEAT_ALL) == KC3X_STATE_REPEAT_ALL){	// 重复所有文件
 			g2DIP_ShowBuffer[7] |= 0x01;
 		}else {													// 重复当前文件/夹
 			g2DIP_ShowBuffer[7] |= 0x02;
@@ -960,7 +960,7 @@ void MDIP_PlaySymbol(BYTE status){
 }
 void MDIP_WifiSymbol(BYTE turnOn){
 	if (turnOn == 0xff){
-		turnOn = (MKCM_ReadRegister(KCM_WIFI_STATUS) & 0x80) ? 1 : 0;
+		turnOn = (MKCM_ReadRegister(KCM_WORK_STATUS) & 0x80) ? 1 : 0;
 	}
 	if (turnOn){
 		g2DIP_ShowBuffer[6] |= 0x0800;	

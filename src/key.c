@@ -295,19 +295,19 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 
 		case cRmKey_Stop:
-            MKCM_WriteRegister(KCM_PLAY_STATUS, KC3X_STATUS_PLAY_STOP);  // 多媒体播放停止
+            MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_STOP);  // 多媒体播放停止
 			break;
 		case cRmKey_PlayPause:
 			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-				BYTE flag = gPlayStatus & KC3X_STATUS_PLAY_FLAG;
-				if (flag == KC3X_STATUS_PLAY_PLAY){					// 如果已经在播放之中
-		            MKCM_WriteRegister(KCM_PLAY_STATUS, KC3X_STATUS_PLAY_PAUSE);  // 暂停
-		            gPlayStatus &= ~KC3X_STATUS_PLAY_FLAG;					
-		            gPlayStatus |= KC3X_STATUS_PLAY_PAUSE;
+				BYTE flag = gPlayStatus & KC3X_STATE_PLAY_FLAG;
+				if (flag == KC3X_STATE_PLAY_PLAY){					// 如果已经在播放之中
+		            MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_PAUSE);  // 暂停
+		            gPlayStatus &= ~KC3X_STATE_PLAY_FLAG;					
+		            gPlayStatus |= KC3X_STATE_PLAY_PAUSE;
 		        }else {
-			        MKCM_WriteRegister(KCM_PLAY_STATUS, KC3X_STATUS_PLAY_PLAY);  // 播放
-			        gPlayStatus &= ~KC3X_STATUS_PLAY_FLAG;
-		            gPlayStatus |= KC3X_STATUS_PLAY_PLAY;
+			        MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_PLAY);  // 播放
+			        gPlayStatus &= ~KC3X_STATE_PLAY_FLAG;
+		            gPlayStatus |= KC3X_STATE_PLAY_PLAY;
 		        }
 		        MDIP_PlaySymbol(gPlayStatus);								// 加快图标显示，让操作感觉好点
 			}

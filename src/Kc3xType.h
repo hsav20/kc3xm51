@@ -7,17 +7,13 @@ typedef enum {
 	KCM_READ_IRQ = 0x01,				// 读中断请求寄存器，16位寄存器
 	KCM_CLEAR_IRQ = 0x03,				// 清除中断请求寄存器，16位寄存器
 	KCM_POWER_ON = 0x05,				// 用户主机上电	
-	KCM_SRC_FORMAT = 0x06,				// 数码信号输入格式及通道信息指示
-	KCM_BPS_RATE = 0x07,				// 采样频率及码流率指示
 	KCM_VOLUME_MUTE = 0x08,				// 音频静音及音量加减控制
 	KCM_TEST_TONE = 0x09,				// 噪音测试
-	KCM_WIFI_STATUS = 0x0d,				// WIFI状态指示
-	KCM_PLAY_STATUS = 0x0e,				// 多媒体文件播放状态
-	KCM_PLAY_OPERATE = 0x0f,			// 多媒体文件播放控制
-	KCM_PLAY_INDEX = 0x10,				// 控制多媒体文件播放编号，16位寄存器
-	KCM_PLAY_TIME = 0x12,				// 读取多媒体文件正在播放的时间，16位寄存器
+	KCM_SRC_DETECT = 0x0a,				// 检测所有有效的音源一次
+	KCM_SRC_FORMAT = 0x18,				// 数码信号输入格式及通道信息指示
+	KCM_BPS_RATE = 0x1a,				// 采样频率及码流率指示
 	KCM_SRC_VALID = 0x1c,				// 有效的音源输入改变，16位寄存器
-	KCM_SRC_DETECT = 0x1f,				// 检测所有有效的音源一次
+	KCM_WORK_STATUS = 0x1f,				// 模块工作/运行状态指示
 
 	// 以下为带上电记忆的寄存器
 	KCM_INPUT_SOURCE = 0x20,			// 输入音源选择
@@ -63,10 +59,18 @@ typedef enum {
 	KCM_RD_SPECTRUM = 0x8f,				// 频谱数值读取
 	KCM_WR_FLASH = 0x90,				// 写入512字节FLASH掉电记忆空间，不可以单独写入
 	KCM_RD_FLASH = 0x91,				// 读取512字节FLASH掉电记忆空间，不可以单独读取
-	KCM_RD_SD_QTY = 0x96,				// 读取SD卡多媒体文件总数量，共2字节
-	KCM_RD_UDISK_QTY = 0x97,			// 读取U盘多媒体文件总数量，共2字节
-	KCM_RD_FILE_TIME = 0x99,			// 读取多媒体文件正在播放的总时间，共2字节单位秒
-	KCM_APP_COMMAND = 0xa0				// 读取手机/远程APP控制指令，多字节
+	KCM_APP_COMMAND = 0x98,				// 读取手机/远程APP控制指令，多字节
+
+	KCM_PLAY_SD_QTY = 0xa0,				// 读取SD卡多媒体文件总数量，共2字节
+	KCM_PLAY_UDISK_QTY = 0xa1,			// 读取U盘多媒体文件总数量，共2字节
+	KCM_PLAY_FILE_TIME = 0xa2,			// 读取多媒体文件正在播放的总时间，共2字节单位秒
+	KCM_PLAY_TIME = 0xa3,				// 读取多媒体文件正在播放的时间，共2字节单位秒
+	KCM_PLAY_INDEX = 0xa4,				// 控制多媒体文件播放编号，共2字节
+	KCM_PLAY_STATE = 0xa5,				// 多媒体文件播放状态，共1字节
+	KCM_PLAY_OPERATE = 0xa6,			// 多媒体文件播放控制，共1字节
+	KCM_PLAY_FILE_NAME = 0xa7,			// 当前多媒体文件名，最多32字节
+	KCM_PLAY_SONG_NAME = 0xa8,			// 当前多媒体文件歌曲名，最多32字节
+	KCM_REGISTER_LAST = 0xaf
 } KC3X_REGISTER;
 
 typedef enum {
@@ -76,7 +80,7 @@ typedef enum {
 	KCM_IRQ_SRC_VALID = 0x0008,        	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
 
 	KCM_IRQ_FIRMWARE = 0x10,        	// 固件更新，需要读取"KCM_RD_INFO"寄存器
-	KCM_IRQ_PLAY_STATUS = 0x0020,       // 多媒体文件播放状态改变，需要读取"KCM_PLAY_STATUS"寄存器
+	KCM_IRQ_PLAY_STATE = 0x0020,       	// 多媒体文件播放状态改变，需要读取"KCM_PLAY_STATE"寄存器
 	KCM_IRQ_PLAY_TIME = 0x0040,        	// 多媒体播放时间改变，需要读取"KCM_PLAY_TIME"寄存器
 	KCM_IRQ_APP_COMMAND = 0x0080,  		// 收到手机/远程APP控制指令，需要读取"KCM_APP_COMMAND"寄存器
 
@@ -167,17 +171,19 @@ typedef enum {
 	KCM_MODEL_36H = 0x56				// 模块型号KC36H
 } KC3X_MODEL_TYPE;
 
-#define KC3X_STATUS_PLAY_PAUSE			0x01				// 写入暂停，读取为已经暂停
-#define KC3X_STATUS_PLAY_PLAY			0x02				// 写入播放，读取为已经播放
-#define KC3X_STATUS_PLAY_STOP			0x03				// 写入停止，读取为已经停止
-#define KC3X_STATUS_PLAY_FLAG			0x03				// 写入停止，读取为已经停止
-#define KC3X_STATUS_RANDOM_NONE  		0x00				// 随机播放关闭，多媒体文件播放状态
-#define KC3X_STATUS_RANDOM_PATH			0x10				// 随机播放当前文件夹，多媒体文件播放状态
-#define KC3X_STATUS_RANDOM_ALL 			0x20				// 随机播放全部，多媒体文件播放状态
-#define KC3X_STATUS_REPEAT_NONE  		0x00				// 多媒体文件播放没有重复
-#define KC3X_STATUS_REPEAT_FILE  		0x40				// 多媒体文件播放重复当前文件
-#define KC3X_STATUS_REPEAT_PATH  		0x80				// 多媒体文件播放重复当前文件夹
-#define KC3X_STATUS_REPEAT_ALL  		0xc0				// 多媒体文件播放重复所有文件
+#define KC3X_STATE_PLAY_PAUSE			0x01				// 写入暂停，读取为已经暂停
+#define KC3X_STATE_PLAY_PLAY			0x02				// 写入播放，读取为已经播放
+#define KC3X_STATE_PLAY_STOP			0x03				// 写入停止，读取为已经停止
+#define KC3X_STATE_PLAY_FLAG			0x03				// 修改播放标志
+#define KC3X_STATE_RANDOM_NONE  		0x00				// 随机播放关闭，多媒体文件播放状态
+#define KC3X_STATE_RANDOM_PATH			0x10				// 随机播放当前文件夹，多媒体文件播放状态
+#define KC3X_STATE_RANDOM_ALL 			0x20				// 随机播放全部，多媒体文件播放状态
+#define KC3X_STATE_RANDOM_FLAG			0x30				// 修改RANDOM标志
+#define KC3X_STATE_REPEAT_NONE  		0x00				// 多媒体文件播放没有重复
+#define KC3X_STATE_REPEAT_FILE  		0x40				// 多媒体文件播放重复当前文件
+#define KC3X_STATE_REPEAT_PATH  		0x80				// 多媒体文件播放重复当前文件夹
+#define KC3X_STATE_REPEAT_ALL  			0xc0				// 多媒体文件播放重复所有文件
+#define KC3X_STATE_REPEAT_FLAG			0xc0				// 修改REPEAT标志
 
 typedef enum {
 	KCM_OPERATE_SKIP_UP = 0x01,			// 播放前一个文件

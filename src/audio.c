@@ -259,7 +259,7 @@ void MKCM_ReadSrcValid(){
 		       	found = 1;
 	        	switch (flag){
 	            case KCM_SRC_VALID_SD:
-		            g2SdQty = MKCM_Read2Byte(KCM_RD_SD_QTY);
+		            g2SdQty = MKCM_Read2Byte(KCM_PLAY_SD_QTY);
 		            if (g2SdQty){								// 有播放文件 
 			            g2PlayIndex = 0;
 	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
@@ -269,7 +269,7 @@ void MKCM_ReadSrcValid(){
 		            }
 					break;	
 	            case KCM_SRC_VALID_UDISK: 
-					g2UDiskQty = MKCM_Read2Byte(KCM_RD_UDISK_QTY);
+					g2UDiskQty = MKCM_Read2Byte(KCM_PLAY_UDISK_QTY);
 					if (g2UDiskQty){								// 有播放文件 
 			            g2PlayIndex = 0;
 	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         

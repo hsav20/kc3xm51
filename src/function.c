@@ -53,7 +53,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MDIP_SrcFormatSymbol();
             MDIP_SurroundSymbol();
         	if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-                g2TimeLength = MKCM_Read2Byte(KCM_RD_FILE_TIME);
+                g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
             }
 		}
 		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
@@ -78,9 +78,9 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
                 MDIP_MenuNormal(cMenu_PlayTrack);
             }
         }
-        if ((gLocal_1 & KCM_IRQ_PLAY_STATUS) > 0){           // 多媒体文件播放状态改变
-        	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATUS);     // 读取多媒体文件播放状态
-			MLOG("KCM_IRQ_PLAY_STATUS %02x\r\n", (u32)gPlayStatus);
+        if ((gLocal_1 & KCM_IRQ_PLAY_STATE) > 0){           // 多媒体文件播放状态改变
+        	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATE);     // 读取多媒体文件播放状态
+			MLOG("KCM_IRQ_PLAY_STATE %02x\r\n", (u32)gPlayStatus);
         	MDIP_PlaySymbol(gPlayStatus);
         }
 		if ((gLocal_1 & KCM_IRQ_APP_COMMAND) > 0){          // 收到手机/远程APP控制指令，需要读取"KCM_APP_COMMAND"寄存器
