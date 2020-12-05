@@ -69,16 +69,16 @@ void TBascTimer(void) interrupt 1 {
 		if (FDIP_FreqSymbol){
 			if (++gBrightnessTimer > 19){
 				gBrightnessTimer = 0;
-				HAL_DIP_LED(1);
+				HAL_DIP_LED(1);                             // 点亮显示屏固定的符号
 			}
 			else {
 				if ((gDIP_Brightness == 0) && (gBrightnessTimer == 1)){
-					HAL_DIP_LED(0);
+					HAL_DIP_LED(0);                         // 亮度为0时熄灭显示屏固定的符号
 				}
 				else if ((gDIP_Brightness == 1) && (gBrightnessTimer == 4)){
-					HAL_DIP_LED(0);
-				}else if ((gBrightnessTimer == 8)){		// (gDIP_Brightness == 2) && 
-					HAL_DIP_LED(0);
+					HAL_DIP_LED(0);                         // 亮度为1时熄灭显示屏固定的符号
+				}else if ((gBrightnessTimer == 8)){
+					HAL_DIP_LED(0);                         // 亮度为2时熄灭显示屏固定的符号
 				}
 			}
 		}

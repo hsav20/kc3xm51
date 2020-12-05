@@ -14,6 +14,8 @@
 
 // £¡£¡£¡ÒÔÉÏÉèÖÃÇëÑ¡ÔñÒ»¸öÊÊºÏ×Ô¼ºµÄ±àÒë£¬¶øÇÒ±ØÐëÑ¡ÔñÒ»¸ö(Ö»ÓÐÒ»¸öÃ»ÓÐ//×¢ÊÍ)
 
+#define DISPLAY_OLD                                         // ¶¨Òå¾Í±àÒë ¾É°æ±¾ÏÔÊ¾ÆÁ(P25È¡·´)
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,12 +27,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // I2C½Ó¿Ú²¿·ÖµÄ¶¨Òå ///////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define cI2C_ACK						0
-#define cI2C_NAK						1
-
-#define cI2C_ADDRESS					0xcc				// ÉèÖÃI2CµÄ´Ó»úµØÖ·
-
 EXTR BOOL FKCM_I2C_Error;
 
 void MKCM_WriteRegister(					  				// Ð´DA32UxµÄI2C¼Ä´æÆ÷, ³É¹¦·µ»Ø1
@@ -43,24 +39,19 @@ void MKCM_Write2Byte(										// Write 2 bytes to DA32C. Ð´Èë2¸ö×Ö½Ú
 					WORD vaule);      						// 16 bit Data. 16Î»Êý¾Ý
 void MKCM_WriteXByte(										// Write buffer to DA32C. Ð´Èë¶à¸ö×Ö½Ú
 					BYTE address,      						// Index. ¼Ä´æÆ÷Ë÷ÒýÖµ
-					WORD length,      						// Length. ³¤¶È
-					BYTE* inData);   						// Buffer address. Êý¾Ý»º³å
+					BYTE* inData,   						// Buffer address. Êý¾Ý»º³å
+					WORD length);      						// Length. ³¤¶È
 WORD MKCM_Read2Byte(										// Read word from DA32C. ¶ÁÈ¡16Î»µÄ¼Ä´æÆ÷
 					BYTE address);      					// Index. ¼Ä´æÆ÷Ë÷ÒýÖµ
 void MKCM_ReadXByte(	                                    // Read buffer from DA32C. ¶ÁÈ¡¶à¸ö×Ö½Ú
 					BYTE address,      						// Index. ¼Ä´æÆ÷Ë÷ÒýÖµ
-					WORD length,      						// Length. ³¤¶È
-					BYTE* outData);   						// Buffer address. Êý¾Ý»º³å
+					BYTE* outData,   						// Buffer address. Êý¾Ý»º³å
+					WORD length);      						// Length. ³¤¶È
 WORD MKCM_ReadAutoByte(	                                    // ¶ÁÈ¡ÓÉ×Ö½ÚÖ¸Ê¾³¤¶ÈµÄ¶à×Ö½Ú
 					BYTE address,      						// Index. ¼Ä´æÆ÷Ë÷ÒýÖµ
-					WORD limit,      						// limit. ×î´óÊä³ö³¤¶È
-					BYTE* outData);   						// Buffer address. Êý¾Ý»º³å
-
-
+					BYTE* outData,   						// Buffer address. Êý¾Ý»º³å
+					WORD limit);      						// limit. ×î´óÊä³ö³¤¶È
 void MKCM_MutilRead(WORD length, BYTE* outData);
-
-
-
 
 void MI2C_Bus_Write(BYTE gLocal_1);      					// ÍùI2C×ÜÏßÐ´ÈëÒ»¸ö×Ö½Ú£¬gLocalÎª´ýÐ´Êý¾Ý£¬·µ»ØÎª0±íÊ¾³É¹¦
 BYTE MI2C_Bus_Read(BOOL FLocal_NAK);						// ´ÓI2C×ÜÏß¶ÁÒ»¸ö×Ö½Ú£¬ÔÚ×îºóÒ»´Î¶ÁÊ±£¬FLocal_NAK±ØÐëÎª1
@@ -73,6 +64,7 @@ void MI2C_400K_DELAY();										// °´ÕÕ400KbpsµÄ±ê×¼ÑÓÊ±£¬¿ÉÒÔÓÐÐ§µØÌá¸ßÍ¨Ñ¶µÄË
 #define HAL_KCM_I2C_SCL(b)				{P16=b;}
 #define HAL_KCM_I2C_SDA(b)				{P15=b;}
 #define HAL_KCM_I2C_IN_SDA()			(P15)
+
 
 
 
@@ -288,6 +280,7 @@ void MDIP_SourceFormat();
 void MDIP_InputSource();
 void MDIP_VideoSrc();
 void MDIP_ListenMode(BYTE value);                           // ÏÔÊ¾ñöÌýÄ£Ê½
+void MDIP_FirewareInfo();                                   // ÏÔÊ¾¹Ì¼þ¸üÐÂ
 
 void MDIP_SurroundMode(BYTE index, MENU_SET mode);
 void MDIP_SurroundSymbol();

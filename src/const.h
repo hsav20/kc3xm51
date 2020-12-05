@@ -18,7 +18,12 @@
 #define HAL_PKEY_2(b)					{P22=b;}
 #define HAL_PKEY_3(b)					{}
 
+#ifdef DISPLAY_OLD                                          // 定义就编译 旧版本显示屏(P25取反)
 #define HAL_DIP_LED(b)                	{P25=b;}
+#else
+#define HAL_DIP_LED(b)                	{P25=b^1;}
+#endif
+
 #define HAL_DIP_CLK(b)					{P10=b;}
 #define HAL_DIP_DAT(b)					{P11=b;}
 #define HAL_DIP_STB(b)					{P13=b;}
@@ -123,7 +128,7 @@ typedef enum {
     MENU_POWER_ON = 2,                                      // 菜单状态:电源打开
 
     MENU_LISTEN_MODE = 0x03,				                // 菜单聆听模式选择
-    MENU_EQ_SELECT = 0x05,                                   // 菜单EQ均衡器选择
+    MENU_EQ_SELECT = 0x05,                                  // 菜单EQ均衡器选择
 
     cMenu_VideoSrc = 6,
     cMenu_SrcFormat = 7,
@@ -132,7 +137,9 @@ typedef enum {
     cMenu_AudioMute = 10,
     cMenu_NightMode = 11,
     cMenu_NoiseSignal = 12,
-    cMenu_Fireware = 13,                  // 显示固件升级
+    
+    MENU_FIREWARE_INFO = 0x0d,                              // 显示固件升级
+
     cMenu_SdInsert = 14,                  // 显示SD插入
     cMenu_UDiskInsert = 15,                  // 显示U盘插入
     cMenu_SdRemove = 16,                  // 显示SD拔出
@@ -253,7 +260,8 @@ typedef enum {
     INPUT_SWITCH_HDMI2 = 9,                                 // 9=HDMI2   
     INPUT_SWITCH_HDMI3 = 10,                                 // 10=HDMI3   
     INPUT_SWITCH_H_ARC = 11,                                 // 11=HDMI-ARC
-    INPUT_SWITCH_NONE = 12                                  // 循环方式或还没有选择    
+    INPUT_SWITCH_E8CH = 12,                                 // 12=外置7.1声道
+    INPUT_SWITCH_NONE = 13                                  // 循环方式或还没有选择    
 } INPUT_SWITCH;
 
 #define cDIP_SURR_STEREO               	0
@@ -268,40 +276,4 @@ typedef enum {
 #define cI2C_NAK						1
 
 #define cI2C_ADDRESS					0xcc				// 设置I2C的从机地址
-
-EXTR BOOL FKCM_I2C_Error;
-
-void MKCM_WriteRegister(					  				// 写DA32Ux的I2C寄存器, 成功返回1
-					BYTE address, 							// 地址索引值
-					BYTE vaule); 							// 数据
-BYTE MKCM_ReadRegister(										// Read byte from DA32C. 读取8位的寄存器
-					BYTE address);      					// Index. 寄存器索引值
-void MKCM_Write2Byte(										// Write 2 bytes to DA32C. 写入2个字节
-					BYTE address,      						// Index. 寄存器索引值
-					WORD vaule);      						// 16 bit Data. 16位数据
-void MKCM_WriteXByte(										// Write buffer to DA32C. 写入多个字节
-					BYTE address,      						// Index. 寄存器索引值
-					WORD length,      						// Length. 长度
-					BYTE* in_data);   						// Buffer address. 数据缓冲
-WORD MKCM_Read2Byte(										// Read word from DA32C. 读取16位的寄存器
-					BYTE address);      					// Index. 寄存器索引值
-void MKCM_ReadXByte(										// Read buffer from DA32C. 读取多个字节
-					BYTE address,      						// Index. 寄存器索引值
-					WORD length,    						// Length. 长度
-					BYTE* out_data);      					// Buffer 数据缓冲
-
-
-
-
-void MI2C_Bus_Write(BYTE gLocal_1);      					// 往I2C总线写入一个字节，gLocal为待写数据，返回为0表示成功
-BYTE MI2C_Bus_Read(BOOL FLocal_NAK);						// 从I2C总线读一个字节，在最后一次读时，FLocal_NAK必须为1
-void MI2C_Bus_Start();  									// I2C总线开始
-void MI2C_Bus_Stop();										// I2C总线停止
-void MI2C_100K_DELAY();										// 按照100Kbps的标准延时，以确保状态稳定
-void MI2C_400K_DELAY();										// 按照400Kbps的标准延时，可以有效地提高通讯的速度
-
-#define HAL_KCM_I2C_INT()				(P14)
-#define HAL_KCM_I2C_SCL(b)				{P16=b;}
-#define HAL_KCM_I2C_SDA(b)				{P15=b;}
-#define HAL_KCM_I2C_IN_SDA()			(P15)
 

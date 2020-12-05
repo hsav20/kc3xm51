@@ -10,7 +10,7 @@
 void MDIP_Initialize(){										  
     BYTE gLocal_0;
 
-	HAL_DIP_LED(0);
+	HAL_DIP_LED(0);                                         // Ï¨ÃðÏÔÊ¾ÆÁ¹Ì¶¨µÄ·ûºÅ
     HAL_DIP_STB(0);											// TA6932Æ¬Ñ¡
     MUSDELAY(1);
 	MDIP_WriteByte(0x40);		  							// ³õÊ¼»¯ÉÏµçÊ±£¬µØÖ·µÝÔö¼Ó1
@@ -102,7 +102,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ²Ëµ¥Ñ¡Ôñ¸ß¼¶Ä£Ê½£¬mode 0Ò»
 		//FDIP_MenuTwinkle = 0;
 	}
 	FDIP_FreqSymbol = 0;
-    HAL_DIP_LED(0);
+    HAL_DIP_LED(0);                                         // Ï¨ÃðÏÔÊ¾ÆÁ¹Ì¶¨µÄ·ûºÅ
 	MDIP_ClearSpectrum();
     
     DIP_DOT_OFF();
@@ -171,9 +171,9 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ²Ëµ¥Ñ¡Ôñ¸ß¼¶Ä£Ê½£¬mode 0Ò»
 	case cMenu_NoiseSignal:
 		MDIP_NoiseSignal();
 		break;
-	case cMenu_Fireware:                                    // ÏÔÊ¾¹Ì¼þÉý¼¶
-		MDIP_Fireware();
-		break;
+//	case cMenu_Fireware:                                    // ÏÔÊ¾¹Ì¼þÉý¼¶
+//		MDIP_Fireware();
+//		break;
     case cMenu_SdInsert:                                   // ÏÔÊ¾SD²åÈë
     case cMenu_UDiskInsert:                                // ÏÔÊ¾UÅÌ²åÈë
     case cMenu_SdRemove:                                   // ÏÔÊ¾SD°Î³ö 
@@ -544,8 +544,8 @@ void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 
 
 CONST_CHAR Tab_DIP_InputSwitch[] = {
-	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC- -BT-  HDMI-1HDMI-2HDMI-3HDMI-A"
-//	 ++++++------++++++------++++++------++++++------++++++------++++++------
+	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC- -BT-  HDMI-1HDMI-2HDMI-3HDMI-A E8CH "
+//	 ++++++------++++++------++++++------++++++------++++++------++++++------++++++
 };
 
 void MDIP_InputSource(){
@@ -618,91 +618,6 @@ void MDIP_EqSelect(BYTE value){                               // ÏÔÊ¾EQ¾ùºâÆ÷Ñ¡Ô
     }
     MDIP_SetState(MENU_EQ_SELECT);
 }
-
-/*
-CONST_CHAR Tab_DIP_Surround2Ch[] = {
-	"  HIFI 2+1CH"
-//	 ++++++------
-};
-CONST_CHAR Tab_DIP_Surround8Ch[] = {
-	"MODE"
-};
-
-void MDIP_SoundEffect(BYTE mode){
-	if (mode >= 3){
-		if (gDIP_MenuSelect == cMenu_SoundEffect){      
-			MAUD_MixSoundEffect();
-		}
-	}
-    if (gDIP_SoundEffect == 0){
-    	MDIP_WriteString(" FLAT ");
-    }else {
-    	MDIP_WriteString("SOUND");
-    	MDIP_SingleChar(5, gDIP_SoundEffect + '0');
-    }
-}
-
-
-
-void MDIP_SurroundMode(BYTE index, MENU_SET mode){
-	// [6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:ÔÆ  B4:DSP B3:ATMOS B2:DD  B1:AUTO B0:ST
-//MDEBUG(0x99);MDEBUG(change);MDEBUG(gDIP_MenuSelect);MDEBUG(index);
-    if (index == gDIP_MenuSelect){                          // ÉÏ´ÎÒÑ¾­½øÈëµ±Ç°²Ëµ¥
-        if (index == cMenu_Surround2Ch){                    // Á¢ÌåÉù
-    		if (gDIP_Surround[0]){                          // Èç¹û´ò¿ª³¬µÍÒô
-                gDIP_Surround[0] = 0;                       // ¹Ø±Õ³¬µÍÒô
-            }else {
-                gDIP_Surround[0] = 1;                       // ´ò¿ª³¬µÍÒô
-            }
-        	MKCM_WriteRegister(KCM_LISTEN_MODE, gDIP_Surround[0]);
-
-            MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SURROUND_2CH, gDIP_Surround[0]);
-            if (gDIP_Select2Ch != 1){
-                gDIP_Select2Ch = 1;
-                MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 1);
-            }
-        }else {                                             // ¶àÉùµÀ
-            if (++gDIP_Surround[1] >= 4){
-                gDIP_Surround[1] = 0;
-            }
-//MDEBUG(0x99);MDEBUG(gDIP_Surround[1]);
-            if (gDIP_Surround[1] == 0){
-                MKCM_WriteRegister(KCM_LISTEN_MODE, 0x10);  // Ô­Ê¼¶àÉùµÀÄ£Ê½
-            }else if (gDIP_Surround[1] < 3){
-                MKCM_WriteRegister(KCM_LISTEN_MODE, 0x20 | gDIP_Surround[1]);   // Ñ¡Ôñ¶àÉùµÀÄ£Ê½£¬B1:0Îª¸÷ÖÖ²»Í¬Ëã·¨µÄ¶àÉùµÀÄ£Ê½
-            }else {
-                MKCM_WriteRegister(KCM_LISTEN_MODE, 0x30);  // Ñ¡Ôñ¶àÉùµÀÒôÐ§£¬B1:0Îª¸÷ÖÖ²»Í¬Ëã·¨µÄ¶àÉùµÀÒôÐ§
-            }
-            MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SURROUND_8CH, gDIP_Surround[1]);
-            if (gDIP_Select2Ch != 0){
-                gDIP_Select2Ch = 0;
-                MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 0);
-            }
-        }
-    }else if (gDIP_MenuSelect == cMenu_Surround8Ch && index == cMenu_Surround2Ch){  // ÉÏ´ÎÊÇ¶àÉùµÀ£¬µ±Ç°ÎªÁ¢ÌåÉù
-        MKCM_WriteRegister(KCM_LISTEN_MODE, gDIP_Surround[0]);
-        gDIP_Select2Ch = 1;
-        MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 1);
-    }else if (gDIP_MenuSelect == cMenu_Surround2Ch && index == cMenu_Surround8Ch){  // ÉÏ´ÎÊÇÁ¢ÌåÉù£¬µ±Ç°Îª¶àÉùµÀ
-        if (gDIP_Surround[1] < 3){
-            MKCM_WriteRegister(KCM_LISTEN_MODE, 0x10 | gDIP_Surround[1]);
-        }else {
-            MKCM_WriteRegister(KCM_LISTEN_MODE, 0x30);      // Ñ¡Ôñ¶àÉùµÀÒôÐ§£¬B1:0Îª¸÷ÖÖ²»Í¬Ëã·¨µÄ¶àÉùµÀÒôÐ§
-        }
-        gDIP_Select2Ch = 0;
-        MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SELECT_2CH, 0);
-    }
-
-    if (index == cMenu_Surround2Ch){
-		MDIP_WriteString((char*)&Tab_DIP_Surround2Ch[gDIP_Surround[0] * 6]);
-    }else {
-        MDIP_WriteString((char*)Tab_DIP_Surround8Ch);
-        MDIP_SingleChar(4, ' ');
-        MDIP_SingleChar(5, gDIP_Surround[1] + '1');
-    }
-	MDIP_SurroundSymbol();
-} */
-
 CONST_CHAR Tab_DIP_SRC_CH[] = {
 	"2/01/02/03/02/13/12/23/23/33/42/32/4"
 //	 +++---+++---+++---+++---+++---+++---
@@ -781,12 +696,6 @@ void MDIP_NightMode(){
 		MDIP_WriteString("NIG-OF");
 	}
 }
-void MDIP_Fireware(){
-	gDIP_MenuTimer = 50;
-    MDIP_WriteString("FWDONE");
-}
-
-
 CONST_CHAR Tab_DIP_ExtrInOut[] = {
 	"SD-IN UD-IN SD-OUTUD-OUTPC-OUTBT-OUTHD-OUT"
 //	 ++++++------++++++------++++++------++++++
@@ -878,6 +787,28 @@ void MDIP_AdjDelayTime(BYTE index, BYTE mode){				// 0=LINSYNC 1Ç°ÖÃ 2ÖÐÖÃ 3»·ÈÆ
 		}
 	}
 //MDEBUG(0xc7);MDEBUG(index);MDEBUG(gDIP_DelayTime[index]);
+}
+/*
+void MDIP_Fireware(){
+	gDIP_MenuTimer = 50;
+    MDIP_WriteString("FWDONE");
+}
+  */
+
+
+void MDIP_FirewareInfo(){				                    // ÏÔÊ¾¹Ì¼þ¸üÐÂ
+    BYTE tmpData[10];
+    MKCM_ReadXByte(KCM_RD_INFO, tmpData, 2);
+    if (tmpData[0] == 100){
+        MDIP_WriteString("FWDONE");
+    }else if (tmpData[0] == 104){
+        MDIP_WriteString("FW Err");
+    }else {
+        MDIP_WriteString("FW -");
+        MDIP_Write2Digit(4, tmpData[0]);
+    }
+    MDIP_SetState(MENU_FIREWARE_INFO);
+    gDIP_MenuTimer = 60;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1167,7 +1098,7 @@ void MDIP_ReadSpectrum(){
 	BYTE outData[3];
 
 	// 5¶ÎÆµÆ×£¬×Ö½Ú0µÄB2:0ÎªµÚ1ÁÐ£¬B5:3ÎªµÚ2ÁÐ£¬×Ö½Ú1µÄ B2:0ÎªµÚ3ÁÐ£¬B5:3ÎªµÚ4ÁÐ£¬×Ö½Ú2µÄ B2:0ÎªµÚ5ÁÐ
-	MKCM_ReadXByte(KCM_RD_SPECTRUM, 3, outData);
+	MKCM_ReadXByte(KCM_RD_SPECTRUM, outData, 3);
 //MDEBUG(0xaa);/*MDEBUG(outData[0]);MDEBUG(outData[1]);*/MDEBUG(outData[2]);
 	if (FKCM_I2C_Error){
 		MDIP_ClearSpectrum();

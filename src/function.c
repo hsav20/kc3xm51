@@ -65,8 +65,9 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				MDIP_MenuNormal(cMenu_MasterVolume);
 			}
 		}
-        if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             	// 固件更新，需要读取"KCM_RD_INFO"寄存器
-            MDIP_MenuNormal(cMenu_Fireware);
+        if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             // 固件更新，需要读取"KCM_RD_INFO"寄存器
+            MDIP_FirewareInfo();                            // 显示固件更新
+//            MDIP_MenuNormal(cMenu_Fireware);
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           		// 多媒体播放时间改变
             g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
@@ -143,7 +144,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
     BYTE temp[10];
 
 	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
-	MKCM_ReadXByte(KCM_EXTR_MEMORY, 4, temp);               // 用户记忆
+	MKCM_ReadXByte(KCM_EXTR_MEMORY, temp, 4);               // 用户记忆
 	if (FKCM_I2C_Error){									// 读取KCM出错
 		MDIP_MenuNormal(MENU_RESTORE);						// 已经出错，就不做 
 		return;
@@ -213,7 +214,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
     temp[1] = (BYTE)(CUSTOM_CODE >> 16);
     temp[2] = (BYTE)(CUSTOM_CODE >> 8);
     temp[3] = (BYTE)(CUSTOM_CODE >> 0);
-    MKCM_WriteXByte(KCM_CUSTOM_CODE, 4, temp);              // 设置用户自定义功能代码及升级模块固件寄存器
+    MKCM_WriteXByte(KCM_CUSTOM_CODE, temp, 4);              // 设置用户自定义功能代码及升级模块固件寄存器
                       
     for (select = 0; select < 4; select++){
         // 多路均衡EQ音效处理设置，一般写入一次用于初始化
@@ -221,7 +222,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
             temp[counter + 1] = TabEqSetup[counter];
         }
         temp[0] = select + 1;
-        MKCM_WriteXByte(KCM_EQ_SETUP, 1 + sizeof(TabEqSetup), temp);   // 多路均衡EQ音效处理设置
+        MKCM_WriteXByte(KCM_EQ_SETUP, temp, 1 + sizeof(TabEqSetup));   // 多路均衡EQ音效处理设置
 
         // 多路均衡EQ音效频率，一般写入一次用于初始化
         for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // 写入EQ频率
@@ -231,9 +232,9 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
             temp[counter + 1] |= TabEqLevel[select][counter];
         }
         temp[0] = select + 1;
-        MKCM_WriteXByte(KCM_EQ_VALUE, 1 + sizeof(TabEqFreq), temp);   // 多路均衡EQ音效处理设置
+        MKCM_WriteXByte(KCM_EQ_VALUE, temp, 1 + sizeof(TabEqFreq));   // 多路均衡EQ音效处理设置
     }
-    MKCM_WriteXByte(KCM_WR_SPECTRUM, sizeof(TabSpectrum), TabSpectrum);   // 设置频谱模式
+    MKCM_WriteXByte(KCM_WR_SPECTRUM, TabSpectrum, sizeof(TabSpectrum));   // 设置频谱模式
 
 	// 清除一些上电需要确定值的变量及标志
 	gAUD_SrcFormat = 0;
@@ -274,7 +275,7 @@ void MKCM_FactorySet(){										// 出厂设置
 	gLocal_Buffer[MEM_SURROUND_8CH] = 0;                    // 环绕声模式多声道
 	gLocal_Buffer[MEM_SELECT_2CH] = 0;                      // 选择为立体声
 	gLocal_Buffer[MEM_BRIGHTNESS] = 2;                      // 显示屏亮度
-	MKCM_WriteXByte(KCM_EXTR_MEMORY, 5, gLocal_Buffer);
+	MKCM_WriteXByte(KCM_EXTR_MEMORY, gLocal_Buffer, 5);
 
 	MKCM_WriteRegister(KCM_VOLUME_CTRL, 39); 				// 音量值
 
@@ -292,7 +293,7 @@ void MKCM_FactorySet(){										// 出厂设置
 }
 void MKCM_AppCommand(){
     BYTE inData[8];
-    BYTE length = MKCM_ReadAutoByte(KCM_APP_COMMAND, 8, inData);
+    BYTE length = MKCM_ReadAutoByte(KCM_APP_COMMAND, inData, 8);
     if (length == 2){
 //        MKCM_WriteRegister(inData[0], inData[1]);
     	switch (inData[0]){

@@ -63,13 +63,12 @@ typedef enum {
 
 	KCM_PLAY_SD_QTY = 0xa0,				// 读取SD卡多媒体文件总数量，共2字节
 	KCM_PLAY_UDISK_QTY = 0xa1,			// 读取U盘多媒体文件总数量，共2字节
-	KCM_PLAY_FILE_TIME = 0xa2,			// 读取多媒体文件正在播放的总时间，共2字节单位秒
-	KCM_PLAY_TIME = 0xa3,				// 读取多媒体文件正在播放的时间，共2字节单位秒
-	KCM_PLAY_INDEX = 0xa4,				// 控制多媒体文件播放编号，共2字节
-	KCM_PLAY_STATE = 0xa5,				// 多媒体文件播放状态，共1字节
-	KCM_PLAY_OPERATE = 0xa6,			// 多媒体文件播放控制，共1字节
-	KCM_PLAY_FILE_NAME = 0xa7,			// 当前多媒体文件名，最多32字节
-	KCM_PLAY_SONG_NAME = 0xa8,			// 当前多媒体文件歌曲名，最多32字节
+	KCM_PLAY_FILE_TIME = 0xa2,			// 读取正在播放文件的总时间，共2字节单位秒
+	KCM_PLAY_TIME = 0xa3,				// 读取正在播放的实际时间，共2字节单位秒
+	KCM_PLAY_INDEX = 0xa4,				// 读取/写入文件播放编号，共2字节
+	KCM_PLAY_STATE = 0xa5,				// 读取/写入文件播放状态，共1字节
+	KCM_PLAY_OPERATE = 0xa6,			// 读取/写入文件播放控制，共1字节
+	KCM_PLAY_FILE_NAME = 0xa7,			// 读取当前多媒体文件名/歌曲名，最多32字节
 	KCM_REGISTER_LAST = 0xaf
 } KC3X_REGISTER;
 
