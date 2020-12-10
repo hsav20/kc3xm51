@@ -248,19 +248,19 @@ typedef enum {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef enum {
-    INPUT_SWITCH_AUX = 0,                                   // 0=模拟输入
-    INPUT_SWITCH_OPTIC = 1,                                 // 1=数码1   
-    INPUT_SWITCH_COA1 = 2,                                  // 2=数码2   
-    INPUT_SWITCH_COA2 = 3,                                  // 3=数码3   
-    INPUT_SWITCH_SD = 4,                                    // 4=SD      
-    INPUT_SWITCH_UDISK = 5,                                 // 5=UDISK   
-    INPUT_SWITCH_USBA = 6,                                 	// 6=USB声卡
-    INPUT_SWITCH_BT = 7,                                 	// 7=蓝牙音频
-    INPUT_SWITCH_HDMI1 = 8,                                 // 8=HDMI1   
-    INPUT_SWITCH_HDMI2 = 9,                                 // 9=HDMI2   
-    INPUT_SWITCH_HDMI3 = 10,                                 // 10=HDMI3   
-    INPUT_SWITCH_H_ARC = 11,                                 // 11=HDMI-ARC
-    INPUT_SWITCH_E8CH = 12,                                 // 12=外置7.1声道
+    INPUT_SWITCH_AUX = 0,                                   // 模拟输入
+    INPUT_SWITCH_OPTIC = 1,                                 // 数码1   
+    INPUT_SWITCH_COA1 = 2,                                  // 数码2   
+    INPUT_SWITCH_COA2 = 3,                                  // 数码3   
+    INPUT_SWITCH_SD = 4,                                    // SD      
+    INPUT_SWITCH_UDISK = 5,                                 // UDISK   
+    INPUT_SWITCH_USBA = 6,                                 	// USB声卡
+    INPUT_SWITCH_E8CH = 7,                                  // 外置7.1声道
+    INPUT_SWITCH_BT = 8,                                 	// 蓝牙音频
+    INPUT_SWITCH_HDMI1 = 9,                                 // HDMI1   
+    INPUT_SWITCH_HDMI2 = 10,                                // HDMI2   
+    INPUT_SWITCH_HDMI3 = 11,                                // HDMI3   
+    INPUT_SWITCH_H_ARC = 12,                                // HDMI-ARC
     INPUT_SWITCH_NONE = 13                                  // 循环方式或还没有选择    
 } INPUT_SWITCH;
 

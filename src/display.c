@@ -544,7 +544,7 @@ void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 
 
 CONST_CHAR Tab_DIP_InputSwitch[] = {
-	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC- -BT-  HDMI-1HDMI-2HDMI-3HDMI-A E8CH "
+	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC-  E8CH -BT-  HDMI-1HDMI-2HDMI-3HDMI-A"
 //	 ++++++------++++++------++++++------++++++------++++++------++++++------++++++
 };
 

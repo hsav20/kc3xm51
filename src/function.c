@@ -59,7 +59,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
             MKCM_ReadSrcValid();
 		}
-		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
+		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               	// 音量调节改变中断，需要读取"KCM_VOLUME_CTRL"寄存器获取更新的音量值
 			gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);     // 读取当前音量值
 			if (gDIP_MenuSelect == cMenu_MasterVolume){
 				MDIP_MenuNormal(cMenu_MasterVolume);
@@ -341,20 +341,37 @@ void MKCM_AppCommand(){
 // //////////////////////////////////////////////////
 // KCM寄存器的值与本机调节的值相互转换
 // //////////////////////////////////////////////////
-CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE
-	KCM_INPUT_ANALOG,                                       // 0=模拟输入
-	KCM_INPUT_DIGITAL | 0,                                  // 1=数码1
-    KCM_INPUT_DIGITAL | 1,                                  // 2=数码2
-    KCM_INPUT_DIGITAL | 2, 			                        // 3=数码3
-    KCM_INPUT_MEDIA | 0,                                    // 4=SD
-    KCM_INPUT_MEDIA | 1,		                            // 5=UDISK
-    KCM_INPUT_MEDIA | 2,                                    // 6=USB声卡
-    KCM_INPUT_MEDIA | 3,		                            // 7=蓝牙音频
-    KCM_INPUT_HDMI | 0,				                        // 8=HDMI1
-    KCM_INPUT_HDMI | 1,                                     // 9=HDMI2
-    KCM_INPUT_HDMI | 2,                                     // 10=HDMI3
-    KCM_INPUT_HDMI | 4,	                                    // 11=HDMI-ARC 
+CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE     KC3X_INPUT_TYPE
+	KCM_INPUT_ANALOG,			                            // 音源选择模拟输入
+	KCM_INPUT_RX1,				                            // 音源选择RX1输入
+	KCM_INPUT_RX2,				                            // 音源选择RX2输入
+	KCM_INPUT_RX3,				                            // 音源选择RX3输入
+	KCM_INPUT_SD,				                            // 音源选择SD/TF卡输入
+	KCM_INPUT_UDISK,				                        // 音源选择U盘输入
+	KCM_INPUT_PC,				                            // 音源选择USB声卡输入
+	KCM_INPUT_E8CH,				                            // 音源选择外置7.1声道输入
+	KCM_INPUT_BT,				                            // 音源选择蓝牙输入
+	KCM_INPUT_HDMI1,				                        // 音源选择HDMI1输入
+	KCM_INPUT_HDMI2,				                        // 音源选择HDMI2输入
+	KCM_INPUT_HDMI3,				                        // 音源选择HDMI3输入
+	KCM_INPUT_ARC,				                            // 音源选择HDMI ARC输入
 };  						 
+/*	KCM_INPUT_ANALOG,                                       // 模拟输入
+	KCM_INPUT_DIGITAL | 0,                                  // 数码1
+    KCM_INPUT_DIGITAL | 1,                                  // 数码2
+    KCM_INPUT_DIGITAL | 2, 			                        // 数码3
+    KCM_INPUT_MEDIA | 0,                                    // SD
+    KCM_INPUT_MEDIA | 1,		                            // UDISK
+    KCM_INPUT_MEDIA | 2,                                    // USB声卡
+    KCM_INPUT_MEDIA | 3,		                            // 外置7.1声道
+    KCM_INPUT_MEDIA | 4,		                            // 蓝牙音频
+    KCM_INPUT_HDMI | 0,				                        // HDMI1
+    KCM_INPUT_HDMI | 1,                                     // HDMI2
+    KCM_INPUT_HDMI | 2,                                     // HDMI3
+    KCM_INPUT_HDMI | 4,	                                    // HDMI-ARC 
+  */
+
+
 
 CONST_CHAR Tab_SurroundMode[] = {
 	0x00, 0x01, 0x10, 0x11, 0x12, 0x13,

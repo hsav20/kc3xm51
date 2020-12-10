@@ -120,7 +120,8 @@ typedef enum {
 	KCM_INPUT_SD = 0x30,				// 音源选择SD/TF卡输入
 	KCM_INPUT_UDISK = 0x31,				// 音源选择U盘输入
 	KCM_INPUT_PC = 0x32,				// 音源选择USB声卡输入
-	KCM_INPUT_BT = 0x33,				// 音源选择蓝牙输入
+	KCM_INPUT_E8CH = 0x33,				// 音源选择外置7.1声道输入
+	KCM_INPUT_BT = 0x34,				// 音源选择蓝牙输入
 	KCM_INPUT_SIGNAL = 0x40				// 音源选择内部产生信号
 } KC3X_INPUT_TYPE;
 
