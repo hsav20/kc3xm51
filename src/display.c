@@ -78,7 +78,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if (!FSYS_Standby && !FSYS_MuteEnable && !FSYS_TestTone && FDIP_FreqSymbol && ((gAUD_SrcFormat & 0x0f) >= KCM_SRC_NOS)){
             MDIP_ReadSpectrum();
 		}else {
-//		MLOG("FSYS_TestTone:%d %d\r\n", (u32)FSYS_TestTone, (u32)FSYS_TestTone);
+//		MLOG("FSYS_TestTone:%d %d", FSYS_TestTone, FSYS_TestTone);
 		}
 	}
     return;
@@ -555,7 +555,7 @@ void MDIP_InputSource(){
 	else {
 		g2DIP_ShowBuffer[6] &= ~0x0020;	
 	}
-//MLOG("MDIP_InputSource: %02x\r\n", (u32)g2DIP_ShowBuffer[6]);
+MLOG("Source: %02x %02x", mINPUT_SWITCH, g2DIP_ShowBuffer[6]);
 	MDIP_WriteString((char*)&Tab_DIP_InputSwitch[mINPUT_SWITCH * 6]);
 }
 void MDIP_VideoSrc(){
@@ -873,7 +873,7 @@ void MDIP_SrcFormatSymbol(){
 }
 void MDIP_PlaySymbol(BYTE status){
 	BYTE flag = status & 0x03;
-//	MLOG("MDIP_PlaySymbol %02x\r\n", (u32)status);
+//	MLOG("MDIP_PlaySymbol %02x", status);
 	DIP_PLAY_OFF();
 	if (flag == KC3X_STATE_PLAY_PAUSE){
 		g2DIP_ShowBuffer[7] |= 0x08;

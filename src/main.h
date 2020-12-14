@@ -195,8 +195,6 @@ BYTE MKEY_FirstPress(BYTE gLocal_0);
 void MKCM_10msTimer(BYTE baseTimer);   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
 void MPKey_Scan();											// Ãæ°å°´¼üÉ¨Ãè
 
-void MDEBUG(BYTE gLocal_1);
-
 void MTestToneShow();
 void MMenuSelect();
 void MPowerCtrl();

@@ -23,7 +23,7 @@ static char Hex2Ascii(char lowercase, unsigned char value){
 // zeroPad 	不管前面是否非0，共需要显示的位数
 // value 	输入的数据
 // outData 	输出的串（定义缓冲区必需大于10）
-static u8 formatValue(char mode, char zeroPad, u32 value, char* outData){
+static u8 formatValue(char mode, char zeroPad, u8 value, char* outData){
     char FLocal_2;
     unsigned char gLocal_2;
     unsigned char gLocal_3;
@@ -38,6 +38,7 @@ static u8 formatValue(char mode, char zeroPad, u32 value, char* outData){
     FLocal_2 = 0;
 	gLocal_2 = 0;
 	if (mode == 'd' || mode == 'u'){                        // 'd'为有符号十进制，'u'为无符号十进制
+	    /*
 	    u32 g4Local_1 = 1000000000;
 		if (mode == 'd' && value & 0x80000000){				// 负数
 	        outData[gLocal_2++] = '-';
@@ -55,9 +56,31 @@ static u8 formatValue(char mode, char zeroPad, u32 value, char* outData){
 	        value %= g4Local_1;
 	        g4Local_1 /= 10;
 	    } while(g4Local_1 != 0);
+        */
+        gLocal_3 = value / 100;
+        if (gLocal_3){
+            outData[gLocal_2++] = Hex2Ascii(0, gLocal_3);
+        }else if (zeroPad == 3){
+            outData[gLocal_2++] = '0';
+        }
+        gLocal_3 = value % 100;
+        gLocal_4 = gLocal_3 / 10;
+        if (gLocal_4){
+            outData[gLocal_2++] = Hex2Ascii(0, gLocal_4);
+        }else if (zeroPad == 2){
+            outData[gLocal_2++] = '0';
+        }
+        outData[gLocal_2++] = Hex2Ascii(0, gLocal_3 % 10);
 	}
 	else {                                                  // 'x'为16进制小写字母，'X'为16进制大写字母
-		gLocal_3 = 32;
+//MDEBUG(0xa9);MDEBUG(zeroPad);
+        if (value & 0xf0){
+            outData[gLocal_2++] = Hex2Ascii((mode == 'X') ? 1 : 0, value >> 4);
+        }else if (zeroPad >= 2){
+            outData[gLocal_2++] = '0';
+        }
+        outData[gLocal_2++] = Hex2Ascii((mode == 'X') ? 1 : 0, value);
+		/*gLocal_3 = 8;
 		gLocal_4 = 9;
 		do {
 			gLocal_3 -= 4;
@@ -69,6 +92,7 @@ static u8 formatValue(char mode, char zeroPad, u32 value, char* outData){
 				outData[gLocal_2++] = Hex2Ascii((mode == 'X') ? 1 : 0, gLocal_5);
 			}
 		} while (gLocal_3 != 0);
+        */
 	}
 	outData[gLocal_2] = 0x00;
     return gLocal_2;
@@ -80,18 +104,22 @@ u8 VsPrintf(char* outData, const char* fmt, va_list args){
 	char* strData;
 	char nowStr;
 	char zeroPad;
-	u32 value;
+//	u32 value;
+	u8 value;
 	while (1){
+//MDEBUG(0xa1);MDEBUG(inCoun);MDEBUG(fmt[inCoun]);
 		if (fmt[inCoun] != '%') {
 			if (outCoun > 30){
 //OWN_LOG("return A %d %d\r\n",inCoun, outCoun);							
+
+				return outCoun;
+			}
+			if (!fmt[inCoun]){
+//OWN_LOG("return B %d %d\r\n",inCoun, outCoun);
+//MDEBUG(0xa2);
 				return outCoun;
 			}
 			outData[outCoun++] = fmt[inCoun++];
-			if (!fmt[inCoun]){
-//OWN_LOG("return B %d %d\r\n",inCoun, outCoun);											
-				return outCoun;
-			}
 			continue;
 		}
 		nowStr = fmt[inCoun+1];
@@ -129,19 +157,20 @@ u8 VsPrintf(char* outData, const char* fmt, va_list args){
 
 //OWN_LOG("EE %d %d %02x %02x\r\n", zeroPad, strCoun, inCoun+1, outCoun);// 补零
 		strData = (char*)&fmt[(1 + inCoun + strCoun)];
-		inCoun = 1 + 1 + inCoun + strCoun;
+//MDEBUG(0xa8);MDEBUG(strCoun);
+		inCoun = 1 + 1 + inCoun + strCoun;              // % x 02
 		switch (strData[0]){
 		case 'd':										// 有符号十进制
 		case 'u':										// 无符号十进制
 		case 'x': 										// 小写的十六进制
 		case 'X': 										// 大写的十六进制 
+//			value = va_arg(args,char);
+  //          value <<= 8;
+	//		value |= va_arg(args,char);
+      //      value <<= 8;
 			value = va_arg(args,char);
-            value <<= 8;
-			value |= va_arg(args,char);
-            value <<= 8;
-			value |= va_arg(args,char);
-            value <<= 8;
-			value |= va_arg(args,char);
+//            value <<= 8;
+//			value |= va_arg(args,char);
 			outCoun += formatValue(strData[0], zeroPad, value, &outData[outCoun]);
 			break;
 		}
@@ -150,17 +179,40 @@ u8 VsPrintf(char* outData, const char* fmt, va_list args){
 	return outCoun;
 }
 
+void memset(u8* str, u8 value, int length){
+    while (--length != 0){
+        *str = value;
+    }
+}
+void MDEBUG(char value){
+    /*
+    while (TI);
+    TI = 0;
+    SBUF = value;
+    */
+	TI = 0;
+	SBUF = value;
+	while (!TI);
+
+}
 
 void MLOG(char *fmt, ...){
 	char counter;
 	char length;
 	va_list args; 
 	va_start(args, fmt);  
+    
+//    memset(gLogBuffer, 0, sizeof(gLogBuffer));
     length = VsPrintf(gLogBuffer, fmt, args);
+//MDEBUG(length);
+    gLogBuffer[length++] = '\r';                            // 在显示最后加入回车
+    gLogBuffer[length++] = '\n';                            // 在显示最后加入换行                       
 	va_end(args); 
+    
     for (counter = 0; counter < length; counter++){
-        TI = 0;
-        SBUF = gLogBuffer[counter];
-        while (!TI);
-    }
+        MDEBUG(gLogBuffer[counter]);
+//        TI = 0;
+  //      SBUF = gLogBuffer[counter];
+    //    while (!TI);
+    } 
 }

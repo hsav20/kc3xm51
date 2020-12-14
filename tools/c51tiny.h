@@ -244,3 +244,4 @@ extern void          _nop_     (void);
 #define NOP          _nop_
 
 void MLOG(char *fmt, ...);
+void MDEBUG(char value);

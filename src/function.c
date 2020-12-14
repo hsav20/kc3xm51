@@ -16,7 +16,7 @@ void MKCM_SetPowerOn(){ 									// KCM开机
 	MKCM_WriteRegister(KCM_POWER_ON, 1);
     MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 100;									// 暂时锁定显示10秒
-    MLOG("KCM_POWER_ON\r\n");
+    MLOG("KCM_POWER_ON");
 }	  
 
 
@@ -29,18 +29,18 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		gLocal_1 = MKCM_ReadRegister(KCM_READ_IRQ);			// Read interrupt 读取KCM中断
 		MKCM_WriteRegister(KCM_CLEAR_IRQ, gLocal_1);  		// Clear interrupt 清除相应的中断
 		if (FKCM_I2C_Error){
-            MLOG("KCM_READ_IRQ Error\r\n");
+            MLOG("KCM_READ_IRQ Error");
 			return;
 		}
 		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// 不是多媒体播放时间改变
-// MLOG("KCM_READ_IRQ %02x\r\n", (u32)gLocal_1);
+// MLOG("KCM_READ_IRQ %02x", gLocal_1);
 		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// 模式初始化完成中断，需要写入"KCM_POWER_ON"寄存器，
             MKCM_RestoreMemory();
 		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
-			//MLOG("gAUD_SrcFormat %02x\r\n", (u32)gAUD_SrcFormat);
+			//MLOG("gAUD_SrcFormat %02x", gAUD_SrcFormat);
             gAUD_BpsRate = MKCM_ReadRegister(KCM_BPS_RATE);
 			if (gDIP_MenuLock == 0){						// 
 				if (!FSYS_TestTone){						// 没有打开噪音测试
@@ -81,7 +81,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_STATE) > 0){           // 多媒体文件播放状态改变
         	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATE);     // 读取多媒体文件播放状态
-			MLOG("KCM_IRQ_PLAY_STATE %02x\r\n", (u32)gPlayStatus);
+			MLOG("KCM_IRQ_PLAY_STATE %02x", gPlayStatus);
         	MDIP_PlaySymbol(gPlayStatus);
         }
 		if ((gLocal_1 & KCM_IRQ_APP_COMMAND) > 0){          // 收到手机/远程APP控制指令，需要读取"KCM_APP_COMMAND"寄存器
@@ -144,27 +144,32 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
     BYTE temp[10];
 
 	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
-	MKCM_ReadXByte(KCM_EXTR_MEMORY, temp, 4);               // 用户记忆
+	MKCM_ReadXByte(KCM_EXTR_MEMORY, temp, 4);               // 读取用户记忆区的记忆到temp
 	if (FKCM_I2C_Error){									// 读取KCM出错
 		MDIP_MenuNormal(MENU_RESTORE);						// 已经出错，就不做 
 		return;
 	}
+    value = temp[MEM_SOURCE_AUTO];
 //	gDIP_Surround[0] = temp[MEM_SURROUND_2CH] & 0x01;       // 聆听模式立体声
 //	gDIP_Surround[1] = temp[MEM_SURROUND_8CH] & 0x03;       // 聆听模式多声道
 	//gDIP_Select2Ch = temp[MEM_SELECT_2CH] & 0x01;           // 选择为立体声
 	gDIP_Brightness = temp[MEM_BRIGHTNESS] & 0x03;          // 显示屏亮度
+//MLOG("BrightA_%02x_%02x_", temp[MEM_SOURCE_AUTO], temp[MEM_BRIGHTNESS]);
 
-	// 输入端口选择：使用KCM_INPUT寄存器的记忆值
-	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
-	gSYS_ModelType = MKCM_ReadRegister(KCM_RD_INFO);
 	gLocal_1 = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
-	MLOG("INPUT_SWITCH %02x %d\r\n", (u32)value, (u32)gLocal_1, (u32)temp[MEM_SOURCE_AUTO]);
+	MLOG("RestoreA %02x %02x %02x", value, gLocal_1, temp[MEM_SOURCE_AUTO]);
 	if (gLocal_1 >= INPUT_SWITCH_SD && gLocal_1 <= INPUT_SWITCH_BT){	// SD/UDISK/USB声卡/蓝牙音频
 		mINPUT_SWITCH = temp[MEM_SOURCE_AUTO];  			// 自动输入的恢复 
 	}else{
 		mINPUT_SWITCH = gLocal_1;							// 使用KCM记忆的输入端口选择
 	}
+//MLOG("mINPUT_B %02x %02x", mINPUT_SWITCH, gLocal_1);
 	
+	// 输入端口选择：使用KCM_INPUT寄存器的记忆值
+	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
+	MKCM_ReadXByte(KCM_RD_INFO, temp, 2);                   // 读取模块信息寄存器
+    gSYS_ModelType = temp[1];                               // [0]文件升级百分比[1]模块型号[2-n]每8字节为各种固件的日期版本
+
 
 	// 音量：使用KCM_VOLUME寄存器的记忆值
 	gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);	// 记忆的音量值
@@ -244,7 +249,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	FSYS_TestTone = 0;
 	FSYS_MuteEnable = 0;
 	gRemoveTimer = 0;
-	MAUD_MakePreemptible(0x0000);							// 生成抢占式输入选择 
+	MAUD_MakePreemptible(KCM_SRC_VALID_E8CH);				// 生成抢占式输入选择，模块版本是KC35H，需要加入外置7.1声道 
 
     MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 10;										// 可以退出暂时锁定显示了
@@ -298,23 +303,23 @@ void MKCM_AppCommand(){
 //        MKCM_WriteRegister(inData[0], inData[1]);
     	switch (inData[0]){
     	case KCM_VOLUME_CTRL:									// 音频静音及音量加减控制
-            MLOG("KCM_VOLUME_CTRL %d\r\n", (u32)inData[1]);
+            MLOG("KCM_VOLUME_CTRL %d", inData[1]);
             gAUD_MasterVolume = inData[1];
             MDIP_MenuNormal(cMenu_MasterVolume);
     		break;
     	case KCM_INPUT_SOURCE:									// 输入音源选择
-            MLOG("KCM_INPUT_SOURCE %02x\r\n", (u32)inData[1]);
+            MLOG("KCM_INPUT_SOURCE %02x", inData[1]);
     		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, inData[1]);	// 通过寄存器反向将选择的数值恢复
     		MAUD_AutoCanclMute();
     		MAUD_AutoCanclTestTone();
     		MDIP_MenuNormal(MENU_RESTORE);
     		break;
 	    case KCM_LISTEN_MODE:				                    // 聆听模式选择
-            MLOG("KCM_LISTEN_MODE %02x\r\n", (u32)inData[1]);
+            MLOG("KCM_LISTEN_MODE %02x", inData[1]);
             MDIP_ListenMode(inData[1]);
             break;
 	    case KCM_EQ_SELECT:				                        // 多路均衡音效处理选择
-            MLOG("KCM_LISTEN_MODE %02x\r\n", (u32)inData[1]);
+            MLOG("KCM_LISTEN_MODE %02x", inData[1]);
             MDIP_EqSelect(inData[1]);
             break;
 
@@ -330,7 +335,7 @@ void MKCM_AppCommand(){
     	default :
             if (inData[0] >= KCM_FL_TRIM && inData[0] <= KCM_BR_TRIM){    // 各声道的微调
             }
-        MLOG("AppCommand %02x %02x %02x\r\n", (u32)length, (u32)inData[0], (u32)inData[1]);
+        MLOG("AppCommand %02x %02x %02x", length, inData[0], inData[1]);
     	    break;
     	}
     }
@@ -356,20 +361,6 @@ CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE     KC3X_INPUT_TYPE
 	KCM_INPUT_HDMI3,				                        // 音源选择HDMI3输入
 	KCM_INPUT_ARC,				                            // 音源选择HDMI ARC输入
 };  						 
-/*	KCM_INPUT_ANALOG,                                       // 模拟输入
-	KCM_INPUT_DIGITAL | 0,                                  // 数码1
-    KCM_INPUT_DIGITAL | 1,                                  // 数码2
-    KCM_INPUT_DIGITAL | 2, 			                        // 数码3
-    KCM_INPUT_MEDIA | 0,                                    // SD
-    KCM_INPUT_MEDIA | 1,		                            // UDISK
-    KCM_INPUT_MEDIA | 2,                                    // USB声卡
-    KCM_INPUT_MEDIA | 3,		                            // 外置7.1声道
-    KCM_INPUT_MEDIA | 4,		                            // 蓝牙音频
-    KCM_INPUT_HDMI | 0,				                        // HDMI1
-    KCM_INPUT_HDMI | 1,                                     // HDMI2
-    KCM_INPUT_HDMI | 2,                                     // HDMI3
-    KCM_INPUT_HDMI | 4,	                                    // HDMI-ARC 
-  */
 
 
 
