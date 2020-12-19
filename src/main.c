@@ -17,33 +17,6 @@ void main(){
     while (1){ 						   
         
         if ((gTBascTimer & 0x01) > 0){						// 10ms (B3=1000ms B2=500ms B1=100ms B0=10ms) 
-        
-if ((gTBascTimer & 0x08) > 0){						// 10ms (B3=1000ms B2=500ms B1=100ms B0=10ms) 
-if(++g2TimeLength>3){
-/*
-BYTE temp[10];
-temp[0]=0x01;temp[4]=0xff;
-MLOG("A_%02x_%02x", temp[MEM_SOURCE_AUTO], temp[MEM_BRIGHTNESS]);
-*/
-/*
-BYTE select=0x12;
-BYTE last=0x34;
-BYTE ggg=0x56;
-
-
-//MLOG("ROOT %02x %03d P", aaa, bbb);
- //       MLOG("A:%02x B:%02x", select, last);
-//MLOG("A:%02x B:%02x C:%02x", select, last, ggg);
-//		MLOG("InputSourceB:%d last:%02x", select, MKCM_ReadRegister(KCM_INPUT_SOURCE));
-mINPUT_SWITCH=8;
-MLOG("A:_%02x_%02x", mINPUT_SWITCH, last);//, , g2DIP_ShowBuffer[6]);
-MDEBUG(0x66);
-
-MDEBUG(mINPUT_SWITCH);
-
-*/
-g2TimeLength=0;}}       
-
 	        MKCM_10msTimer(gTBascTimer);                	// 子处理模块10ms时间处理 		
 			MKEY_10msTimer(gTBascTimer);					// 按键模块10ms时间处理
             MDIP_10msTimer(gTBascTimer);  					// 显示模块10ms时间处理
