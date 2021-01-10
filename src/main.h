@@ -14,8 +14,10 @@
 
 // ！！！以上设置请选择一个适合自己的编译，而且必须选择一个(只有一个没有//注释)
 
-#define DISPLAY_OLD                                         // 定义就编译 旧版本显示屏(P25取反)
+#define DISPLAY_OLD                                         // 定义就编译 旧版本显示屏(P2.5取反)
 
+#define TONE_ENABLE                                       	// 定义就使用遥控器的音调、音调+、音调-
+#define MICROPHONE                                         	// 定义就将遥控器的音调、音调+、音调-改变为话筒控制
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,7 +269,6 @@ BYTE MAUD_GetInputSource(BYTE memory);
 void MDIP_SetState(MENU_STATE state);                       // 设置菜单状态
 
 void MKEY_ListenMode(BYTE stereo);                          // 按键聆听模式选择
-void MKEY_EqSelect();                                       // 按键EQ均衡器模式
 
 void MDIP_EqSelect(BYTE value);                             // 显示EQ均衡器模式
 void MDIP_ChannelTrim(SPKER_CHANNEL channel, BYTE value);   // 显示通道微调
@@ -334,3 +335,8 @@ void MDIP_Brightness(BYTE show, BYTE bright);
 void MKCM_AppCommand();
 void MKCM_WifiCommand(BYTE regNumber, BYTE value);			// 收到远程APP的指令
 
+void MEQMIC_Restore();										// EQ及话筒恢复记忆
+void MEQMIC_KeyEqSelect();                                  // 按键EQ均衡器模式
+void MEQMIC_KeyCtrl();										// EQ或MIC按键CTRL入口
+void MEQMIC_KeyUp();										// EQ或MIC按键调节+入口
+void MEQMIC_KeyDown();										// EQ或MIC按键调节-入口

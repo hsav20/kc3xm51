@@ -78,50 +78,6 @@ void MAUD_MixTrimAdjust(BYTE index, BYTE directUp){
 //MDEBUG(0xaa);MDEBUG(index);MDEBUG(KCM_FL_TRIM + address);MDEBUG(value);
     MKCM_WriteRegister(KCM_FL_TRIM + address, value);
 }
-void MAUD_MixMicAdjust(BYTE index, BYTE directUp){
-	BYTE value;
-    BYTE temp0;
-
-	MAUD_AutoCanclMute();
-    temp0 = index - cMenu_MicVolume1;
-	if (directUp){
-		if (gDIP_MicCtrl[temp0] < 9){
-			++gDIP_MicCtrl[temp0];
-		}
-	}
-	else {
-		if (gDIP_MicCtrl[temp0] > 0){
-			--gDIP_MicCtrl[temp0];
-		}
-	}
-    switch (index){                                     // 0话筒1音量 1话筒2  2回声 3重复 4延迟 5混响
-    case cMenu_MicVolume1:                               // 话筒1音量
-    case cMenu_MicVolume2:                               // 话筒2音量
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[0]);
-        temp0 = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[1]);
-        MKCM_WriteRegister(KCM_MIC_VOLUME, temp0 << 4 | value);   // 话筒1及话筒2音量比例
-        break;
-    case cMenu_MicEcho:                                 // 话筒回声比例
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[2]);
-        temp0 = 0;                                  // 话筒多段EQ均衡音效处理选择比例
-        MKCM_WriteRegister(KCM_MIC_ECHO_EQ, temp0 << 4 | value);   // 话筒回声及话筒多段EQ均衡音效处理选择比例
-        break;
-    case cMenu_MicRepeat:                               // 话筒重复比例
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[3]);
-        temp0 = 8;                                  // 直达声比例固定为8
-        MKCM_WriteRegister(KCM_MIC_REPEAT, temp0 << 4 | value);
-        break;
-    case cMenu_MicReverb:                               // 话筒混响比例
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[5]);
-        temp0 = 1;                                  // 话筒混响2固定为1
-        MKCM_WriteRegister(KCM_MIC_REVERB, temp0 << 4 | value);
-        break;
-    case cMenu_MicDelay:                                // 话筒延迟时间，每步20毫秒
-        value = MKCM_ToRegister(KCM_MIC_DELAY, gDIP_MicCtrl[4]);    // 0-255转换到0-9
-        MKCM_WriteRegister(KCM_MIC_DELAY, value);
-        break;
-    }
-}
 void MAUD_AutoCanclTestTone(){
 //MDEBUG(0xa7);
 	if (FSYS_TestTone){
@@ -264,20 +220,20 @@ void MKCM_ReadSrcValid(){
 	        	switch (flag){
 	            case KCM_SRC_VALID_SD:
 		            g2SdQty = MKCM_Read2Byte(KCM_PLAY_SD_QTY);
-		            if (g2SdQty){								// 有播放文件 
-			            g2PlayIndex = 0;
+		            if (g2SdQty){							// 有播放文件 
+			            g2PlayIndex = 0xffff;				// 没有指定播放文件
 	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
             		}else {
 		            	MDIP_MenuNormal(cMenu_SdInsert); 
-		            	found = 0;								// 没有播放文件 
+		            	found = 0;							// 没有播放文件 
 		            }
 					break;	
 	            case KCM_SRC_VALID_UDISK: 
 					g2UDiskQty = MKCM_Read2Byte(KCM_PLAY_UDISK_QTY);
-					if (g2UDiskQty){								// 有播放文件 
-			            g2PlayIndex = 0;
+					if (g2UDiskQty){						// 有播放文件 
+			            g2PlayIndex = 0xffff;				// 没有指定播放文件
 	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
-            		}else {										// 没有播放文件 
+            		}else {									// 没有播放文件 
 		            	MDIP_MenuNormal(cMenu_UDiskInsert); 
 		            	found = 0;
 		            }

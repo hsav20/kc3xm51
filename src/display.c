@@ -162,7 +162,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 		gDIP_MenuTimer = 50;
 		MDIP_VideoSrc();
 		break;
-	case cMenu_SrcFormat:
+	case MENU_SRC_FORMAT:									// 菜单显示输入码流格式
 		MDIP_SourceFormat();
 		break;
 	case cMenu_NightMode:
@@ -397,36 +397,6 @@ void MDIP_TrimControl(BYTE index, MENU_SET mode){          // 声道微调参数调节
             MDIP_SingleChar(4, ' ');
             MDIP_SingleChar(5, (value - 9) + '0');
         }
-		if (mode == MENU_SET_NORMAL){                           // 正常的显示模式
-			gDIP_MenuTimer = 80;
-			FDIP_MenuTwinkle = 1;
-		}
-       
-	}
-}
-// 话筒1音量 话筒2音量 话筒回声比例 话筒重复比例 话筒延迟时间 话筒混响比例
-CONST_CHAR Tab_DIP_MicShow[] = {
-	"MIC1MIC2ECHOREPTDELYREVB"
-//	 ++++----++++----++++----
-};
-void MDIP_MicControl(BYTE index, MENU_SET mode){
-//if(mode!=MENU_SET_TWINKLE_ON&&mode!=MENU_SET_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(mode);}
-	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWN或MENU_SET_ADJ_UP 
-		if (index == gDIP_MenuSelect){                      // 上次已经进入当前菜单
-			MAUD_MixMicAdjust(index, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	
-			gDIP_MenuTimer = 80;
-		}
-	}
-    index -= cMenu_MicVolume1;                              // 从话筒1音量开始
-	MDIP_WriteString((char*)&Tab_DIP_MicShow[index * 4]);
-    MDIP_SingleChar(4, ' ');
-
-	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFF闪烁熄灭
-		MDIP_SingleChar(5, ' ');
-	}
-	else {											        // MENU_SET_NORMAL或MENU_SET_TWINKLE_ON闪烁点亮
-    	BYTE gLocal_1 = gDIP_MicCtrl[index];
-        MDIP_SingleChar(5, gLocal_1 + '0');
 		if (mode == MENU_SET_NORMAL){                           // 正常的显示模式
 			gDIP_MenuTimer = 80;
 			FDIP_MenuTwinkle = 1;

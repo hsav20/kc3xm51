@@ -64,7 +64,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MKEY_ListenMode(0);                             // 按键聆听模式选择
 			break;
  		case cPanKey_EqSelect:                              // 面板EQ均衡器选择
-			MKEY_EqSelect();                                // 按键EQ均衡器选择
+			MEQMIC_KeyEqSelect();                           // 按键EQ均衡器选择
 			break;
 
 		case cPanKey_PlayPause:
@@ -128,16 +128,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MKCM_FactorySet();
 			break;
 		case cRmKey_MicCtrl:
-			if (CUSTOM_CODE != 0x44443000){			// 不是这个版本，旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
-				if (gDIP_MenuSelect < cMenu_MicVolume1){	    // 还没有进入Mic菜单 
-					MDIP_MenuNormal(cMenu_MicVolume1);
-				}else {
-					if (++gDIP_MenuSelect > cMenu_MicReverb){
-						gDIP_MenuSelect = cMenu_MicVolume1;
-					}
-					MDIP_MenuNormal(gDIP_MenuSelect);
-				}
-			}
+			MEQMIC_KeyCtrl();								// EQ或MIC按键CTRL入口
 			break;
 		case cRmKey_TrimUp:
             if (gDIP_MenuSelect >= cMenu_ChTrimFL && gDIP_MenuSelect <= cMenu_ChTrimSL){	// 已经进入声道微调菜单 
@@ -158,20 +149,10 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
 			break;
 		case cRmKey_MicUp:
-			if (CUSTOM_CODE != 0x44443000){			// 不是这个版本，旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
-				if (gDIP_MenuSelect >= cMenu_MicVolume1 && gDIP_MenuSelect <= cMenu_MicReverb){	// 已经进入Mic菜单 
-					gRmKeyContinCanclTm = 1;
-					MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
-				}
-			}
+			MEQMIC_KeyUp();									// EQ或MIC按键调节+入口
 			break;
 		case cRmKey_MicDown:
-			if (CUSTOM_CODE != 0x44443000){			// 不是这个版本，旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
-				if (gDIP_MenuSelect >= cMenu_MicVolume1 && gDIP_MenuSelect <= cMenu_MicReverb){	// 已经进入Mic菜单 
-					gRmKeyContinCanclTm = 1;
-					MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
-				}
-			}
+			MEQMIC_KeyDown();								// EQ或MIC按键调节-入口
 			break;
 		case cRmKey_VolumeUp:
 			gRmKeyContinCanclTm = 1;
@@ -325,8 +306,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_UP);  // 多媒体播放前一首
 			break;
 		case cRmKey_EqSelect:
-			//MDIP_MenuNormal(cMenu_EqSelect);
-            MKEY_EqSelect();                                // 按键EQ均衡器选择
+            MEQMIC_KeyEqSelect();                           // 按键EQ均衡器选择
 			break;
 		case cRmKey_NightMode:
 			MDIP_MenuNormal(cMenu_NightMode);
@@ -554,13 +534,3 @@ void MKEY_ListenMode(BYTE stereo){                          // 按键聆听模式选择
     MDIP_ListenMode(value);
 }
 
-void MKEY_EqSelect(){                                       // 按键EQ均衡器选择
-    BYTE value = MKCM_ReadRegister(KCM_EQ_SELECT);          // 多路均衡音效处理选择
-    if (gDIP_MenuSelect == MENU_EQ_SELECT){                 // 只有进入对应的菜单才改变模式
-        if (++value > 4){                                   // 1至4分别为4组预置音效高低音音调或多段EQ均衡器。
-            value = 0;                                      // 0为停止使用音效
-        }
-        MKCM_WriteRegister(KCM_EQ_SELECT, value);
-    }
-    MDIP_EqSelect(value);
-}

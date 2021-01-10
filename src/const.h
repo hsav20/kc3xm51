@@ -18,7 +18,7 @@
 #define HAL_PKEY_2(b)					{P22=b;}
 #define HAL_PKEY_3(b)					{}
 
-#ifdef DISPLAY_OLD                                          // 定义就编译 旧版本显示屏(P25取反)
+#ifdef DISPLAY_OLD                                          // 定义就编译 旧版本显示屏(P2。5取反)
 #define HAL_DIP_LED(b)                	{P25=b;}
 #else
 #define HAL_DIP_LED(b)                	{P25=b^1;}
@@ -131,7 +131,7 @@ typedef enum {
     MENU_EQ_SELECT = 0x05,                                  // 菜单EQ均衡器选择
 
     cMenu_VideoSrc = 6,
-    cMenu_SrcFormat = 7,
+    MENU_SRC_FORMAT = 7,                                    // 菜单显示输入码流格式
     cMenu_Standby = 8,
     cMenu_Brightness = 9,
     cMenu_AudioMute = 10,
@@ -233,11 +233,9 @@ typedef enum {
 } SPKER_SETUP;
 
 typedef enum {
-    MEM_SOURCE_AUTO = 0,                                   	// 自动输入的恢复 
-    MEM_SURROUND_2CH = 1,                                   // 环绕声模式立体声
-    MEM_SURROUND_8CH = 2,                                   // 环绕声模式多声道
-    MEM_SELECT_2CH = 3,                                     // 选择为立体声
-    MEM_BRIGHTNESS = 4                                      // 显示屏亮度
+    MEM_BRIGHTNESS = 0,                                     // 显示屏亮度
+    MEM_SOURCE_AUTO = 1,                                   	// 自动输入的恢复 
+    MEM_SELECT_2CH = 2                                      // 选择为立体声
 } MEMORY_USER;                                              // 用户记忆
 
 

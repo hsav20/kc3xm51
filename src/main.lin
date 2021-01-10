@@ -4,6 +4,7 @@
 "audio.obj",
 "key.obj",
 "display.obj",
+"EqMic.obj",
 "c51tiny.obj",
 "main.obj"
 

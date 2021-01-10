@@ -2,7 +2,7 @@
     "configurations": [
         {
             "name": "Keil",
-            "compilerPath": "${workspaceFolder}/c.bat",
+            "compilerPath": "${workspaceFolder}\\c.bat",
             "includePath": [
                 "${workspaceFolder}/**",
                 "src", "tools"
