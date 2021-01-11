@@ -303,12 +303,6 @@ CONST_CHAR Tab_ChannelTrim[] = {
 	0x10 | 4, 0x10 | 3, 0x10 | 2, 0x10 | 1, 0x00,		    // -4 -3 -2 -1 0  dB
 	1,2,3,4,5,6,7,8,9, 								        // +1 ~ +9 dB
 };  						 
-CONST_CHAR Tab_MicDelay[] = {                               // 0-255×ª»»µ½0-9
-    60/20,80/20,100/20,120/20,      160/20,200/20,300/20,500/20,    1000/20,2000/20,    // µ¥Î»ºÁÃë    
-};
-CONST_CHAR Tab_Mic16To10[] = {                              // 0-15×ª»»µ½0-9
-    0,2,4,6,     8,10,12,13,    14,15,         
-};
 
 BYTE MKCM_ToRegister(BYTE index, BYTE counter){				// ´Ó±¾»ú´¦ÀíµÄÖµ£¬×ª»»µ½KCM¼Ä´æÆ÷µÄÖµ
 	switch (index){
@@ -336,10 +330,6 @@ BYTE MKCM_ToRegister(BYTE index, BYTE counter){				// ´Ó±¾»ú´¦ÀíµÄÖµ£¬×ª»»µ½KCM¼
 			gLocal_1 |= gDIP_SpeakSetup[4] << 6;			// ºóÖÃ
 			return gLocal_1;
 		}
-	case KCM_MIC_VOLUME :									// »°Í²±ÈÀý
-	    return Tab_Mic16To10[counter];
-	case KCM_MIC_DELAY :				                    // »°Í²ÑÓ³ÙÊ±¼ä
-	    return Tab_MicDelay[counter];
 	}
 	return 0;
 }
@@ -383,20 +373,6 @@ BYTE MKCM_FromRegister(BYTE index, BYTE value){				// ´ÓKCMÀ´µÄ¼Ä´æÆ÷£¬×ª»»µ½±¾»
 	    gDIP_SpeakSetup[3] = (value >> 4) & 0x03;
 	    gDIP_SpeakSetup[4] = (value >> 6) & 0x03;
 		break;
-	case KCM_MIC_VOLUME :								    // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´
-		do {
-			if (Tab_Mic16To10[gLocal_1] == value){          // 0-15×ª»»µ½0-9
-				return gLocal_1;
-			}
-		} while (++gLocal_1 < sizeof(Tab_Mic16To10));
-	    return 0;
-    case KCM_MIC_DELAY:                                     // »°Í²ÑÓ³ÙÊ±¼ä
-		do {
-			if (Tab_MicDelay[gLocal_1] == value){
-				return gLocal_1;
-			}
-		} while (++gLocal_1 < sizeof(Tab_MicDelay));
-        return 0;
 	}
 	return 0;												// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµ0dB
 }

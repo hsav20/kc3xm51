@@ -261,7 +261,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
     case cMenu_MicDelay:                                    // 话筒延迟时间
     case cMenu_MicReverb:                                   // 话筒混响比例
         MAUD_AutoCanclTestTone();
-		MDIP_MicControl(index, mode);                       // 话筒各种参数调节
+		MEQMIC_MicDisplay(index, mode);                     // 显示话筒各种参数调节
 		break;
 	case cMenu_SpeakFront:
 	case cMenu_SpeakCenter:

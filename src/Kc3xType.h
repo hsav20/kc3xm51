@@ -55,10 +55,12 @@ typedef enum {
 	KCM_EQ_SETUP = 0x8b,				// 多段EQ均衡音效处理设置
 	KCM_EQ_VALUE = 0x8c,				// 多段EQ均衡音效处理数值
 	KCM_MIC_EQ_VALUE = 0x8d,			// 话筒多段EQ均衡音效处理数值
-	KCM_WR_SPECTRUM = 0x8e,				// 设置频谱模式
-	KCM_RD_SPECTRUM = 0x8f,				// 频谱数值读取
-	KCM_WR_FLASH = 0x90,				// 写入512字节FLASH掉电记忆空间，不可以单独写入
-	KCM_RD_FLASH = 0x91,				// 读取512字节FLASH掉电记忆空间，不可以单独读取
+	KCM_MIC_ADJ_MAX = 0x8e,				// 话筒各种参数最大值设置
+	KCM_WR_SPECTRUM = 0x90,				// 设置频谱模式
+	KCM_RD_SPECTRUM = 0x91,				// 频谱数值读取
+	KCM_WR_FLASH = 0x94,				// 写入512字节FLASH掉电记忆空间，带偏移量及长度
+	KCM_WR_GET_FLASH = 0x95,			// 准备读取512字节FLASH掉电记忆空间，写入偏移量
+	KCM_RD_FLASH = 0x96,				// 读取512字节FLASH掉电记忆空间
 	KCM_APP_COMMAND = 0x98,				// 读取手机/远程APP控制指令，多字节
 
 	KCM_PLAY_SD_QTY = 0xa0,				// 读取SD卡多媒体文件总数量，共2字节

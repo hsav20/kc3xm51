@@ -259,7 +259,6 @@ void MAUD_MakePreemptible(WORD g2Local_1);			// 生成抢占式输入选择
 void MAUD_MixSoundEffect();
 void MAUD_MixMasterVolume(BYTE directUp);
 void MAUD_MixTrimAdjust(BYTE menuMic, BYTE directUp);
-void MAUD_MixMicAdjust(BYTE menuMic, BYTE directUp);
 void MAUD_AutoCanclMute();
 void MAUD_TestToneChannel(BYTE channel);					// 噪音测试
 void MAUD_AutoCanclTestTone();
@@ -289,7 +288,6 @@ void MDIP_WifiSymbol(BYTE turnOn);
 void MDIP_SoundEffect(BYTE mode);
 void MDIP_TestTone(BYTE index, MENU_SET mode);             // 声道微调参数调节
 void MDIP_TrimControl(BYTE index, MENU_SET mode);          // 声道微调参数调节
-void MDIP_MicControl(BYTE index, MENU_SET mode);           // 话筒各种参数调节
 void MDIP_SpeakSetup(BYTE index, BYTE mode);				// mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+  
 void MDIP_DelayTime(BYTE index, BYTE mode);					// mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+  
 BYTE MDIP_WriteDec(BYTE number, WORD value);                // 显示十进制数，返回下一个字开始的位置
@@ -340,3 +338,5 @@ void MEQMIC_KeyEqSelect();                                  // 按键EQ均衡器模式
 void MEQMIC_KeyCtrl();										// EQ或MIC按键CTRL入口
 void MEQMIC_KeyUp();										// EQ或MIC按键调节+入口
 void MEQMIC_KeyDown();										// EQ或MIC按键调节-入口
+void MEQMIC_MicDisplay(BYTE index, MENU_SET mode);          // 显示话筒各种参数调节
+void MEQMIC_MicKcm(BYTE menuMic, BYTE directUp);			// 话筒各种参数调节写入到KCM

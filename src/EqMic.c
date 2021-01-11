@@ -15,7 +15,6 @@ CONST_CHAR TabEqFreq[9] = {                                 // ∂‡¬∑∂Œæ˘∫‚EQ“Ù–ß¥
     0x00|6,  0x20|3,  0,                                    // 50Hz(50-20/5=6),             350Hz(300-150/50=3)
     0x20|17, 0x40|18, 0,                                    // 1000Hz(1000-150/50=17),      3300Hz(3300-1500/100=18)
     0x60|21, 0,       0,                                    // 15000Hz(15000-4500/500=21)
-    
 };     
 
 CONST_CHAR TabEqLevel[4][9] = {                             // ∂‡¬∑∂Œæ˘∫‚EQ“Ù–ß¥¶¿ÌµÁ∆Ω
@@ -37,32 +36,57 @@ CONST_CHAR TabEqLevel[4][9] = {                             // ∂‡¬∑∂Œæ˘∫‚EQ“Ù–ß¥
     0x00, 0x00, 13,                                         // +13dB,
 },
 };
+
+CONST_CHAR TabMicAdjMax[5] = {                              // ª∞Õ≤∏˜÷÷≤Œ ˝øÿ÷∆◊Ó¥Û÷µ…Ë÷√
+    9,                                                      // ª∞Õ≤—”≥Ÿ ±º‰KCM_MIC_DELAYøÿ÷∆◊Ó¥Û÷µ
+    9 << 4 | 9,                                             // ª∞Õ≤1º∞2“Ù¡ø±»¿˝KCM_MIC_VOLUMEøÿ÷∆◊Ó¥Û÷µ
+    9,                                                      // ªÿ…˘±»¿˝KCM_MIC_ECHO_EQøÿ÷∆◊Ó¥Û÷µ
+    9 << 4 | 9,                                             // ª∞Õ≤÷ÿ∏¥º∞÷±¥Ô…˘±»¿˝KCM_MIC_REPEATøÿ÷∆◊Ó¥Û÷µ
+    9 << 4 | 9,                                             // ª∞Õ≤ªÏœÏ1º∞ªÏœÏ2±»¿˝KCM_MIC_REVERBøÿ÷∆◊Ó¥Û÷µ
+};  
+
 void MEQMIC_Restore(){										// EQº∞ª∞Õ≤ª÷∏¥º«“‰
 	BYTE value;
     BYTE counter;
     BYTE select;
     BYTE temp[10];
 
+    MKCM_WriteXByte(KCM_MIC_ADJ_MAX, TabMicAdjMax, sizeof(TabMicAdjMax));   // ª∞Õ≤∏˜÷÷≤Œ ˝◊Ó¥Û÷µ…Ë÷√
+
 	value = MKCM_ReadRegister(KCM_MIC_VOLUME);	            // ª∞Õ≤1º∞ª∞Õ≤2“Ù¡ø±»¿˝
-	gDIP_MicCtrl[0] = MKCM_FromRegister(KCM_MIC_VOLUME, value & 0x0f);  // 0-15◊™ªªµΩ0-9
-	gDIP_MicCtrl[1] = MKCM_FromRegister(KCM_MIC_VOLUME, (value >> 4) & 0x0f);
+	gDIP_MicCtrl[0] = value & 0x0f;                         // B7:4Œ™ª∞Õ≤1“Ù¡ø
+	gDIP_MicCtrl[1] = (value >> 4) & 0x0f;                  // B3:0Œ™ª∞Õ≤2“Ù¡ø
+    if (gDIP_MicCtrl[0] > 9){                               // ≥¨≥ˆ∑∂Œßµƒ¥¶¿Ì
+        gDIP_MicCtrl[0] = 2;                                // …Ë÷√ƒ¨»œ÷µ
+    }
+    if (gDIP_MicCtrl[1] > 9){                               // ≥¨≥ˆ∑∂Œßµƒ¥¶¿Ì
+        gDIP_MicCtrl[1] = 2;                                // …Ë÷√ƒ¨»œ÷µ
+    }
 
 	value = MKCM_ReadRegister(KCM_MIC_ECHO_EQ);	            // ª∞Õ≤ªÿ…˘º∞ª∞Õ≤∂‡∂ŒEQæ˘∫‚“Ù–ß¥¶¿Ì—°‘Ò±»¿˝
-	gDIP_MicCtrl[2] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15◊™ªªµΩ0-9
-	
+                                                            // B7:4Œ™ª∞Õ≤∂‡∂ŒEQæ˘∫‚“Ù–ß¥¶¿Ì—°‘Ò£¨1¥Úø™EQ“Ù–ß£¨0πÿ±’“Ù–ß
+	gDIP_MicCtrl[2] = value & 0x0f;                         // B3:0Œ™ªÿ…˘±»¿˝
+    if (gDIP_MicCtrl[2] > 9){                               // ≥¨≥ˆ∑∂Œßµƒ¥¶¿Ì
+        gDIP_MicCtrl[2] = 2;                                // …Ë÷√ƒ¨»œ÷µ
+    }	
 	value = MKCM_ReadRegister(KCM_MIC_REPEAT);	            // ª∞Õ≤÷ÿ∏¥º∞ª∞Õ≤÷±¥Ô…˘±»¿˝
-	gDIP_MicCtrl[3] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15◊™ªªµΩ0-9
-	
+                                                            // B7:4Œ™ª∞Õ≤÷±¥Ô…˘∫œ≥…µƒ±»¿˝
+	gDIP_MicCtrl[3] = value & 0x0f;                         // B3:0Œ™ª∞Õ≤÷ÿ∏¥±»¿˝
+	 if (gDIP_MicCtrl[3] > 9){                               // ≥¨≥ˆ∑∂Œßµƒ¥¶¿Ì
+        gDIP_MicCtrl[3] = 2;                                // …Ë÷√ƒ¨»œ÷µ
+    }	
 	value = MKCM_ReadRegister(KCM_MIC_DELAY);	            // ª∞Õ≤—”≥Ÿ ±º‰ º«“‰µ˜’˚÷µ
-	gDIP_MicCtrl[4] = MKCM_FromRegister(KCM_MIC_DELAY, value);	// 255≤Ω◊™ªªµΩ0-9
-	
+                                                            // B7:4Œ™±£¡ÙŒ™0°£
+	gDIP_MicCtrl[4] = value;	                            // B3:0Œ™ª∞Õ≤—”≥Ÿ ±º‰°£◊Ó¥Û—”≥Ÿ ±º‰Œ™1000∫¡√Î
+	 if (gDIP_MicCtrl[4] > 9){                               // ≥¨≥ˆ∑∂Œßµƒ¥¶¿Ì
+        gDIP_MicCtrl[4] = 2;                                // …Ë÷√ƒ¨»œ÷µ
+    }	
+
 	value = MKCM_ReadRegister(KCM_MIC_REVERB);	            // ª∞Õ≤ªÏœÏ±»¿˝ º«“‰µ˜’˚÷µ
 	gDIP_MicCtrl[5] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15◊™ªªµΩ0-9
-
-		// “Ù–ß¥¶¿ÌÕ®µ¿£∫ π”√KCM_EQ_SELECTº∞∏˜◊‘µƒºƒ¥Ê∆˜µƒº«“‰÷µ
-//	gDIP_SoundEffect = MKCM_ReadRegister(KCM_EQ_SELECT);			// º«“‰µƒ“Ù–ß¥¶¿ÌÕ®µ¿—°‘Ò
-
-//MDEBUG(0xf6);MDEBUG(gDIP_MicCtrl[0]);MDEBUG(gDIP_MicCtrl[1]);
+    if (gDIP_MicCtrl[5] > 9){                               // ≥¨≥ˆ∑∂Œßµƒ¥¶¿Ì
+        gDIP_MicCtrl[5] = 2;                                // …Ë÷√ƒ¨»œ÷µ
+    }	
 
 	for (select = 0; select < 4; select++){
         // ∂‡¬∑æ˘∫‚EQ“Ù–ß¥¶¿Ì…Ë÷√£¨“ª∞„–¥»Î“ª¥Œ”√”⁄≥ı ºªØ
@@ -132,11 +156,11 @@ CONST_CHAR Tab_DIP_MicShow[] = {
 	"MIC1MIC2ECHOREPTDELYREVB"
 //	 ++++----++++----++++----
 };
-void MDIP_MicControl(BYTE index, MENU_SET mode){
+void MEQMIC_MicDisplay(BYTE index, MENU_SET mode){          // œ‘ æª∞Õ≤∏˜÷÷≤Œ ˝µ˜Ω⁄
 //if(mode!=MENU_SET_TWINKLE_ON&&mode!=MENU_SET_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(mode);}
 	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWNªÚMENU_SET_ADJ_UP 
 		if (index == gDIP_MenuSelect){                      // …œ¥Œ“—æ≠Ω¯»Îµ±«∞≤Àµ•
-			MAUD_MixMicAdjust(index, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	
+			MEQMIC_MicKcm(index, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	// ª∞Õ≤∏˜÷÷≤Œ ˝µ˜Ω⁄–¥»ÎµΩKCM
 			gDIP_MenuTimer = 80;
 		}
 	}
@@ -150,14 +174,14 @@ void MDIP_MicControl(BYTE index, MENU_SET mode){
 	else {											        // MENU_SET_NORMALªÚMENU_SET_TWINKLE_ON…¡À∏µ„¡¡
     	BYTE gLocal_1 = gDIP_MicCtrl[index];
         MDIP_SingleChar(5, gLocal_1 + '0');
-		if (mode == MENU_SET_NORMAL){                           // ’˝≥£µƒœ‘ æƒ£ Ω
+		if (mode == MENU_SET_NORMAL){                       // ’˝≥£µƒœ‘ æƒ£ Ω
 			gDIP_MenuTimer = 80;
 			FDIP_MenuTwinkle = 1;
 		}
        
 	}
 }
-void MAUD_MixMicAdjust(BYTE index, BYTE directUp){
+void MEQMIC_MicKcm(BYTE index, BYTE directUp){              // ª∞Õ≤∏˜÷÷≤Œ ˝µ˜Ω⁄–¥»ÎµΩKCM
 	BYTE value;
     BYTE temp0;
 
@@ -173,32 +197,56 @@ void MAUD_MixMicAdjust(BYTE index, BYTE directUp){
 			--gDIP_MicCtrl[temp0];
 		}
 	}
-    switch (index){                                     // 0ª∞Õ≤1“Ù¡ø 1ª∞Õ≤2  2ªÿ…˘ 3÷ÿ∏¥ 4—”≥Ÿ 5ªÏœÏ
-    case cMenu_MicVolume1:                               // ª∞Õ≤1“Ù¡ø
-    case cMenu_MicVolume2:                               // ª∞Õ≤2“Ù¡ø
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[0]);
-        temp0 = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[1]);
-        MKCM_WriteRegister(KCM_MIC_VOLUME, temp0 << 4 | value);   // ª∞Õ≤1º∞ª∞Õ≤2“Ù¡ø±»¿˝
+    switch (index){                                         // 0ª∞Õ≤1“Ù¡ø 1ª∞Õ≤2  2ªÿ…˘ 3÷ÿ∏¥ 4—”≥Ÿ 5ªÏœÏ
+    case cMenu_MicVolume1:                                  // ª∞Õ≤1“Ù¡ø
+    case cMenu_MicVolume2:                                  // ª∞Õ≤2“Ù¡ø
+        MKCM_WriteRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[0] << 4 | gDIP_MicCtrl[1]);   // ª∞Õ≤1º∞ª∞Õ≤2“Ù¡ø±»¿˝
         break;
-    case cMenu_MicEcho:                                 // ª∞Õ≤ªÿ…˘±»¿˝
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[2]);
-        temp0 = 0;                                  // ª∞Õ≤∂‡∂ŒEQæ˘∫‚“Ù–ß¥¶¿Ì—°‘Ò±»¿˝
-        MKCM_WriteRegister(KCM_MIC_ECHO_EQ, temp0 << 4 | value);   // ª∞Õ≤ªÿ…˘º∞ª∞Õ≤∂‡∂ŒEQæ˘∫‚“Ù–ß¥¶¿Ì—°‘Ò±»¿˝
+    case cMenu_MicEcho:                                     // ª∞Õ≤ªÿ…˘±»¿˝
+        temp0 = 0;                                          // ª∞Õ≤∂‡∂ŒEQæ˘∫‚“Ù–ß¥¶¿Ì—°‘Ò±»¿˝
+        MKCM_WriteRegister(KCM_MIC_ECHO_EQ, temp0 << 4 | gDIP_MicCtrl[2]);   // ª∞Õ≤ªÿ…˘º∞ª∞Õ≤∂‡∂ŒEQæ˘∫‚“Ù–ß¥¶¿Ì—°‘Ò±»¿˝
         break;
-    case cMenu_MicRepeat:                               // ª∞Õ≤÷ÿ∏¥±»¿˝
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[3]);
-        temp0 = 8;                                  // ÷±¥Ô…˘±»¿˝πÃ∂®Œ™8
-        MKCM_WriteRegister(KCM_MIC_REPEAT, temp0 << 4 | value);
+    case cMenu_MicRepeat:                                   // ª∞Õ≤÷ÿ∏¥±»¿˝
+        temp0 = 8;                                          // ÷±¥Ô…˘±»¿˝πÃ∂®Œ™8
+        MKCM_WriteRegister(KCM_MIC_REPEAT, temp0 << 4 | gDIP_MicCtrl[3]);
         break;
-    case cMenu_MicReverb:                               // ª∞Õ≤ªÏœÏ±»¿˝
-        value = MKCM_ToRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[5]);
-        temp0 = 1;                                  // ª∞Õ≤ªÏœÏ2πÃ∂®Œ™1
-        MKCM_WriteRegister(KCM_MIC_REVERB, temp0 << 4 | value);
+    case cMenu_MicReverb:                                   // ª∞Õ≤ªÏœÏ±»¿˝
+        temp0 = 1;                                          // ª∞Õ≤ªÏœÏ2πÃ∂®Œ™1
+        MKCM_WriteRegister(KCM_MIC_REVERB, temp0 << 4 | gDIP_MicCtrl[5]);
         break;
-    case cMenu_MicDelay:                                // ª∞Õ≤—”≥Ÿ ±º‰£¨√ø≤Ω20∫¡√Î
-        value = MKCM_ToRegister(KCM_MIC_DELAY, gDIP_MicCtrl[4]);    // 0-255◊™ªªµΩ0-9
-        MKCM_WriteRegister(KCM_MIC_DELAY, value);
+    case cMenu_MicDelay:                                    // ª∞Õ≤—”≥Ÿ ±º‰
+        MKCM_WriteRegister(KCM_MIC_DELAY, gDIP_MicCtrl[4]);
         break;
     }
 }
 
+
+
+/*
+CONST_CHAR Tab_MicDelay[] = {                               // 0-255◊™ªªµΩ0-9
+    60/20,80/20,100/20,120/20,      160/20,200/20,300/20,500/20,    1000/20,2000/20,    // µ•Œª∫¡√Î    
+};
+CONST_CHAR Tab_Mic16To10[] = {                              // 0-15◊™ªªµΩ0-9
+    0,2,4,6,     8,10,12,13,    14,15,         
+};
+	case KCM_MIC_VOLUME :									// ª∞Õ≤±»¿˝
+	    return Tab_Mic16To10[counter];
+	case KCM_MIC_DELAY :				                    // ª∞Õ≤—”≥Ÿ ±º‰
+	    return Tab_MicDelay[counter];
+
+	case KCM_MIC_VOLUME :								    // 0ª∞Õ≤1“Ù¡ø 1ª∞Õ≤2  2ªÿ…˘ 3÷ÿ∏¥
+		do {
+			if (Tab_Mic16To10[gLocal_1] == value){          // 0-15◊™ªªµΩ0-9
+				return gLocal_1;
+			}
+		} while (++gLocal_1 < sizeof(Tab_Mic16To10));
+	    return 0;
+    case KCM_MIC_DELAY:                                     // ª∞Õ≤—”≥Ÿ ±º‰
+		do {
+			if (Tab_MicDelay[gLocal_1] == value){
+				return gLocal_1;
+			}
+		} while (++gLocal_1 < sizeof(Tab_MicDelay));
+        return 0;
+
+*/

@@ -17,6 +17,7 @@ for %%a in (..\src\*.h) do (
 
 for %%a in (*.c) do (
 	..\Tools\C51 %%a SMALL "WL(1)" > error.h 
+	if errorlevel 2 goto ERR_COMP
 )
 
 
