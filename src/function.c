@@ -61,8 +61,8 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		}
 		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               	// 音量调节改变中断，需要读取"KCM_VOLUME_CTRL"寄存器获取更新的音量值
 			gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);     // 读取当前音量值
-			if (gDIP_MenuSelect == cMenu_MasterVolume){
-				MDIP_MenuNormal(cMenu_MasterVolume);
+			if (gDIP_MenuSelect == MENU_MASTER_VOL){
+				MDIP_MenuNormal(MENU_MASTER_VOL);
 			}
 		}
         if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             // 固件更新，需要读取"KCM_RD_INFO"寄存器
@@ -114,8 +114,10 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 		MDIP_MenuNormal(MENU_RESTORE);						// 已经出错，就不做 
 		return;
 	}
-	gDIP_Brightness = temp[MEM_BRIGHTNESS] & 0x03;          // 显示屏亮度
-    value = temp[MEM_SOURCE_AUTO];
+	gDIP_Brightness = temp[MEM_BRIGHTNESS] & 0x03;          // 从记忆之中恢复显示屏亮度
+	gDIP_MicTone[0] = temp[MEM_MIC_BASS];					// 从记忆之中恢复话筒低音
+	gDIP_MicTone[1] = temp[MEM_MIC_TREBLE];					// 从记忆之中恢复话筒高音
+    value = temp[MEM_SOURCE_AUTO];							// 从记忆之中恢复自动输入
 //MLOG("BrightA_%02x_%02x_", temp[MEM_SOURCE_AUTO], temp[MEM_BRIGHTNESS]);
 
 	gLocal_1 = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
@@ -165,7 +167,8 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
     temp[2] = (BYTE)(CUSTOM_CODE >> 8);
     temp[3] = (BYTE)(CUSTOM_CODE >> 0);
     MKCM_WriteXByte(KCM_CUSTOM_CODE, temp, 4);              // 设置用户自定义功能代码及升级模块固件寄存器
-	MEQMIC_Restore();										// EQ及话筒恢复记忆
+	MEQMIC_EqRestore();										// EQ恢复记忆
+	MEQMIC_MicRestore();									// 话筒恢复记忆
     MKCM_WriteXByte(KCM_WR_SPECTRUM, TabSpectrum, sizeof(TabSpectrum));   // 设置频谱模式
 
 	// 清除一些上电需要确定值的变量及标志
@@ -202,9 +205,10 @@ void MKCM_FactorySet(){										// 出厂设置
 	} while (++gLocal_1 < 100);
 
 	// KCM扩展记忆：使用KCM_MEMORYRD寄存器的记忆值
-	temp[MEM_SOURCE_AUTO] = 0;                    	// 自动输入的恢复
-	temp[MEM_SELECT_2CH] = 0;                      // 选择为立体声
-	temp[MEM_BRIGHTNESS] = 2;                      // 显示屏亮度
+	temp[MEM_BRIGHTNESS] = 2;                      			// 显示屏亮度
+	temp[MEM_SOURCE_AUTO] = 0;                    			// 自动输入的恢复
+	temp[MEM_MIC_BASS] = 9;                      			// 记忆话筒音调低音调节
+	temp[MEM_MIC_TREBLE] = 9;                      			// 从记忆之中恢复话筒高音
 	MKCM_WriteXByte(KCM_EXTR_MEMORY, temp, 4);
 
 	MKCM_WriteRegister(KCM_VOLUME_CTRL, 39); 				// 音量值
@@ -230,7 +234,7 @@ void MKCM_AppCommand(){
     	case KCM_VOLUME_CTRL:									// 音频静音及音量加减控制
             MLOG("KCM_VOLUME_CTRL %d", inData[1]);
             gAUD_MasterVolume = inData[1];
-            MDIP_MenuNormal(cMenu_MasterVolume);
+            MDIP_MenuNormal(MENU_MASTER_VOL);
     		break;
     	case KCM_INPUT_SOURCE:									// 输入音源选择
             MLOG("KCM_INPUT_SOURCE %02x", inData[1]);
@@ -253,7 +257,7 @@ void MKCM_AppCommand(){
     			//MKEY_AudioMute();
     		}
     		else if (inData[1] & 0x04){							// 音量加或减
-    			gDIP_MenuSelect = cMenu_MasterVolume;
+    			gDIP_MenuSelect = MENU_MASTER_VOL;
     			//MKCM_WriteRegister(KCM_VOLUME_MUTE, inData[1]);
     		}
     		break;

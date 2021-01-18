@@ -7,18 +7,20 @@
 
 // ！！！编译版本选择
 
-//#define CUSTOM_CODE                     0x12123000          // 标准版本 使用PT2258音量IC
+#define CUSTOM_CODE                     0x12123030          // 标准版本 使用PT2258音量IC，支持话筒EQ
 //#define CUSTOM_CODE                     0x12123018          // 数码输出 使用PT2258音量IC，字节1(B3:PT2258)字节0(B3:模拟从MIC输入)
 //#define CUSTOM_CODE                     0x12120000          // 标准版本
-#define CUSTOM_CODE                     0x44443000          // 旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
+//#define CUSTOM_CODE                     0x44443000          // 旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
 
 // ！！！以上设置请选择一个适合自己的编译，而且必须选择一个(只有一个没有//注释)
 
 #define DISPLAY_OLD                                         // 定义就编译 旧版本显示屏(P2.5取反)
 
 #define TONE_ENABLE                                       	// 定义就使用遥控器的音调、音调+、音调-
-#define MICROPHONE                                         	// 定义就将遥控器的音调、音调+、音调-改变为话筒控制
 
+#if (CUSTOM_CODE & 0x00000030) != 0							// 支持话筒
+#define MICROPHONE                                         	// 定义就将遥控器的音调、音调+、音调-改变为话筒控制
+#endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,8 +153,8 @@ EXTR xdata BYTE gDIP_SpeakSetup[5];		// 0前置 1中置 2超低音 3环绕 4后置
 EXTR xdata BYTE gDIP_DelayTime[5];		// 0=LINSYNC 1前置 2中置 3环绕 4后置
 
 EXTR xdata BYTE gDIP_TrimCtrl[8];	    // 0=FL 1=CN 2=SW 3=FR 4=SR 5=BR 6=BL 7=SL
-EXTR xdata BYTE gDIP_MicCtrl[6];		// 0话筒1音量 1话筒2  2回声 3重复 4延迟 5混响
-
+EXTR xdata BYTE gDIP_MicCtrl[5];		// 0话筒1音量 1话筒2  2回声 3重复 4延迟
+EXTR xdata BYTE gDIP_MicTone[2];		// 话筒音调低、高音调节
 
 EXTR BOOL FPowerCTRL;
 EXTR BOOL FPKeyDetect;
@@ -166,7 +168,8 @@ EXTR BOOL FInitialize;
 EXTR BOOL FAUD_PowerOffOn;  
 EXTR BOOL FKey_ChildLock;  
 EXTR BOOL FDIP_ScreenUpdata; 
-EXTR BOOL FDIP_ScreenFill;  
+EXTR BOOL FDIP_ScreenFill; 
+EXTR BOOL FMicTurnOn;  										// 话筒打开标志
 
 EXTR xdata BYTE gDelay_111;
 
@@ -237,7 +240,8 @@ void MDIP_ScreenUpdata();
 void MDIP_WriteByte(BYTE gLocal_1);
 void MDIP_TrimShow(BYTE gLocal_0,BYTE gLocal_1);
 
-void MDIP_Initialize();    
+void MDIP_HalInit();										// 显示模块硬件底层初始化
+void MDIP_BaseInit();										// 显示模块基础层初始化
 void MDIP_WriteString(char* string);
 void MPKey_Scan();
 void MDIP_ScreenUpdata();    
@@ -271,7 +275,8 @@ void MKEY_ListenMode(BYTE stereo);                          // 按键聆听模式选择
 
 void MDIP_EqSelect(BYTE value);                             // 显示EQ均衡器模式
 void MDIP_ChannelTrim(SPKER_CHANNEL channel, BYTE value);   // 显示通道微调
-
+void MDIP_SetUpDown(BYTE directUp, BYTE upMax, BYTE* value);	// 显示加减调节
+void MDIP_ShowNegative9(BYTE value);						// 在显示最后两个字的位置显示-9到+9的数值
 BYTE GetListenModeIndex(BYTE value);
 
 void MDIP_SourceFormat();
@@ -333,10 +338,12 @@ void MDIP_Brightness(BYTE show, BYTE bright);
 void MKCM_AppCommand();
 void MKCM_WifiCommand(BYTE regNumber, BYTE value);			// 收到远程APP的指令
 
-void MEQMIC_Restore();										// EQ及话筒恢复记忆
+void MEQMIC_EqRestore();									// EQ恢复记忆
 void MEQMIC_KeyEqSelect();                                  // 按键EQ均衡器模式
+void MEQMIC_MicRestore();									// 话筒恢复记忆
 void MEQMIC_KeyCtrl();										// EQ或MIC按键CTRL入口
 void MEQMIC_KeyUp();										// EQ或MIC按键调节+入口
 void MEQMIC_KeyDown();										// EQ或MIC按键调节-入口
 void MEQMIC_MicDisplay(BYTE index, MENU_SET mode);          // 显示话筒各种参数调节
 void MEQMIC_MicKcm(BYTE menuMic, BYTE directUp);			// 话筒各种参数调节写入到KCM
+void MEQMIC_MicSetTone();                                  	// 写入话筒的音调到KCM

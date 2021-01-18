@@ -245,3 +245,5 @@ extern void          _nop_     (void);
 
 void MLOG(char *fmt, ...);
 void MDEBUG(char value);
+void memset(u8* str, u8 value, u16 length);
+void memcpy(u8* outData, u8* inData, u16 length);

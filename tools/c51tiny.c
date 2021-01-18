@@ -179,9 +179,14 @@ u8 VsPrintf(char* outData, const char* fmt, va_list args){
 	return outCoun;
 }
 
-void memset(u8* str, u8 value, int length){
+void memset(u8* str, u8 value, u16 length){
     while (--length != 0){
         *str = value;
+    }
+}
+void memcpy(u8* outData, u8* inData, u16 length){
+    while (--length != 0){
+        *outData = *outData;
     }
 }
 void MDEBUG(char value){

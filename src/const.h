@@ -152,31 +152,32 @@ typedef enum {
 
 
 
-    cMenu_TToneFL = 36,                  // 测试噪音前置左声道
-    cMenu_TToneCE = 37,                  // 测试噪音中置声道
-    cMenu_TToneSW = 38,                  // 测试噪音超低音声道
-    cMenu_TToneFR = 39,                  // 测试噪音前置右声道
-    cMenu_TToneSR = 40,                  // 测试噪音环绕右声道
-    cMenu_TToneBR = 41,                  // 测试噪音后置右声道
-    cMenu_TToneBL = 42,                  // 测试噪音后置左声道
-    cMenu_TToneSL = 43,                  // 测试噪音环绕左声道
+    MENU_TESTTONE_FL = 36,                                  // 测试噪音前置左声道
+    MENU_TESTTONE_CE = 37,                                  // 测试噪音中置声道
+    MENU_TESTTONE_SW = 38,                                  // 测试噪音超低音声道
+    MENU_TESTTONE_FR = 39,                                  // 测试噪音前置右声道
+    MENU_TESTTONE_SR = 40,                                  // 测试噪音环绕右声道
+    MENU_TESTTONE_BR = 41,                                  // 测试噪音后置右声道
+    MENU_TESTTONE_BL = 42,                                  // 测试噪音后置左声道
+    MENU_TESTTONE_SL = 43,                                  // 测试噪音环绕左声道
 
-    cMenu_ChTrimFL = 46,                  // 声道微调前置左声道
-    cMenu_ChTrimCE = 47,                  // 声道微调中置声道
-    cMenu_ChTrimSW = 48,                  // 声道微调超低音声道
-    cMenu_ChTrimFR = 49,                  // 声道微调前置右声道
-    cMenu_ChTrimSR = 50,                  // 声道微调环绕右声道
-    cMenu_ChTrimBR = 51,                  // 声道微调后置右声道
-    cMenu_ChTrimBL = 52,                  // 声道微调后置左声道
-    cMenu_ChTrimSL = 53,                  // 声道微调环绕左声道
+    MENU_CH_TRIM_FL = 46,                                   // 声道微调前置左声道
+    MENU_CH_TRIM_CE = 47,                                   // 声道微调中置声道
+    MENU_CH_TRIM_SW = 48,                                   // 声道微调超低音声道
+    MENU_CH_TRIM_FR = 49,                                   // 声道微调前置右声道
+    MENU_CH_TRIM_SR = 50,                                   // 声道微调环绕右声道
+    MENU_CH_TRIM_BR = 51,                                   // 声道微调后置右声道
+    MENU_CH_TRIM_BL = 52,                                   // 声道微调后置左声道
+    MENU_CH_TRIM_SL = 53,                                   // 声道微调环绕左声道
 
-    cMenu_MasterVolume = 56,
-    cMenu_MicVolume1 = 57,                  // 话筒1音量
-    cMenu_MicVolume2 = 58,                  // 话筒2音量
-    cMenu_MicEcho = 59,                  // 话筒回声比例
-    cMenu_MicRepeat = 60,                  // 话筒重复比例
-    cMenu_MicDelay = 61,                  // 话筒延迟时间
-    cMenu_MicReverb = 62,                  // 话筒混响比例
+    MENU_MASTER_VOL = 56,                                   // 菜单主音量调节
+    MENU_MIC_VOL1 = 57,                                     // 菜单话筒1音量
+    MENU_MIC_VOL2 = 58,                                     // 菜单话筒2音量
+    MENU_MIC_ECHO = 59,                                     // 菜单话筒回声比例
+    MENU_MIC_REPEAT = 60,                                   // 菜单话筒重复比例
+    MENU_MIC_DELAY = 61,                                    // 菜单话筒延迟时间
+    MENU_MIC_BASS = 62,                                     // 菜单话筒音调低音调节
+    MENU_MIC_TREBLE = 63,                                   // 菜单话筒音调高音调节
 
 
     cMenu_LipSync = 70,
@@ -233,9 +234,10 @@ typedef enum {
 } SPKER_SETUP;
 
 typedef enum {
-    MEM_BRIGHTNESS = 0,                                     // 显示屏亮度
-    MEM_SOURCE_AUTO = 1,                                   	// 自动输入的恢复 
-    MEM_SELECT_2CH = 2                                      // 选择为立体声
+    MEM_BRIGHTNESS = 0,                                     // 记忆显示屏亮度
+    MEM_SOURCE_AUTO = 1,                                   	// 记忆自动输入的恢复 
+    MEM_MIC_BASS = 2,                                       // 记忆话筒音调低音调节
+    MEM_MIC_TREBLE = 3                                      // 记忆话筒音调高音调节
 } MEMORY_USER;                                              // 用户记忆
 
 

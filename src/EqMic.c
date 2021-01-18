@@ -8,16 +8,25 @@
 #include "main.h"           
 
 
-CONST_CHAR TabEqSetup[5] = {                                // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ
-    0x03, 0xc0 | 5, 0, 8,                                   // Ç°ÖÃÍ¨µÀÊ¹ÓÃEQ£¬5¶Î¼°HSF&LSF£¬MICÃ»ÓĞÒôĞ§£¬Ö÷ÉùµÀQÖµ8
-};     
-CONST_CHAR TabEqFreq[9] = {                                 // ¶àÂ·¶Î¾ùºâEQÒôĞ§´¦ÀíÆµÂÊ
+#ifdef MICROPHONE
+#define MAIN_EQ                         3                   // Èç¹û´ò¿ªMICÉùµÀEQÒôĞ§ÔòµÚ4×éÎª»°Í²µÄÒôĞ§
+#else
+#define MAIN_EQ                         4                   // Ã»ÓĞ´ò¿ªMICÉùµÀEQÒôĞ§Ôò¿ÉÓÃ4×éÎªÖ÷ÉùµÀÒôĞ§
+#endif
+
+CONST_CHAR TabEqSetup[4] = {                                // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
+    0x03,                                                   // KCM_EQ_SETUP×Ö½Ú1 Ç°ÖÃÍ¨µÀÊ¹ÓÃEQ
+    0x00 | 5,                                               // Ö÷ÉùµÀÊ¹ÓÃ5¶ÎEQ
+    0xc0 | 2,                                               // »°Í²ÉùµÀ¸ßµÍÒô£¬B7=HSF B6=LSF ¹²2¶Î
+    (6<<4) | 8,                                             // ÂË²¨Æ÷QÖµ »°Í²=6 Ö÷ÉùµÀ=8    
+}; 
+CONST_CHAR TabEqFreq[9] = {                                 // ¶àÂ·¶Î¾ùºâEQÒôĞ§´¦ÀíÆµÂÊ£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
     0x00|6,  0x20|3,  0,                                    // 50Hz(50-20/5=6),             350Hz(300-150/50=3)
     0x20|17, 0x40|18, 0,                                    // 1000Hz(1000-150/50=17),      3300Hz(3300-1500/100=18)
     0x60|21, 0,       0,                                    // 15000Hz(15000-4500/500=21)
 };     
 
-CONST_CHAR TabEqLevel[4][9] = {                             // ¶àÂ·¶Î¾ùºâEQÒôĞ§´¦ÀíµçÆ½
+CONST_CHAR TabEqLevel[4][9] = {                             // ¶àÂ·¶Î¾ùºâEQÒôĞ§´¦ÀíµçÆ½£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
 {   
     0x00, 0x80, 15|(2<<4),                                  // +15dB, -2dB
     0x80, 0x00, 12|(5<<4),                                  // -12dB, +5dB,
@@ -37,25 +46,78 @@ CONST_CHAR TabEqLevel[4][9] = {                             // ¶àÂ·¶Î¾ùºâEQÒôĞ§´
 },
 };
 
-CONST_CHAR TabMicAdjMax[5] = {                              // »°Í²¸÷ÖÖ²ÎÊı¿ØÖÆ×î´óÖµÉèÖÃ
-    9,                                                      // »°Í²ÑÓ³ÙÊ±¼äKCM_MIC_DELAY¿ØÖÆ×î´óÖµ
-    9 << 4 | 9,                                             // »°Í²1¼°2ÒôÁ¿±ÈÀıKCM_MIC_VOLUME¿ØÖÆ×î´óÖµ
-    9,                                                      // »ØÉù±ÈÀıKCM_MIC_ECHO_EQ¿ØÖÆ×î´óÖµ
-    9 << 4 | 9,                                             // »°Í²ÖØ¸´¼°Ö±´ïÉù±ÈÀıKCM_MIC_REPEAT¿ØÖÆ×î´óÖµ
-    9 << 4 | 9,                                             // »°Í²»ìÏì1¼°»ìÏì2±ÈÀıKCM_MIC_REVERB¿ØÖÆ×î´óÖµ
-};  
-
-void MEQMIC_Restore(){										// EQ¼°»°Í²»Ö¸´¼ÇÒä
+void MEQMIC_EqRestore(){									// EQ»Ö¸´¼ÇÒä
 	BYTE value;
     BYTE counter;
     BYTE select;
     BYTE temp[10];
+    
+    // ¶àÂ·¾ùºâEQÒôĞ§´¦Àí³õÊ¼»¯
+	for (select = 0; select < MAIN_EQ; select++){           // ¶àÂ·¾ùºâEQÒôĞ§´¦Àí
+        // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ£¬Ò»°ãĞ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
+        memcpy(&temp[1], TabEqSetup, sizeof(TabEqSetup));
+        temp[0] = select + 1;
+        MKCM_WriteXByte(KCM_EQ_SETUP, temp, 1 + sizeof(TabEqSetup));   // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ
 
-    MKCM_WriteXByte(KCM_MIC_ADJ_MAX, TabMicAdjMax, sizeof(TabMicAdjMax));   // »°Í²¸÷ÖÖ²ÎÊı×î´óÖµÉèÖÃ
+        // ¶àÂ·¾ùºâEQÒôĞ§ÆµÂÊ£¬Ò»°ãĞ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
+        memcpy(&temp[1], TabEqFreq, sizeof(TabEqFreq));
+        for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // Ğ´ÈëEQÆµÂÊµçÆ½
+            temp[counter + 1] |= TabEqLevel[select][counter];
+        }
+        temp[0] = select + 1;
+        MKCM_WriteXByte(KCM_EQ_VALUE, temp, 1 + sizeof(TabEqFreq));   // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ
+    }
+}
+
+void MEQMIC_KeyEqSelect(){                                  // °´¼üEQ¾ùºâÆ÷Ñ¡Ôñ
+    BYTE value = MKCM_ReadRegister(KCM_EQ_SELECT);          // ¶àÂ·¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ
+    if (gDIP_MenuSelect == MENU_EQ_SELECT){                 // Ö»ÓĞ½øÈë¶ÔÓ¦µÄ²Ëµ¥²Å¸Ä±äÄ£Ê½
+        if (++value > MAIN_EQ){                             // 1ÖÁ3·Ö±ğÎª3×é¶à¶ÎEQ¾ùºâÆ÷¡£»òµÚ4×éÓÃÓÚ»°Í²µÄ¸ßµÍÒô¿ØÖÆ
+            value = 0;                                      // 0ÎªÍ£Ö¹Ê¹ÓÃÒôĞ§
+        }
+        MKCM_WriteRegister(KCM_EQ_SELECT, value);
+    }
+    MDIP_EqSelect(value);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MIC_VOL_PT2259
+
+#ifdef MIC_VOL_PT2259
+#define MIC_CHIP 1
+#else
+#define MIC_CHIP 0
+#endif
+
+CONST_CHAR TabMicAdjMax[5] = {                              // »°Í²¸÷ÖÖ²ÎÊı¿ØÖÆ×î´óÖµÉèÖÃKCM_MIC_ADJ_MAX
+    (0<<4) | MIC_CHIP,                                      // ºÏ³É¼°ÒôÁ¿·½Ê½ÉèÖÃ
+    (9<<4) | 9,                                             // »°Í²1¼°2ÒôÁ¿±ÈÀıKCM_MIC_VOLUME¿ØÖÆ×î´óÖµ
+    (9<<4) | 0x0f,                                          // »°Í²ÑÓ³ÙÊ±¼ä¼°»ØÉù±ÈÀı£¬×î´ó²»ĞèÒª100%µÄ
+    (0x0f<<4) | 0x0f,                                       // »°Í²ÖØ¸´¼°Ö±´ïÉù×î´óÖµ£¬×î´ó²»ĞèÒª100%µÄ
+    (0<<4) | 0,                                             // »°Í²»ìÏì1¼°»ìÏì2±ÈÀıKCM_MIC_REVERB¿ØÖÆ×î´óÖµ
+};  
+
+
+
+void MEQMIC_MicRestore(){									// »°Í²»Ö¸´¼ÇÒä
+	BYTE value;
+    BYTE temp[5];
+
+#ifdef MICROPHONE											// ¶¨Òå¾Í¼ÓÈë»°Í²¿ØÖÆ
+    // MKCM_RestoreMemory ´ÓKCM_EXTR_MEMORY¼ÇÒäÖ®ÖĞ»Ö¸´»°Í²µÍ¡¢¸ßÒô	
+	if (gDIP_MicTone[0] > 18){								// -9µ½+9 ³¬³ö·¶Î§µÄ´¦Àí
+        gDIP_MicTone[0] = 9;                                // ÉèÖÃÄ¬ÈÏÖµ
+	}
+	if (gDIP_MicTone[1] > 18){								// -9µ½+9 ³¬³ö·¶Î§µÄ´¦Àí
+        gDIP_MicTone[1] = 9;                                // ÉèÖÃÄ¬ÈÏÖµ
+	}
+
 
 	value = MKCM_ReadRegister(KCM_MIC_VOLUME);	            // »°Í²1¼°»°Í²2ÒôÁ¿±ÈÀı
-	gDIP_MicCtrl[0] = value & 0x0f;                         // B7:4Îª»°Í²1ÒôÁ¿
-	gDIP_MicCtrl[1] = (value >> 4) & 0x0f;                  // B3:0Îª»°Í²2ÒôÁ¿
+	FMicTurnOn = value > 0 ? 1 : 0;                         // »°Í²´ò¿ª±êÖ¾    
+    gDIP_MicCtrl[0] = (value >> 4) & 0x0f;                  // B7:4Îª»°Í²1ÒôÁ¿
+	gDIP_MicCtrl[1] = value & 0x0f;                         // B3:0Îª»°Í²2ÒôÁ¿
     if (gDIP_MicCtrl[0] > 9){                               // ³¬³ö·¶Î§µÄ´¦Àí
         gDIP_MicCtrl[0] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
     }
@@ -63,71 +125,43 @@ void MEQMIC_Restore(){										// EQ¼°»°Í²»Ö¸´¼ÇÒä
         gDIP_MicCtrl[1] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
     }
 
-	value = MKCM_ReadRegister(KCM_MIC_ECHO_EQ);	            // »°Í²»ØÉù¼°»°Í²¶à¶ÎEQ¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ±ÈÀı
-                                                            // B7:4Îª»°Í²¶à¶ÎEQ¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ£¬1´ò¿ªEQÒôĞ§£¬0¹Ø±ÕÒôĞ§
-	gDIP_MicCtrl[2] = value & 0x0f;                         // B3:0Îª»ØÉù±ÈÀı
+    value = MKCM_ReadRegister(KCM_MIC_ECHO);	            // »°Í²ÑÓ³ÙÊ±¼ä¼°»ØÉù±ÈÀı
+	gDIP_MicCtrl[4] = (value >> 4) & 0x0f;	                // B7:4Îª»°Í²ÑÓ³ÙÊ±¼ä£¬ÓëKCM_MIC_ADJ_MAX¶ÔÓ¦µÄ×î´óÖµ±ÈÀı
+	 if (gDIP_MicCtrl[4] > 9){                              // ³¬³ö·¶Î§µÄ´¦Àí
+        gDIP_MicCtrl[4] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
+    }
+	gDIP_MicCtrl[2] = value & 0x0f;                         // B3:0Îª»°Í²»ØÉùÒôÁ¿
     if (gDIP_MicCtrl[2] > 9){                               // ³¬³ö·¶Î§µÄ´¦Àí
         gDIP_MicCtrl[2] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
     }	
-	value = MKCM_ReadRegister(KCM_MIC_REPEAT);	            // »°Í²ÖØ¸´¼°»°Í²Ö±´ïÉù±ÈÀı
+	
+    value = MKCM_ReadRegister(KCM_MIC_REPEAT);	            // »°Í²ÖØ¸´¼°»°Í²Ö±´ïÉù±ÈÀı
                                                             // B7:4Îª»°Í²Ö±´ïÉùºÏ³ÉµÄ±ÈÀı
 	gDIP_MicCtrl[3] = value & 0x0f;                         // B3:0Îª»°Í²ÖØ¸´±ÈÀı
 	 if (gDIP_MicCtrl[3] > 9){                               // ³¬³ö·¶Î§µÄ´¦Àí
         gDIP_MicCtrl[3] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
-    }	
-	value = MKCM_ReadRegister(KCM_MIC_DELAY);	            // »°Í²ÑÓ³ÙÊ±¼ä ¼ÇÒäµ÷ÕûÖµ
-                                                            // B7:4Îª±£ÁôÎª0¡£
-	gDIP_MicCtrl[4] = value;	                            // B3:0Îª»°Í²ÑÓ³ÙÊ±¼ä¡£×î´óÑÓ³ÙÊ±¼äÎª1000ºÁÃë
-	 if (gDIP_MicCtrl[4] > 9){                               // ³¬³ö·¶Î§µÄ´¦Àí
-        gDIP_MicCtrl[4] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
-    }	
-
-	value = MKCM_ReadRegister(KCM_MIC_REVERB);	            // »°Í²»ìÏì±ÈÀı ¼ÇÒäµ÷ÕûÖµ
-	gDIP_MicCtrl[5] = MKCM_FromRegister(KCM_MIC_DELAY, value & 0x0f);   // 0-15×ª»»µ½0-9
-    if (gDIP_MicCtrl[5] > 9){                               // ³¬³ö·¶Î§µÄ´¦Àí
-        gDIP_MicCtrl[5] = 2;                                // ÉèÖÃÄ¬ÈÏÖµ
-    }	
-
-	for (select = 0; select < 4; select++){
-        // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ£¬Ò»°ãĞ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
-        for (counter = 0; counter < sizeof(TabEqSetup); counter++){ 
-            temp[counter + 1] = TabEqSetup[counter];
-        }
-        temp[0] = select + 1;
-        MKCM_WriteXByte(KCM_EQ_SETUP, temp, 1 + sizeof(TabEqSetup));   // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ
-
-        // ¶àÂ·¾ùºâEQÒôĞ§ÆµÂÊ£¬Ò»°ãĞ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
-        for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // Ğ´ÈëEQÆµÂÊ
-            temp[counter + 1] = TabEqFreq[counter];
-        }
-        for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // Ğ´ÈëEQÆµÂÊµçÆ½
-            temp[counter + 1] |= TabEqLevel[select][counter];
-        }
-        temp[0] = select + 1;
-        MKCM_WriteXByte(KCM_EQ_VALUE, temp, 1 + sizeof(TabEqFreq));   // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ
     }
 
-}
+    MKCM_WriteRegister(KCM_MIC_MIXER, (8<<4) | 8);          // »°Í²ÉùÒôÓëÖ÷ÉùµÀºÏ³É±ÈÀı
+    MKCM_WriteXByte(KCM_MIC_ADJ_MAX, TabMicAdjMax, sizeof(TabMicAdjMax));   // »°Í²¸÷ÖÖ²ÎÊı×î´óÖµÉèÖÃ
+ 
+    temp[0] = 4;                                            // µÚ4×é¹Ì¶¨Îª»°Í²µÄEQÔ¤ÖÃÒôĞ§
+    memcpy(&temp[1], TabEqSetup, sizeof(TabEqSetup));
+    MKCM_WriteXByte(KCM_EQ_SETUP, temp, 1 + sizeof(TabEqSetup));   // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ    
+    MEQMIC_MicSetTone();                                    // Ğ´Èë»°Í²µÄÒôµ÷µ½KCM
+#endif      // MICROPHONE ¶¨Òå¾Í¼ÓÈë»°Í²¿ØÖÆ
 
-void MEQMIC_KeyEqSelect(){                                  // °´¼üEQ¾ùºâÆ÷Ñ¡Ôñ
-    BYTE value = MKCM_ReadRegister(KCM_EQ_SELECT);          // ¶àÂ·¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ
-    if (gDIP_MenuSelect == MENU_EQ_SELECT){                 // Ö»ÓĞ½øÈë¶ÔÓ¦µÄ²Ëµ¥²Å¸Ä±äÄ£Ê½
-        if (++value > 4){                                   // 1ÖÁ4·Ö±ğÎª4×éÔ¤ÖÃÒôĞ§¸ßµÍÒôÒôµ÷»ò¶à¶ÎEQ¾ùºâÆ÷¡£
-            value = 0;                                      // 0ÎªÍ£Ö¹Ê¹ÓÃÒôĞ§
-        }
-        MKCM_WriteRegister(KCM_EQ_SELECT, value);
-    }
-    MDIP_EqSelect(value);
+    
 }
 
 
 void MEQMIC_KeyCtrl(){										// EQ»òMIC°´¼üCTRLÈë¿Ú
 #ifdef MICROPHONE											// ¶¨Òå¾Í½«Ò£¿ØÆ÷µÄÒôµ÷¡¢Òôµ÷+¡¢Òôµ÷-¸Ä±äÎª»°Í²¿ØÖÆ
-	if (gDIP_MenuSelect < cMenu_MicVolume1){	    		// »¹Ã»ÓĞ½øÈëMic²Ëµ¥ 
-		MDIP_MenuNormal(cMenu_MicVolume1);
+	if (gDIP_MenuSelect < MENU_MIC_VOL1){	    		// »¹Ã»ÓĞ½øÈëMic²Ëµ¥ 
+		MDIP_MenuNormal(MENU_MIC_VOL1);
 	}else {
-		if (++gDIP_MenuSelect > cMenu_MicReverb){
-			gDIP_MenuSelect = cMenu_MicVolume1;
+		if (++gDIP_MenuSelect > MENU_MIC_TREBLE){
+			gDIP_MenuSelect = MENU_MIC_VOL1;
 		}
 		MDIP_MenuNormal(gDIP_MenuSelect);
 	}
@@ -135,7 +169,7 @@ void MEQMIC_KeyCtrl(){										// EQ»òMIC°´¼üCTRLÈë¿Ú
 }
 void MEQMIC_KeyUp(){										// EQ»òMIC°´¼üµ÷½Ú+Èë¿Ú
 #ifdef MICROPHONE											// ¶¨Òå¾Í½«Ò£¿ØÆ÷µÄÒôµ÷¡¢Òôµ÷+¡¢Òôµ÷-¸Ä±äÎª»°Í²¿ØÖÆ
-	if (gDIP_MenuSelect >= cMenu_MicVolume1 && gDIP_MenuSelect <= cMenu_MicReverb){	// ÒÑ¾­½øÈëMic²Ëµ¥ 
+	if (gDIP_MenuSelect >= MENU_MIC_VOL1 && gDIP_MenuSelect <= MENU_MIC_TREBLE){	// ÒÑ¾­½øÈëMic²Ëµ¥ 
 		gRmKeyContinCanclTm = 1;
 		MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
 	}
@@ -143,7 +177,7 @@ void MEQMIC_KeyUp(){										// EQ»òMIC°´¼üµ÷½Ú+Èë¿Ú
 }
 void MEQMIC_KeyDown(){										// EQ»òMIC°´¼üµ÷½Ú-Èë¿Ú
 #ifdef MICROPHONE											// ¶¨Òå¾Í½«Ò£¿ØÆ÷µÄÒôµ÷¡¢Òôµ÷+¡¢Òôµ÷-¸Ä±äÎª»°Í²¿ØÖÆ
-	if (gDIP_MenuSelect >= cMenu_MicVolume1 && gDIP_MenuSelect <= cMenu_MicReverb){	// ÒÑ¾­½øÈëMic²Ëµ¥ 
+	if (gDIP_MenuSelect >= MENU_MIC_VOL1 && gDIP_MenuSelect <= MENU_MIC_TREBLE){	// ÒÑ¾­½øÈëMic²Ëµ¥ 
 		gRmKeyContinCanclTm = 1;
 		MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
 	}
@@ -151,102 +185,96 @@ void MEQMIC_KeyDown(){										// EQ»òMIC°´¼üµ÷½Ú-Èë¿Ú
 }
 
 
-// »°Í²1ÒôÁ¿ »°Í²2ÒôÁ¿ »°Í²»ØÉù±ÈÀı »°Í²ÖØ¸´±ÈÀı »°Í²ÑÓ³ÙÊ±¼ä »°Í²»ìÏì±ÈÀı
+// »°Í²1ÒôÁ¿ »°Í²2ÒôÁ¿ »°Í²»ØÉù±ÈÀı »°Í²ÖØ¸´±ÈÀı »°Í²ÑÓ³ÙÊ±¼ä »°Í²µÍÒô »°Í²¸ßÒô
 CONST_CHAR Tab_DIP_MicShow[] = {
-	"MIC1MIC2ECHOREPTDELYREVB"
-//	 ++++----++++----++++----
+	"MIC1MIC2ECHOREPTDELYMBASMTRE"
+//	 ++++----++++----++++----++++
 };
 void MEQMIC_MicDisplay(BYTE index, MENU_SET mode){          // ÏÔÊ¾»°Í²¸÷ÖÖ²ÎÊıµ÷½Ú
-//if(mode!=MENU_SET_TWINKLE_ON&&mode!=MENU_SET_TWINKLE_OFF){MDEBUG(0xee);MDEBUG(index);MDEBUG(mode);}
+    BYTE value;
+    BYTE temp0;
 	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWN»òMENU_SET_ADJ_UP 
 		if (index == gDIP_MenuSelect){                      // ÉÏ´ÎÒÑ¾­½øÈëµ±Ç°²Ëµ¥
 			MEQMIC_MicKcm(index, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	// »°Í²¸÷ÖÖ²ÎÊıµ÷½ÚĞ´Èëµ½KCM
 			gDIP_MenuTimer = 80;
 		}
 	}
-    index -= cMenu_MicVolume1;                              // ´Ó»°Í²1ÒôÁ¿¿ªÊ¼
-	MDIP_WriteString((char*)&Tab_DIP_MicShow[index * 4]);
+    temp0 = index - MENU_MIC_VOL1;                          // ´Ó»°Í²1ÒôÁ¿¿ªÊ¼
+	MDIP_WriteString((char*)&Tab_DIP_MicShow[temp0 * 4]);
     MDIP_SingleChar(4, ' ');
 
 	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFFÉÁË¸Ï¨Ãğ
 		MDIP_SingleChar(5, ' ');
 	}
 	else {											        // MENU_SET_NORMAL»òMENU_SET_TWINKLE_ONÉÁË¸µãÁÁ
-    	BYTE gLocal_1 = gDIP_MicCtrl[index];
-        MDIP_SingleChar(5, gLocal_1 + '0');
+    	if (index < MENU_MIC_BASS){
+            value = gDIP_MicCtrl[temp0];
+            MDIP_SingleChar(5, value + '0');
+        }else {
+            MDIP_ShowNegative9(gDIP_MicTone[index - MENU_MIC_BASS]);    
+        }
 		if (mode == MENU_SET_NORMAL){                       // Õı³£µÄÏÔÊ¾Ä£Ê½
 			gDIP_MenuTimer = 80;
 			FDIP_MenuTwinkle = 1;
 		}
-       
 	}
+}
+
+#define MIC_BASS_300HZ                  (0x20 | 3)          // B6:5=1  B4:0=3*50+150=300Hz
+#define MIC_TREBL_5000HZ                (0x60 | 1)          // B6:5=3  B4:0=1*500+4500=5000Hz
+WORD makeEqValue(BYTE level, WORD freq){
+    if (level < 9){                                         // ¸ºÊı
+        freq |= 0x80;                                       // B7Îª1Ê±B11:8µÄÖµÎªË¥¼õ-0ÖÁ-15dB¡£ 
+        freq |= (9 - level) << 8;                           // B11:8ÎªdBµÄÊıÖµ²»°üÀ¨·ûºÅ
+    }else{                                                  // 0»òÕıÊı
+        freq |= (level - 9) << 8;                           // B11:8ÎªdBµÄÊıÖµ²»°üÀ¨·ûºÅ
+    }
+    return freq;
 }
 void MEQMIC_MicKcm(BYTE index, BYTE directUp){              // »°Í²¸÷ÖÖ²ÎÊıµ÷½ÚĞ´Èëµ½KCM
 	BYTE value;
-    BYTE temp0;
 
 	MAUD_AutoCanclMute();
-    temp0 = index - cMenu_MicVolume1;
-	if (directUp){
-		if (gDIP_MicCtrl[temp0] < 9){
-			++gDIP_MicCtrl[temp0];
-		}
-	}
-	else {
-		if (gDIP_MicCtrl[temp0] > 0){
-			--gDIP_MicCtrl[temp0];
-		}
-	}
-    switch (index){                                         // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´ 4ÑÓ³Ù 5»ìÏì
-    case cMenu_MicVolume1:                                  // »°Í²1ÒôÁ¿
-    case cMenu_MicVolume2:                                  // »°Í²2ÒôÁ¿
-        MKCM_WriteRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[0] << 4 | gDIP_MicCtrl[1]);   // »°Í²1¼°»°Í²2ÒôÁ¿±ÈÀı
+    if (index < MENU_MIC_BASS){                             // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´ 4ÑÓ³Ù
+        MDIP_SetUpDown(directUp, 9, &gDIP_MicCtrl[index - MENU_MIC_VOL1]);
+        switch (index){                                     // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´ 4ÑÓ³Ù 5»ìÏì
+        case MENU_MIC_VOL1:                                 // »°Í²1ÒôÁ¿
+        case MENU_MIC_VOL2:                                 // »°Í²2ÒôÁ¿
+            MKCM_WriteRegister(KCM_MIC_VOLUME, gDIP_MicCtrl[0] << 4 | gDIP_MicCtrl[1]);   // »°Í²1¼°»°Í²2ÒôÁ¿±ÈÀı
+            break;
+        case MENU_MIC_DELAY:                                // »°Í²ÑÓ³ÙÊ±¼ä
+        case MENU_MIC_ECHO:                                 // »°Í²»ØÉù±ÈÀı
+            MKCM_WriteRegister(KCM_MIC_ECHO, gDIP_MicCtrl[4] << 4 | gDIP_MicCtrl[2]);   // »°Í²»ØÉù¼°»°Í²¶à¶ÎEQ¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ±ÈÀı
+            break;
+        case MENU_MIC_REPEAT:                               // »°Í²ÖØ¸´±ÈÀı
+            value = 8;                                      // Ö±´ïÉù±ÈÀı¹Ì¶¨Îª8
+            MKCM_WriteRegister(KCM_MIC_REPEAT, value << 4 | gDIP_MicCtrl[3]);
         break;
-    case cMenu_MicEcho:                                     // »°Í²»ØÉù±ÈÀı
-        temp0 = 0;                                          // »°Í²¶à¶ÎEQ¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ±ÈÀı
-        MKCM_WriteRegister(KCM_MIC_ECHO_EQ, temp0 << 4 | gDIP_MicCtrl[2]);   // »°Í²»ØÉù¼°»°Í²¶à¶ÎEQ¾ùºâÒôĞ§´¦ÀíÑ¡Ôñ±ÈÀı
+            default:
         break;
-    case cMenu_MicRepeat:                                   // »°Í²ÖØ¸´±ÈÀı
-        temp0 = 8;                                          // Ö±´ïÉù±ÈÀı¹Ì¶¨Îª8
-        MKCM_WriteRegister(KCM_MIC_REPEAT, temp0 << 4 | gDIP_MicCtrl[3]);
-        break;
-    case cMenu_MicReverb:                                   // »°Í²»ìÏì±ÈÀı
-        temp0 = 1;                                          // »°Í²»ìÏì2¹Ì¶¨Îª1
-        MKCM_WriteRegister(KCM_MIC_REVERB, temp0 << 4 | gDIP_MicCtrl[5]);
-        break;
-    case cMenu_MicDelay:                                    // »°Í²ÑÓ³ÙÊ±¼ä
-        MKCM_WriteRegister(KCM_MIC_DELAY, gDIP_MicCtrl[4]);
-        break;
+        }
+    }else{                                                  // »°Í²Òôµ÷µÍ¡¢¸ßÒôµ÷½Ú
+        MDIP_SetUpDown(directUp, 18, &gDIP_MicTone[index - MENU_MIC_BASS]);
+        MEQMIC_MicSetTone();
+        if (index == MENU_MIC_BASS){                        // ½«¸Ä±äµÄµÍÒôÖµĞ´Èë¼ÇÒä
+            MKCM_WriteRegister(KCM_EXTR_MEMORY+MEM_MIC_BASS, gDIP_MicTone[0]);
+        }else{                                              // ½«¸Ä±äµÄ¸ßÒôÖµĞ´Èë¼ÇÒä
+            MKCM_WriteRegister(KCM_EXTR_MEMORY+MEM_MIC_TREBLE, gDIP_MicTone[1]);      
+        }
     }
 }
-
-
-
-/*
-CONST_CHAR Tab_MicDelay[] = {                               // 0-255×ª»»µ½0-9
-    60/20,80/20,100/20,120/20,      160/20,200/20,300/20,500/20,    1000/20,2000/20,    // µ¥Î»ºÁÃë    
-};
-CONST_CHAR Tab_Mic16To10[] = {                              // 0-15×ª»»µ½0-9
-    0,2,4,6,     8,10,12,13,    14,15,         
-};
-	case KCM_MIC_VOLUME :									// »°Í²±ÈÀı
-	    return Tab_Mic16To10[counter];
-	case KCM_MIC_DELAY :				                    // »°Í²ÑÓ³ÙÊ±¼ä
-	    return Tab_MicDelay[counter];
-
-	case KCM_MIC_VOLUME :								    // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´
-		do {
-			if (Tab_Mic16To10[gLocal_1] == value){          // 0-15×ª»»µ½0-9
-				return gLocal_1;
-			}
-		} while (++gLocal_1 < sizeof(Tab_Mic16To10));
-	    return 0;
-    case KCM_MIC_DELAY:                                     // »°Í²ÑÓ³ÙÊ±¼ä
-		do {
-			if (Tab_MicDelay[gLocal_1] == value){
-				return gLocal_1;
-			}
-		} while (++gLocal_1 < sizeof(Tab_MicDelay));
-        return 0;
-
-*/
+void MEQMIC_MicSetTone(){                                   // Ğ´Èë»°Í²µÄÒôµ÷µ½KCM
+    BYTE temp[4];
+    WORD base;
+    WORD treble;
+    base = makeEqValue(gDIP_MicTone[0], MIC_BASS_300HZ);
+    treble = makeEqValue(gDIP_MicTone[1], MIC_TREBL_5000HZ);
+    
+    temp[0] = 4;                                        // µÚ4×éÎª»°Í²µÄÒôĞ§
+    // ×Ö½Ú1¿ªÊ¼Ã¿3¸ö×Ö½ÚÎªÁ½¶Î12Î»µÄEQÉèÖÃÖµ
+    temp[1] = base & 0xff;                              // µÚÒ»×Ö½ÚÎªµÚ1¶ÎµÍ8Î»
+    temp[2] = treble & 0xff;                            // µÚ¶ş×Ö½ÚÎªµÚ2¶ÎµÍ8Î»
+    temp[3] = ((base >> 8) & 0x0f) | ((treble >> 4) & 0xf0);  // µÚÈı×Ö½ÚµÄB3:0ÎªµÚ1¶Î¸ß4Î»£¬B7:4ÎªµÚ2¶Î¸ß4Î»
+//MLOG("EQ_VALUE %02x %02x %02x", temp[1], temp[2], temp[3]);    
+    MKCM_WriteXByte(KCM_EQ_VALUE, temp, 1 + 3);         // ¶àÂ·¾ùºâEQÒôĞ§´¦ÀíÉèÖÃ
+}

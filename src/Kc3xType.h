@@ -36,9 +36,9 @@ typedef enum {
 	KCM_SR_TRIM = 0x35,					// 环绕右声道微调 B4=1为减dB B3-B0为dB数值
 	KCM_BL_TRIM = 0x36,					// 后置左声道微调 B4=1为减dB B3-B0为dB数值
 	KCM_BR_TRIM = 0x37,					// 后置右声道微调 B4=1为减dB B3-B0为dB数值
-	KCM_MIC_DELAY = 0x38,				// 话筒延迟时间，每步20毫秒
+	KCM_MIC_MIXER = 0x38,				// 话筒声音与主声道合成比例
 	KCM_MIC_VOLUME = 0x39,				// 话筒1及话筒2音量比例
-	KCM_MIC_ECHO_EQ = 0x3a,				// 话筒回声比例及话筒多段EQ均衡音效处理选择
+	KCM_MIC_ECHO = 0x3a,				// 话筒延迟时间及回声比例
 	KCM_MIC_REPEAT = 0x3b,				// 话筒重复及直达声比例
 	KCM_MIC_REVERB = 0x3c,				// 话筒混响1及混响2比例
 	KCM_MIC_WHISTLE = 0x3d,				// 话筒啸叫声音反馈模式
@@ -54,8 +54,7 @@ typedef enum {
 	KCM_PROGUCE_SIGNAL = 0x88,			// 模块内部产生的信号配置
 	KCM_EQ_SETUP = 0x8b,				// 多段EQ均衡音效处理设置
 	KCM_EQ_VALUE = 0x8c,				// 多段EQ均衡音效处理数值
-	KCM_MIC_EQ_VALUE = 0x8d,			// 话筒多段EQ均衡音效处理数值
-	KCM_MIC_ADJ_MAX = 0x8e,				// 话筒各种参数最大值设置
+	KCM_MIC_ADJ_MAX = 0x8d,				// 话筒各种参数最大值设置
 	KCM_WR_SPECTRUM = 0x90,				// 设置频谱模式
 	KCM_RD_SPECTRUM = 0x91,				// 频谱数值读取
 	KCM_WR_FLASH = 0x94,				// 写入512字节FLASH掉电记忆空间，带偏移量及长度
@@ -168,6 +167,16 @@ typedef enum {
 } KC3X_INPUT_FREQ;
 
 typedef enum {
+	KCM_ERROR_EQ = 0x80,				// B7多段EQ均衡音效初始化不正常，可能超出最大的预设计段数;
+	KCM_ERROR_MIC = 0x20,				// B5话筒音量芯片硬件初始化不正常;
+	KCM_ERROR_VOLUME = 0x10,			// B4模块控制音量芯片硬件初始化不正常;
+	KCM_ERROR_CODEC = 0x08,				// B3模块ADC/DAC硬件初始化不正常;
+	KCM_ERROR_SPDIF = 0x04,				// B2模块SPDIF接口芯片、时钟不正常;
+	KCM_ERROR_TEMP1 = 0x02,				// B1:0模块温度范围
+	KCM_ERROR_TEMP0 = 0x01				// B1:0模块温度范围
+} KC3X_ERROR_FLAG;
+
+typedef enum {
 	KCM_MODEL_32C = 0x31,				// 模块型号KC32C
 	KCM_MODEL_35H = 0x53,				// 模块型号KC35H
 	KCM_MODEL_36H = 0x56				// 模块型号KC36H
@@ -207,7 +216,7 @@ typedef enum {
 #define CUSTOM_VOLUME_CHIP				0x00700000			// 音量芯片类型
 #define CUSTOM_IN_EACH_MODE				0x00800000			// 为每个输入通道单独记忆聆听模式及多段EQ均衡音效选择
 #define CUSTOM_MIC_LTRT_SWAP			0x08000000			// 话筒MIC与模拟输入交换
-#define CUSTOM_MIC_ENABLE				0x10000000			// 使用话筒声音混合功能
+#define CUSTOM_MIC_EQ_ENABLE			0x30000000			// 话筒声音混合功能+EQ
 #define CUSTOM_BCK_WCK_INPUT			0x80000000			// BCK与WCK端口为输入
 
 

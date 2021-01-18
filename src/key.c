@@ -75,7 +75,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 
   		case cPanKey_AudioMute: 							// MUTE
-			if (gDIP_MenuSelect >= cMenu_MasterVolume && gDIP_MenuSelect <= cMenu_MicReverb){		// 已经在JOG菜单 
+			if (gDIP_MenuSelect >= MENU_MASTER_VOL && gDIP_MenuSelect <= MENU_MIC_TREBLE){		// 已经在JOG菜单 
 				MDIP_MenuNormal(MENU_RESTORE);
 			}
 			else {
@@ -85,12 +85,12 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 
   		case cPanKey_JogMenu:								// JOG
 			
-			if (gDIP_MenuSelect < cMenu_MasterVolume || gDIP_MenuSelect > cMenu_MicVolume2){		// 还没有进入JOG菜单 
-				MDIP_MenuNormal(cMenu_MasterVolume);
+			if (gDIP_MenuSelect < MENU_MASTER_VOL || gDIP_MenuSelect > MENU_MIC_VOL2){		// 还没有进入JOG菜单 
+				MDIP_MenuNormal(MENU_MASTER_VOL);
 			}
 			else {
-				if (++gDIP_MenuSelect > cMenu_MicVolume2){
-					gDIP_MenuSelect = cMenu_MasterVolume;
+				if (++gDIP_MenuSelect > MENU_MIC_VOL2){
+					gDIP_MenuSelect = MENU_MASTER_VOL;
 				}
 				MDIP_MenuNormal(gDIP_MenuSelect);
 			}
@@ -131,19 +131,19 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MEQMIC_KeyCtrl();								// EQ或MIC按键CTRL入口
 			break;
 		case cRmKey_TrimUp:
-            if (gDIP_MenuSelect >= cMenu_ChTrimFL && gDIP_MenuSelect <= cMenu_ChTrimSL){	// 已经进入声道微调菜单 
+            if (gDIP_MenuSelect >= MENU_CH_TRIM_FL && gDIP_MenuSelect <= MENU_CH_TRIM_SL){	// 已经进入声道微调菜单 
                 gRmKeyContinCanclTm = 1;
 				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
-            }else if (gDIP_MenuSelect >= cMenu_TToneFL && gDIP_MenuSelect <= cMenu_TToneSL){	// 已经进入测试噪音菜单 
+            }else if (gDIP_MenuSelect >= MENU_TESTTONE_FL && gDIP_MenuSelect <= MENU_TESTTONE_SL){	// 已经进入测试噪音菜单 
 				gRmKeyContinCanclTm = 1;
 				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
 			}
 			break;
 		case cRmKey_TrimDown:
-            if (gDIP_MenuSelect >= cMenu_ChTrimFL && gDIP_MenuSelect <= cMenu_ChTrimSL){	// 已经进入声道微调菜单 
+            if (gDIP_MenuSelect >= MENU_CH_TRIM_FL && gDIP_MenuSelect <= MENU_CH_TRIM_SL){	// 已经进入声道微调菜单 
                 gRmKeyContinCanclTm = 1;
 				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
-            }else if (gDIP_MenuSelect >= cMenu_TToneFL && gDIP_MenuSelect <= cMenu_TToneSL){	// 已经进入测试噪音菜单 
+            }else if (gDIP_MenuSelect >= MENU_TESTTONE_FL && gDIP_MenuSelect <= MENU_TESTTONE_SL){	// 已经进入测试噪音菜单 
 				gRmKeyContinCanclTm = 1;
 				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
 			}
@@ -156,14 +156,14 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 		case cRmKey_VolumeUp:
 			gRmKeyContinCanclTm = 1;
-			gLocal_1 = (gDIP_MenuSelect == cMenu_MasterVolume) ? MENU_SET_ADJ_UP : MENU_SET_NORMAL;
-			MDIP_MenuSelect(cMenu_MasterVolume, gLocal_1);
+			gLocal_1 = (gDIP_MenuSelect == MENU_MASTER_VOL) ? MENU_SET_ADJ_UP : MENU_SET_NORMAL;
+			MDIP_MenuSelect(MENU_MASTER_VOL, gLocal_1);
 			break;
 		case cRmKey_VolumeDown:
 			if (!FSYS_MuteEnable){
 				gRmKeyContinCanclTm = 1;
-				gLocal_1 = (gDIP_MenuSelect == cMenu_MasterVolume) ? MENU_SET_ADJ_DOWN : MENU_SET_NORMAL;
-				MDIP_MenuSelect(cMenu_MasterVolume, gLocal_1);
+				gLocal_1 = (gDIP_MenuSelect == MENU_MASTER_VOL) ? MENU_SET_ADJ_DOWN : MENU_SET_NORMAL;
+				MDIP_MenuSelect(MENU_MASTER_VOL, gLocal_1);
 			}
 			break;
 
@@ -247,13 +247,13 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
 			break;
 		case cRmKey_TrimCtrl:                               // 声道微调
-			if (gDIP_MenuSelect < cMenu_ChTrimFL || gDIP_MenuSelect > cMenu_ChTrimSL){	    // 还没有进入声道微调菜单 
+			if (gDIP_MenuSelect < MENU_CH_TRIM_FL || gDIP_MenuSelect > MENU_CH_TRIM_SL){	    // 还没有进入声道微调菜单 
             	MAUD_AutoCanclTestTone();
-				MDIP_MenuNormal(cMenu_ChTrimFL);   			// 进入声道微调菜单 
+				MDIP_MenuNormal(MENU_CH_TRIM_FL);   			// 进入声道微调菜单 
 			}else {                                         // 已经进入声道微调菜单 
-                BYTE next = MDIP_GetNextChannel(gDIP_MenuSelect - cMenu_ChTrimFL);    
-//MDEBUG(0xee);MDEBUG(gDIP_MenuSelect - cMenu_ChTrimFL);MDEBUG(next);//MDEBUG(gDIP_SpeakSetup[1]);MDEBUG(gDIP_SpeakSetup[2]);MDEBUG(gDIP_SpeakSetup[3]);MDEBUG(gDIP_SpeakSetup[4]);MDEBUG(gDIP_MenuSelect);MDEBUG(cMenu_ChTrimFL);
-                gDIP_MenuSelect = next + cMenu_ChTrimFL;
+                BYTE next = MDIP_GetNextChannel(gDIP_MenuSelect - MENU_CH_TRIM_FL);    
+//MDEBUG(0xee);MDEBUG(gDIP_MenuSelect - MENU_CH_TRIM_FL);MDEBUG(next);//MDEBUG(gDIP_SpeakSetup[1]);MDEBUG(gDIP_SpeakSetup[2]);MDEBUG(gDIP_SpeakSetup[3]);MDEBUG(gDIP_SpeakSetup[4]);MDEBUG(gDIP_MenuSelect);MDEBUG(MENU_CH_TRIM_FL);
+                gDIP_MenuSelect = next + MENU_CH_TRIM_FL;
 				MDIP_MenuNormal(gDIP_MenuSelect);
 			}
 			break;
@@ -357,11 +357,11 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	}
 	if (FKeyJogSwOK){
 		FKeyJogSwOK = 0;
-		if (gDIP_MenuSelect >= cMenu_MasterVolume && gDIP_MenuSelect <= cMenu_MicVolume2){		// 已经进入JOG菜单 
+		if (gDIP_MenuSelect >= MENU_MASTER_VOL && gDIP_MenuSelect <= MENU_MIC_VOL2){		// 已经进入JOG菜单 
 			MDIP_MenuSelect(gDIP_MenuSelect, FKeyJogUp ? MENU_SET_ADJ_UP : MENU_SET_ADJ_DOWN);
 		}
 		else {
-			MDIP_MenuNormal(cMenu_MasterVolume);
+			MDIP_MenuNormal(MENU_MASTER_VOL);
 		}
 	}
     return;
@@ -372,7 +372,7 @@ void MKEY_AudioMute(){
 	gLocal_1 = FSYS_MuteEnable ? 4 : 3;
 	MDIP_MenuSelect(cMenu_AudioMute, gLocal_1);
 	if (!FSYS_MuteEnable){									// 解除静音
-		MDIP_MenuNormal(cMenu_MasterVolume);
+		MDIP_MenuNormal(MENU_MASTER_VOL);
 	}
     MAUD_AutoCanclTestTone();
     return;
@@ -381,7 +381,7 @@ void MKEY_TestTone(){                                       // MENU_SET mode
 	FSYS_TestTone = ~FSYS_TestTone;
 
 	if (FSYS_TestTone){										// 打开噪音测试
-		MDIP_MenuNormal(cMenu_TToneFL);
+		MDIP_MenuNormal(MENU_TESTTONE_FL);
         MAUD_TestToneChannel(0);
 //MDEBUG(0x99);MDEBUG(gDIP_MenuSelect);MDEBUG(gDIP_MenuTimer);MDEBUG(FSYS_TestTone);
 

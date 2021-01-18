@@ -10,7 +10,8 @@
 
 void main(){
 	MSYS_Initialize(); 										// CPU基本部件初始化
-	MDIP_Initialize();										// 显示模块初始化
+	MDIP_HalInit();											// 显示模块硬件底层初始化
+	MDIP_BaseInit();										// 显示模块基础层初始化
 	MKEY_Initialize();       								// 按键模块初始化
 	MAUD_Initialize();       								// 音频模块初始化
     MKCM_Initialize();                                      // KCM模块初始化

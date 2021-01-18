@@ -3,7 +3,8 @@
 "function.obj",
 "audio.obj",
 "key.obj",
-"display.obj",
+"DispBase.obj",
+"DispHal.obj",
 "EqMic.obj",
 "c51tiny.obj",
 "main.obj"
