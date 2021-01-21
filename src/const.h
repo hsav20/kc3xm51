@@ -130,20 +130,20 @@ typedef enum {
     MENU_LISTEN_MODE = 0x03,				                // 菜单聆听模式选择
     MENU_EQ_SELECT = 0x05,                                  // 菜单EQ均衡器选择
 
-    cMenu_VideoSrc = 6,
+    MENU_VIDEO_SRC = 6,
     MENU_SRC_FORMAT = 7,                                    // 菜单显示输入码流格式
-    cMenu_Standby = 8,
-    cMenu_Brightness = 9,
-    cMenu_AudioMute = 10,
-    cMenu_NightMode = 11,
-    cMenu_NoiseSignal = 12,
+    MENU_STANDBY = 8,
+    MENU_BRIGHTNESS = 9,
+    MENU_AUDIO_MUTE = 10,
+    MENU_NIGHT_MODE = 11,
+    MENU_TEST_TONE = 12,
     
     MENU_FIREWARE_INFO = 0x0d,                              // 显示固件升级
 
-    cMenu_SdInsert = 14,                  // 显示SD插入
-    cMenu_UDiskInsert = 15,                  // 显示U盘插入
-    cMenu_SdRemove = 16,                  // 显示SD拔出
-    cMenu_UDiskRemove = 17,                  // 显示U盘拔出
+    MENU_SD_INSERT = 14,                  // 显示SD插入
+    MENU_UD_INSERT = 15,                  // 显示U盘插入
+    MENU_SD_REMOVE = 16,                  // 显示SD拔出
+    MENU_UD_REMOVE = 17,                  // 显示U盘拔出
     cMenu_UsbaRemove = 18,                 	// 显示USB声卡拔出
     cMenu_BtRemove = 19,                 	// 显示蓝牙音频拔出
     cMenu_HdmiRemove = 20,                  // 显示HDMI拔出 

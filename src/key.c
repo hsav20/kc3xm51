@@ -110,7 +110,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_Standby:
 			FSYS_Standby = ~FSYS_Standby;
 			if (FSYS_Standby){
-				MDIP_MenuNormal(cMenu_Standby);
+				MDIP_MenuNormal(MENU_STANDBY);
 			}
 			else {
 				MKCM_WriteRegister(KCM_POWER_ON, 1);
@@ -119,8 +119,8 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
 			break;
 		case cRmKey_Brightness:
-			gLocal_1 = (gDIP_MenuSelect == cMenu_Brightness) ? MENU_SET_ADJ_UP : MENU_SET_NORMAL;
-			MDIP_MenuSelect(cMenu_Brightness, gLocal_1);
+			gLocal_1 = (gDIP_MenuSelect == MENU_BRIGHTNESS) ? MENU_SET_ADJ_UP : MENU_SET_NORMAL;
+			MDIP_MenuSelect(MENU_BRIGHTNESS, gLocal_1);
 			break;
 		case cRmKey_FactorySet:
 			MDIP_WriteString(" RESET");
@@ -309,10 +309,10 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
             MEQMIC_KeyEqSelect();                           // °´¼üEQ¾ùºâÆ÷Ñ¡Ôñ
 			break;
 		case cRmKey_NightMode:
-			MDIP_MenuNormal(cMenu_NightMode);
+			MDIP_MenuNormal(MENU_NIGHT_MODE);
 			break;
 		case cRmKey_NoiseSignal:
-			MDIP_MenuNormal(cMenu_NoiseSignal);
+			MDIP_MenuNormal(MENU_TEST_TONE);
 			break;
 		case cRmKey_MediaType:
 			break;
@@ -370,7 +370,7 @@ void MKEY_AudioMute(){
 	BYTE gLocal_1;
 	FSYS_MuteEnable = ~FSYS_MuteEnable;
 	gLocal_1 = FSYS_MuteEnable ? 4 : 3;
-	MDIP_MenuSelect(cMenu_AudioMute, gLocal_1);
+	MDIP_MenuSelect(MENU_AUDIO_MUTE, gLocal_1);
 	if (!FSYS_MuteEnable){									// ½â³ý¾²Òô
 		MDIP_MenuNormal(MENU_MASTER_VOL);
 	}
@@ -410,7 +410,7 @@ void MKEY_VideoSelect(){
 			    return;
 			}
 		} while (++gLocal_3 < 3);
-	    MDIP_MenuNormal(cMenu_VideoSrc);
+	    MDIP_MenuNormal(MENU_VIDEO_SRC);
 	}
 	else {
 		MDIP_MenuNormal(MENU_RESTORE);

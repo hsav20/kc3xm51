@@ -38,8 +38,8 @@ typedef enum {
 	KCM_BR_TRIM = 0x37,					// 后置右声道微调 B4=1为减dB B3-B0为dB数值
 	KCM_MIC_MIXER = 0x38,				// 话筒声音与主声道合成比例
 	KCM_MIC_VOLUME = 0x39,				// 话筒1及话筒2音量比例
-	KCM_MIC_ECHO = 0x3a,				// 话筒延迟时间及回声比例
-	KCM_MIC_REPEAT = 0x3b,				// 话筒重复及直达声比例
+	KCM_MIC_ECHO = 0x3a,				// 话筒直达声及回声比例
+	KCM_MIC_DELAY = 0x3b,				// 话筒延迟时间及重复比例
 	KCM_MIC_REVERB = 0x3c,				// 话筒混响1及混响2比例
 	KCM_MIC_WHISTLE = 0x3d,				// 话筒啸叫声音反馈模式
 	KCM_EXTR_MEMORY = 0x40,				// 扩展给用户主机的掉电记忆空间，0x40-0x7f共64字节（带上电记忆）
@@ -216,7 +216,7 @@ typedef enum {
 #define CUSTOM_VOLUME_CHIP				0x00700000			// 音量芯片类型
 #define CUSTOM_IN_EACH_MODE				0x00800000			// 为每个输入通道单独记忆聆听模式及多段EQ均衡音效选择
 #define CUSTOM_MIC_LTRT_SWAP			0x08000000			// 话筒MIC与模拟输入交换
-#define CUSTOM_MIC_EQ_ENABLE			0x30000000			// 话筒声音混合功能+EQ
+#define CUSTOM_MIC_ENABLE				0x10000000			// 话筒声音混合功能
 #define CUSTOM_BCK_WCK_INPUT			0x80000000			// BCK与WCK端口为输入
 
 

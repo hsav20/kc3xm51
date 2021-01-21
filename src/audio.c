@@ -224,7 +224,7 @@ void MKCM_ReadSrcValid(){
 			            g2PlayIndex = 0xffff;				// 没有指定播放文件
 	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
             		}else {
-		            	MDIP_MenuNormal(cMenu_SdInsert); 
+		            	MDIP_MenuNormal(MENU_SD_INSERT); 
 		            	found = 0;							// 没有播放文件 
 		            }
 					break;	
@@ -234,7 +234,7 @@ void MKCM_ReadSrcValid(){
 			            g2PlayIndex = 0xffff;				// 没有指定播放文件
 	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
             		}else {									// 没有播放文件 
-		            	MDIP_MenuNormal(cMenu_UDiskInsert); 
+		            	MDIP_MenuNormal(MENU_UD_INSERT); 
 		            	found = 0;
 		            }
 					break;	
@@ -262,12 +262,12 @@ MLOG("mINPUT_A %02x", mINPUT_SWITCH);
 		            case KCM_SRC_VALID_SD:
 						g2SdQty = 0; 
 						MDIP_PlaySymbol(0);
-						MDIP_MenuNormal(cMenu_SdRemove); 
+						MDIP_MenuNormal(MENU_SD_REMOVE); 
 						break;	
 		            case KCM_SRC_VALID_UDISK: 
 						g2UDiskQty = 0;
 						MDIP_PlaySymbol(0);
-						MDIP_MenuNormal(cMenu_UDiskRemove); 
+						MDIP_MenuNormal(MENU_UD_REMOVE); 
 						break;	
 		            case KCM_SRC_VALID_USBA: 
 						MDIP_MenuNormal(cMenu_UsbaRemove); 

@@ -32,7 +32,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			return;
 		}
 		if (FSYS_MuteEnable && (gDIP_MenuTimer == 0)){
-			MDIP_MenuNormal(cMenu_AudioMute);
+			MDIP_MenuNormal(MENU_AUDIO_MUTE);
 		}
 		if (!FSYS_Standby && gDIP_MenuTimer){				// 100ms如果菜单打开
 			if (--gDIP_MenuTimer == 0) {					// 菜单计时	
@@ -105,7 +105,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 	case MENU_INPUT_SOURCE:
 		MDIP_InputSource();
 		break;
-	case cMenu_Standby:
+	case MENU_STANDBY:
 		MDIP_WriteString(" -OFF-");
 		break;
 	case MENU_POWER_ON:                                     // 菜单状态:电源打开
@@ -113,7 +113,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 		MDIP_ScreenUpdata();
 		gDIP_MenuTimer = 10;
 		break;
-	case cMenu_Brightness:
+	case MENU_BRIGHTNESS:
 		if (mode == 4){
 			gDIP_MenuTimer = 20;
 			if (++gDIP_Brightness > 2){
@@ -136,30 +136,30 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 		MDIP_SoundEffect(4);
 		break;
         */
-	case cMenu_VideoSrc:
+	case MENU_VIDEO_SRC:
 		gDIP_MenuTimer = 50;
 		MDIP_VideoSrc();
 		break;
 	case MENU_SRC_FORMAT:									// 菜单显示输入码流格式
 		MDIP_SourceFormat();
 		break;
-	case cMenu_NightMode:
+	case MENU_NIGHT_MODE:
 		MDIP_NightMode();
 		break;
-	case cMenu_NoiseSignal:
+	case MENU_TEST_TONE:
 		MDIP_NoiseSignal();
 		break;
 //	case cMenu_Fireware:                                    // 显示固件升级
 //		MDIP_Fireware();
 //		break;
-    case cMenu_SdInsert:                                   // 显示SD插入
-    case cMenu_UDiskInsert:                                // 显示U盘插入
-    case cMenu_SdRemove:                                   // 显示SD拔出 
-    case cMenu_UDiskRemove:                                // 显示U盘拔出
+    case MENU_SD_INSERT:                                   // 显示SD插入
+    case MENU_UD_INSERT:                                // 显示U盘插入
+    case MENU_SD_REMOVE:                                   // 显示SD拔出 
+    case MENU_UD_REMOVE:                                // 显示U盘拔出
     case cMenu_UsbaRemove:               	               // 显示USB声卡拔出
     case cMenu_HdmiRemove:                                 // 显示HDMI拔出 
     case cMenu_BtRemove:               	                 	// 显示蓝牙音频拔出
-		MDIP_InsertRemove(index - cMenu_SdInsert);			// 显示外置音源插入/拔出
+		MDIP_InsertRemove(index - MENU_SD_INSERT);			// 显示外置音源插入/拔出
 		break;
     case cMenu_PlayTrack:                                  // 显示多媒体文件信息
         MDIP_PlayTrack();
@@ -170,7 +170,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 		break;
 
 
-	case cMenu_AudioMute:
+	case MENU_AUDIO_MUTE:
 		if (mode == 0 || mode == 4){ 						 // 0一般模式 或者 4静音有效
 			gDIP_MenuTimer = 80;
 			FDIP_MenuTwinkle = 1;
@@ -264,7 +264,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 void MDIP_NoiseSignal(){
 	BYTE gLocal_1 = MKCM_ReadRegister(KCM_TEST_TONE);
 	if (FSYS_TestTone){									// 已经打开了噪音测试
-		if (gDIP_MenuSelect == cMenu_NoiseSignal){	
+		if (gDIP_MenuSelect == MENU_TEST_TONE){	
 			if (++gLocal_1 > 7){
 				gLocal_1 = 0;
 			}
@@ -559,17 +559,6 @@ void MDIP_ListenMode(BYTE value){                           // 显示聆听模式
     MDIP_SetNormal();
     MDIP_SetState(MENU_LISTEN_MODE);
 }
-CONST_CHAR Tab_DIP_EqMode[] = {
-	" FLAT SOUND "
-//	 ++++++------
-};
-void MDIP_EqSelect(BYTE value){                               // 显示EQ均衡器选择
-    MDIP_WriteString((char*)&Tab_DIP_EqMode[value ? 6 : 0]);
-    if (value){
-        MDIP_SingleChar(5, value + '0');
-    }
-    MDIP_SetState(MENU_EQ_SELECT);
-}
 CONST_CHAR Tab_DIP_SRC_CH[] = {
 	"2/01/02/03/02/13/12/23/23/33/42/32/4"
 //	 +++---+++---+++---+++---+++---+++---
@@ -632,7 +621,7 @@ BYTE MDIP_GetSpeakerChar(BYTE index){						// 0前置 1中置 2超低音 3环绕 4后置
 void MDIP_NightMode(){
 	BYTE gLocal_1 = MKCM_ReadRegister(KCM_DYN_COMPRES);
 
-	if (gDIP_MenuSelect == cMenu_NightMode){	
+	if (gDIP_MenuSelect == MENU_NIGHT_MODE){	
 		if (gLocal_1 < 50){                                 
             gLocal_1 = 50;                                  // 50%
         }else {

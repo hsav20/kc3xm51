@@ -7,7 +7,7 @@
 
 // ！！！编译版本选择
 
-#define CUSTOM_CODE                     0x12123030          // 标准版本 使用PT2258音量IC，支持话筒EQ
+#define CUSTOM_CODE                     0x12123010          // 标准版本 使用PT2258音量IC，支持话筒
 //#define CUSTOM_CODE                     0x12123018          // 数码输出 使用PT2258音量IC，字节1(B3:PT2258)字节0(B3:模拟从MIC输入)
 //#define CUSTOM_CODE                     0x12120000          // 标准版本
 //#define CUSTOM_CODE                     0x44443000          // 旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
@@ -18,7 +18,7 @@
 
 #define TONE_ENABLE                                       	// 定义就使用遥控器的音调、音调+、音调-
 
-#if (CUSTOM_CODE & 0x00000030) != 0							// 支持话筒
+#if (CUSTOM_CODE & 0x00000010) != 0							// 支持话筒
 #define MICROPHONE                                         	// 定义就将遥控器的音调、音调+、音调-改变为话筒控制
 #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -347,3 +347,4 @@ void MEQMIC_KeyDown();										// EQ或MIC按键调节-入口
 void MEQMIC_MicDisplay(BYTE index, MENU_SET mode);          // 显示话筒各种参数调节
 void MEQMIC_MicKcm(BYTE menuMic, BYTE directUp);			// 话筒各种参数调节写入到KCM
 void MEQMIC_MicSetTone();                                  	// 写入话筒的音调到KCM
+void MEQMIC_MicAutoMixer();                                 // 根据话筒1及2的音量自动调节话筒声音与主声道合成比例
