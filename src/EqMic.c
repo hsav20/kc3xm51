@@ -14,6 +14,16 @@
 #define MAIN_EQ                         4                   // Ã»ÓÐ´ò¿ªMICÉùµÀEQÒôÐ§Ôò¿ÉÓÃ4×éÎªÖ÷ÉùµÀÒôÐ§
 #endif
 
+
+#define EQ_FREQ(F) (                        \
+    (F<150)  ? ((0<<5) | ((F-20)/5)) :      \
+    (F<1500) ? ((1<<5) | ((F-150)/50)) :    \
+    (F<4500) ? ((2<<5) | ((F-1500)/100)) :  \
+               ((3<<5) | ((F-4500)/500)))
+           
+#define EQ_LEVEL(L) (                       \
+    (L<0) ? (0x80 | (((L&0x1f)^0x1f)+1)) : (L&0x1f))
+
 CONST_CHAR TabEqSetup[5] = {                                // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
     0x03,                                                   // KCM_EQ_SETUP×Ö½Ú1 Ç°ÖÃÍ¨µÀÊ¹ÓÃEQ
     (0<<6) | (0<<5) | (5&0x1f),                             // Ö÷ÉùµÀÊ¹ÓÃ5¶ÎEQ ×Ô¶¯µÄË¥¼õÖµÅäºÏÒôÁ¿Ð¾Æ¬
@@ -21,36 +31,22 @@ CONST_CHAR TabEqSetup[5] = {                                // ¶àÂ·¾ùºâEQÒôÐ§´¦À
     (6<<4) | 8,                                             // ÂË²¨Æ÷QÖµ »°Í²=6 Ö÷ÉùµÀ=8 
     (9<<4) | 15,                                            // Ô¤Ë¥¼õÖµ »°Í²¸ßµÍÒô×î´óÎª+9dB£¬Ö÷ÉùµÀ×î´óÎª+15dB
 }; 
-CONST_CHAR TabEqFreq[9] = {                                 // ¶àÂ·¶Î¾ùºâEQÒôÐ§´¦ÀíÆµÂÊ£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
-    0x00|6,  0x20|3,  0,                                    // 50Hz(50-20/5=6),             350Hz(300-150/50=3)
-    0x20|17, 0x40|18, 0,                                    // 1000Hz(1000-150/50=17),      3300Hz(3300-1500/100=18)
-    0x60|21, 0,       0,                                    // 15000Hz(15000-4500/500=21)
+CONST_CHAR TabEqFreq[6] = {                                 // ¶àÂ·¶Î¾ùºâEQÒôÐ§´¦ÀíÆµÂÊ£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
+    EQ_FREQ(50), EQ_FREQ(350), EQ_FREQ(1000), EQ_FREQ(3300), EQ_FREQ(15000), 0, // ºóÃæÔö¼ÓÒ»¸ö×Ö½ÚÓÃÓÚË«Êý¶ÔÆë
 };     
-
-CONST_CHAR TabEqLevel[4][9] = {                             // ¶àÂ·¶Î¾ùºâEQÒôÐ§´¦ÀíµçÆ½£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
-{   
-    0x00, 0x80, 15|(2<<4),                                  // +15dB, -2dB
-    0x80, 0x00, 12|(5<<4),                                  // -12dB, +5dB,
-    0x00, 0x00, 15,                                         // +15dB,
-},{
-    0x80, 0x00, 12|(2<<4),                                  // -12dB, +2dB
-    0x00, 0x80, 10|(5<<4),                                  // +10dB, -5dB,
-    0x80, 0x00, 8,                                          // -8dB,
-},{
-    0x00, 0x00, 8|(5<<4),                                   // +8dB, +5dB
-    0x80, 0x00, 2|(3<<4),                                   // -2dB,  +3dB,
-    0x00, 0x00, 6,                                          // +6dB,
-},{
-    0x00, 0x80, 5|(2<<4),                                   // +5dB, -2dB
-    0x80, 0x00, 4|(11<<4),                                  // -4dB, +11dB,
-    0x00, 0x00, 13,                                         // +13dB,
-},
+CONST_CHAR TabEqLevel[4][6] = {                             // ¶àÂ·¶Î¾ùºâEQÒôÐ§´¦ÀíµçÆ½£¬×¢Òâ´Ó×Ö½Ú1¿ªÊ¼µÄ
+    {EQ_LEVEL(8), EQ_LEVEL(5), EQ_LEVEL(-2), EQ_LEVEL(3), EQ_LEVEL(6), 0,}, // ºóÃæÔö¼ÓÒ»¸ö×Ö½ÚÓÃÓÚË«Êý¶ÔÆë
+    {EQ_LEVEL(15), EQ_LEVEL(-2), EQ_LEVEL(-12), EQ_LEVEL(5), EQ_LEVEL(15), 0,},
+    {EQ_LEVEL(-12), EQ_LEVEL(2), EQ_LEVEL(10), EQ_LEVEL(-5), EQ_LEVEL(-8), 0,},
+    {EQ_LEVEL(5), EQ_LEVEL(-3), EQ_LEVEL(-4), EQ_LEVEL(11), EQ_LEVEL(13), 0,},
 };
 
 void MEQMIC_EqRestore(){									// EQ»Ö¸´¼ÇÒä
-	BYTE value;
+    BYTE index;
     BYTE counter;
     BYTE select;
+	BYTE value1;
+	BYTE value2;
     BYTE temp[10];
     
     // ¶àÂ·¾ùºâEQÒôÐ§´¦Àí³õÊ¼»¯
@@ -60,13 +56,17 @@ void MEQMIC_EqRestore(){									// EQ»Ö¸´¼ÇÒä
         temp[0] = select + 1;
         MKCM_WriteXByte(KCM_EQ_SETUP, temp, 1 + sizeof(TabEqSetup));   // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ
 
-        // ¶àÂ·¾ùºâEQÒôÐ§ÆµÂÊ£¬Ò»°ãÐ´ÈëÒ»´ÎÓÃÓÚ³õÊ¼»¯
-        memcpy(&temp[1], TabEqFreq, sizeof(TabEqFreq));
-        for (counter = 0; counter < sizeof(TabEqFreq); counter++){ // Ð´ÈëEQÆµÂÊµçÆ½
-            temp[counter + 1] |= TabEqLevel[select][counter];
+        counter = 1;                                        // Ã¿3¸ö×Ö½ÚÎªÁ½¶Î12Î»µÄEQÉèÖÃÖµ
+        for (index = 0; index < sizeof(TabEqFreq); index+=2){ // Ð´ÈëEQÆµÂÊ¼°µçÆ½
+            value1 = TabEqLevel[select][index];
+            value2 = TabEqLevel[select][index+1];
+            temp[counter + 0] = (value1&0x80) | (TabEqFreq[index]&0x7f);
+            temp[counter + 1] = (value2&0x80) | (TabEqFreq[index+1]&0x7f);
+            temp[counter + 2] = (value1&0x0f) | ((value2&0x0f)<<4);
+            counter += 3;
         }
         temp[0] = select + 1;
-        MKCM_WriteXByte(KCM_EQ_VALUE, temp, 1 + sizeof(TabEqFreq));   // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ
+        MKCM_WriteXByte(KCM_EQ_VALUE, temp, counter);   // ¶àÂ·¾ùºâEQÒôÐ§´¦ÀíÉèÖÃ
     }
 }
 
@@ -107,8 +107,8 @@ CONST_CHAR TabMicAdjMax[5] = {                              // »°Í²¸÷ÖÖ²ÎÊý¿ØÖÆ×
     // B7Îª¼Ó±¶ÑÓ³ÙÊ±¼äÑ¡Ôñ B5:4»°Í²ºÏ³Éµ½Ö÷Í¨µÀÑ¡Ôñ B3»°Í²ÉùµÀÖ§³ÖEQ £»B1:0Îª»°Í²1¼°2ÒôÁ¿ºÏ³ÉÐ¾Æ¬ÀàÐÍ
     (0<<7) | (0<<4) | (1<<3) | MIC_CHIP,                    // ×Ö½Ú0ÎªºÏ³É¼°ÒôÁ¿·½Ê½ÉèÖÃ
     (9<<4) | 9,                                             // »°Í²1¼°2ÒôÁ¿±ÈÀýKCM_MIC_VOLUME¿ØÖÆ×î´óÖµ
-    (9<<4) | 0x0f,                                          // »°Í²ÑÓ³ÙÊ±¼ä¼°»ØÉù±ÈÀý£¬×î´ó²»ÐèÒª100%µÄ
-    (0x0f<<4) | 0x0f,                                       // »°Í²ÖØ¸´¼°Ö±´ïÉù×î´óÖµ£¬×î´ó²»ÐèÒª100%µÄ
+    (0x0f<<4) | 0x0f,                                       // »°Í²Ö±´ïÉù¼°»ØÉù×î´óÖµ£¬»ØÉù×î´ó²»ÐèÒª100%
+    (9<<4) | 0x0f,                                          // »°Í²ÑÓ³ÙÊ±¼ä¼°ÖØ¸´±ÈÀý£¬ÖØ¸´×î´ó²»ÐèÒª100%
     (0<<4) | 0,                                             // »°Í²»ìÏì1¼°»ìÏì2±ÈÀýKCM_MIC_REVERB¿ØÖÆ×î´óÖµ
 };  
 
@@ -200,7 +200,7 @@ CONST_CHAR Tab_DIP_MicShow[] = {
 void MEQMIC_MicDisplay(BYTE index, MENU_SET mode){          // ÏÔÊ¾»°Í²¸÷ÖÖ²ÎÊýµ÷½Ú
     BYTE value;
     BYTE temp0;
-	if (mode >= MENU_SET_ADJ_DOWN){							    // MENU_SET_ADJ_DOWN»òMENU_SET_ADJ_UP 
+	if (mode >= MENU_SET_ADJ_DOWN){							// MENU_SET_ADJ_DOWN»òMENU_SET_ADJ_UP 
 		if (index == gDIP_MenuSelect){                      // ÉÏ´ÎÒÑ¾­½øÈëµ±Ç°²Ëµ¥
 			MEQMIC_MicKcm(index, (mode == MENU_SET_ADJ_UP) ? 1 : 0); 	// »°Í²¸÷ÖÖ²ÎÊýµ÷½ÚÐ´Èëµ½KCM
 			gDIP_MenuTimer = 80;
@@ -227,8 +227,6 @@ void MEQMIC_MicDisplay(BYTE index, MENU_SET mode){          // ÏÔÊ¾»°Í²¸÷ÖÖ²ÎÊýµ
 	}
 }
 
-#define MIC_BASS_300HZ                  (0x20 | 3)          // B6:5=1  B4:0=3*50+150=300Hz
-#define MIC_TREBL_5000HZ                (0x60 | 1)          // B6:5=3  B4:0=1*500+4500=5000Hz
 WORD makeEqValue(BYTE level, WORD freq){
     if (level < 9){                                         // ¸ºÊý
         freq |= 0x80;                                       // B7Îª1Ê±B11:8µÄÖµÎªË¥¼õ-0ÖÁ-15dB¡£ 
@@ -242,6 +240,7 @@ void MEQMIC_MicKcm(BYTE index, BYTE directUp){              // »°Í²¸÷ÖÖ²ÎÊýµ÷½ÚÐ
 	BYTE value;
 
 	MAUD_AutoCanclMute();
+   
     if (index < MENU_MIC_BASS){                             // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´ 4ÑÓ³Ù
         MDIP_SetUpDown(directUp, 9, &gDIP_MicCtrl[index - MENU_MIC_VOL1]);
         switch (index){                                     // 0»°Í²1ÒôÁ¿ 1»°Í²2  2»ØÉù 3ÖØ¸´ 4ÑÓ³Ù 5»ìÏì
@@ -257,9 +256,7 @@ void MEQMIC_MicKcm(BYTE index, BYTE directUp){              // »°Í²¸÷ÖÖ²ÎÊýµ÷½ÚÐ
         case MENU_MIC_DELAY:                                // »°Í²ÑÓ³ÙÊ±¼ä
         case MENU_MIC_REPEAT:                               // »°Í²ÖØ¸´±ÈÀý
             MKCM_WriteRegister(KCM_MIC_DELAY, (gDIP_MicCtrl[4]<<4) | gDIP_MicCtrl[3]);
-        break;
-            default:
-        break;
+            break;
         }
     }else{                                                  // »°Í²Òôµ÷µÍ¡¢¸ßÒôµ÷½Ú
         MDIP_SetUpDown(directUp, 18, &gDIP_MicTone[index - MENU_MIC_BASS]);
@@ -275,8 +272,8 @@ void MEQMIC_MicSetTone(){                                   // Ð´Èë»°Í²µÄÒôµ÷µ½K
     BYTE temp[4];
     WORD bass;
     WORD treble;
-    bass = makeEqValue(gDIP_MicTone[0], MIC_BASS_300HZ);
-    treble = makeEqValue(gDIP_MicTone[1], MIC_TREBL_5000HZ);
+    bass = makeEqValue(gDIP_MicTone[0], EQ_FREQ(300));
+    treble = makeEqValue(gDIP_MicTone[1], EQ_FREQ(8000));
     
     temp[0] = 4;                                        // µÚ4×éÎª»°Í²µÄÒôÐ§
     // ×Ö½Ú1¿ªÊ¼Ã¿3¸ö×Ö½ÚÎªÁ½¶Î12Î»µÄEQÉèÖÃÖµ
