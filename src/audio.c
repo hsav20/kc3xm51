@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -102,13 +102,18 @@ void MAUD_InputSelect(INPUT_SWITCH select){
 	MAUD_AutoCanclTestTone();
 	
 	if (gDIP_MenuSelect == MENU_RESTORE || gDIP_MenuSelect == MENU_INPUT_SOURCE){	// 只有菜单已经换到MENU_RESTORE后，才可以改变当前的输入
-MLOG("MenuSelectA %02x", select);
+//MLOG("MenuSelectA %02x", select);
 		mINPUT_SWITCH = select;
 		MAUD_InputWrite(mINPUT_SWITCH, mINPUT_SWITCH);
+		if (mINPUT_SWITCH == INPUT_SWITCH_SD){
+			MKCM_AutoTrack(KCM_PLAY_SD_QTY);					// 输入KCM_PLAY_SD_QTY，如果可以播放返回1
+		}else if (mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+			MKCM_AutoTrack(KCM_PLAY_UDISK_QTY);				// 输入KCM_PLAY_UDISK_QTY，如果可以播放返回1
+		}
 	}
-	MDIP_MenuNormal(MENU_INPUT_SOURCE);                    // 菜单状态:输入音源选择
+	MDIP_MenuNormal(MENU_INPUT_SOURCE);                    	// 菜单状态:输入音源选择
 }
-void MAUD_Preemptible(){							// 抢占式输入选择 
+void MAUD_Preemptible(){									// 抢占式输入选择 
 	MLOG("MKCM_Preemptible:%d %d/%d", gPreemptibleIn[gPreemptibleStep], gPreemptibleStep, gPreemptibleQty);
 	if (gPreemptibleQty){
 		MAUD_InputSelect(gPreemptibleIn[gPreemptibleStep]);
@@ -138,10 +143,10 @@ void MAUD_InputOneKey(){								// 所有输入用一个按键选择
 }
 void MAUD_InputWrite(INPUT_SWITCH select, INPUT_SWITCH last){
 	MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, select));
-    MLOG("SourceW:%02x(%02x)%02x(%02x)", select, MKCM_ToRegister(KCM_INPUT_SOURCE, select), last, MKCM_ToRegister(KCM_INPUT_SOURCE, last));
+ //   MLOG("SourceW:%02x(%02x)%02x(%02x)", select, MKCM_ToRegister(KCM_INPUT_SOURCE, select), last, MKCM_ToRegister(KCM_INPUT_SOURCE, last));
 	if (last <= INPUT_SWITCH_COA2){ 								// 如果原来不是抢占式输入
 	    MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO, MKCM_ToRegister(KCM_INPUT_SOURCE, last));	// 自动输入的恢复
-		MLOG("SourceJ:%02x last:%02x", select, MKCM_ReadRegister(KCM_INPUT_SOURCE));
+		// MLOG("SourceJ:%02x last:%02x", select, MKCM_ReadRegister(KCM_INPUT_SOURCE));
 	}
 }
 CONST_WORD TabSrcValid[] = {
@@ -203,6 +208,21 @@ void MAUD_MakePreemptible(WORD g2Local_1){			        // 生成抢占式输入选择
     g2AUD_SrcValid = g2Local_1;
 }
 
+
+BYTE MKCM_AutoTrack(BYTE value){							// 输入KCM_PLAY_SD_QTY或KCM_PLAY_UDISK_QTY，如果可以播放返回1
+	WORD qty = MKCM_Read2Byte(value);
+	if (value == KCM_PLAY_SD_QTY){
+		g2SdQty = qty;
+	}else{
+		g2UDiskQty = qty;
+	}
+	if (qty){												// 有播放文件 
+		MKCM_Write2Byte(KCM_PLAY_INDEX, 0xffff);  			// 播放上次记忆的曲目
+		return 1;
+	}
+	return 0;
+}
+
 void MKCM_ReadSrcValid(){
 	WORD g2Local_1 = MKCM_Read2Byte(KCM_SRC_VALID);         // 本次的有效音源
 //if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
@@ -219,24 +239,16 @@ void MKCM_ReadSrcValid(){
 		       	found = 1;
 	        	switch (flag){
 	            case KCM_SRC_VALID_SD:
-		            g2SdQty = MKCM_Read2Byte(KCM_PLAY_SD_QTY);
-		            if (g2SdQty){							// 有播放文件 
-			            g2PlayIndex = 0xffff;				// 没有指定播放文件
-	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
-            		}else {
-		            	MDIP_MenuNormal(MENU_SD_INSERT); 
-		            	found = 0;							// 没有播放文件 
-		            }
+					if (MKCM_AutoTrack(KCM_PLAY_SD_QTY) == 0){
+						MDIP_MenuNormal(MENU_SD_INSERT); 
+		            	found = 0;							// 没有播放文件
+					}
 					break;	
 	            case KCM_SRC_VALID_UDISK: 
-					g2UDiskQty = MKCM_Read2Byte(KCM_PLAY_UDISK_QTY);
-					if (g2UDiskQty){						// 有播放文件 
-			            g2PlayIndex = 0xffff;				// 没有指定播放文件
-	                	MKCM_Write2Byte(KCM_PLAY_INDEX, g2PlayIndex);  // 播放第0首	         
-            		}else {									// 没有播放文件 
-		            	MDIP_MenuNormal(MENU_UD_INSERT); 
-		            	found = 0;
-		            }
+					if (MKCM_AutoTrack(KCM_PLAY_UDISK_QTY) == 0){
+						MDIP_MenuNormal(MENU_UD_INSERT); 
+		            	found = 0;							// 没有播放文件
+					}
 					break;	
 	            case INPUT_SWITCH_E8CH: 
 	            	found = 0;
@@ -270,10 +282,10 @@ MLOG("mINPUT_A %02x", mINPUT_SWITCH);
 						MDIP_MenuNormal(MENU_UD_REMOVE); 
 						break;	
 		            case KCM_SRC_VALID_USBA: 
-						MDIP_MenuNormal(cMenu_UsbaRemove); 
+						MDIP_MenuNormal(MENU_PC_REMOVE); 
 						break;	
 		            case KCM_SRC_VALID_BT: 
-						MDIP_MenuNormal(cMenu_BtRemove); 
+						MDIP_MenuNormal(MENU_BT_REMOVE); 
 						break;	
 		            case KCM_SRC_VALID_HDMI1: 
 		            case KCM_SRC_VALID_HDMI2: 

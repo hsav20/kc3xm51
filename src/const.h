@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -83,17 +83,17 @@
 #define cRmKey_EqSelect    			    0x4e
 #define cRmKey_NightMode         		0x4c
 #define cRmKey_NoiseSignal         		0x0c
-#define cRmKey_MediaType                0x0F
+#define cRmKey_MediaType                0x0F                // 蓝牙输入
 
 #define cRmKey_Stereo	    			0x4a
 #define cRmKey_Surround	    			0x48
-#define cRmKey_VideoSrc    				0x08
-#define cRmKey_InputNet	    			0x0b
+#define cRmKey_VideoSrc    				0x08                // SD输入
+#define cRmKey_InputNet	    			0x0b                // UDisk输入
 
 #define cRmKey_InputHdmi1	    		0x46
 #define cRmKey_InputHdmi2	    		0x44
 #define cRmKey_InputHdmi3	    		0x04
-#define cRmKey_InputHdmiArc	    		0x07
+#define cRmKey_InputHdmiArc	    		0x07                // HDMI_ARC或外置7.1输入
 
 #define cRmKey_InputOptica	    		0x42
 #define cRmKey_InputCoaxal1	    		0x40
@@ -140,17 +140,15 @@ typedef enum {
     
     MENU_FIREWARE_INFO = 0x0d,                              // 显示固件升级
 
-    MENU_SD_INSERT = 14,                  // 显示SD插入
-    MENU_UD_INSERT = 15,                  // 显示U盘插入
-    MENU_SD_REMOVE = 16,                  // 显示SD拔出
-    MENU_UD_REMOVE = 17,                  // 显示U盘拔出
-    cMenu_UsbaRemove = 18,                 	// 显示USB声卡拔出
-    cMenu_BtRemove = 19,                 	// 显示蓝牙音频拔出
-    cMenu_HdmiRemove = 20,                  // 显示HDMI拔出 
-    cMenu_PlayTrack = 21,                  // 显示多媒体文件信息
-    cMenu_PlayTime = 22,                  // 显示多媒体播放时间
-
-
+    MENU_SD_INSERT = 14,                                    // 显示SD插入
+    MENU_UD_INSERT = 15,                                    // 显示U盘插入
+    MENU_SD_REMOVE = 16,                                    // 显示SD拔出
+    MENU_UD_REMOVE = 17,                                    // 显示U盘拔出
+    MENU_PC_REMOVE = 18,                 	                // 显示USB声卡拔出
+    MENU_BT_REMOVE = 19,                 	                // 显示蓝牙音频拔出
+    MENU_HDMI_REMOVE = 20,                                  // 显示HDMI拔出 
+    MENU_PLAY_TRACK = 21,                                   // 显示多媒体文件信息
+    MENU_PLAY_TIME = 22,                                    // 显示多媒体播放时间
 
     MENU_TESTTONE_FL = 36,                                  // 测试噪音前置左声道
     MENU_TESTTONE_CE = 37,                                  // 测试噪音中置声道
@@ -180,19 +178,17 @@ typedef enum {
     MENU_MIC_TREBLE = 63,                                   // 菜单话筒音调高音调节
 
 
-    cMenu_LipSync = 70,
-    cMenu_DelayFront = 71,
-    cMenu_DelayCenter = 72,					// 菜单中置声道延迟时间调整
-    cMenu_DelaySurround = 73,					// 菜单环绕声道延迟时间调整
-    cMenu_DelayBack = 74,					// 菜单后置声道延迟时间调整
-    cMenu_SpeakFront = 75,
-    cMenu_SpeakCenter = 76,
-    cMenu_SpeakWoofer = 77,
-    cMenu_SpeakSurround = 78,
-    cMenu_SpeakBack = 79,
-    cMenu_SpeakFilter = 80
-
-
+    MENU_LIP_SYNC = 70,
+    MENU_DELAY_FRONT = 71,
+    MENU_DELAY_CENTER = 72,					                // 菜单中置声道延迟时间调整
+    MENU_DELAY_SURR = 73,					                // 菜单环绕声道延迟时间调整
+    MENU_DELAY_BACK = 74,					                // 菜单后置声道延迟时间调整
+    MENU_SPEAK_FRONT = 75,
+    MENU_SPEAK_CENTER = 76,
+    MENU_SPEAK_WOOFER = 77,
+    MENU_SPEAK_SURR = 78,
+    MENU_SPEAK_BACK = 79,
+    MENU_SPEAK_FILTER = 80
 } MENU_STATE;
 
 

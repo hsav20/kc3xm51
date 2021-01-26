@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -123,12 +123,12 @@ EXTR BOOL FSeekAuto;
 EXTR BOOL FAUD_MasterVolume;
 EXTR xdata BYTE gAUD_MasterVolume;
 EXTR xdata BYTE gAUD_SrcFormat;
-EXTR xdata BYTE gAUD_BpsRate;
+EXTR xdata BYTE gAUD_SrcFreq;
 EXTR xdata WORD g2AUD_SrcValid;
 EXTR xdata BYTE gPlayOperate;
 EXTR xdata WORD g2SdQty;
 EXTR xdata WORD g2UDiskQty;
-EXTR xdata WORD g2PlayIndex;
+//EXTR xdata WORD g2PlayIndex;
 EXTR xdata WORD g2TimeLength;
 EXTR xdata WORD g2PlayTime;
 EXTR xdata BYTE gPlayStatus;
@@ -306,7 +306,6 @@ void MDIP_NoiseSignal();
 void MDIP_Fireware();
 void MDIP_InsertRemove(BYTE type);							// 显示外置音源插入/插出 
 void MDIP_PlayTrack();
-void MDIP_PlayTime();
 BYTE MDIP_GetNextChannel(BYTE index);                       // 测试噪音声道微调获取下一个声道
 
 #define DIP_SURROUND_OFF()              {g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);}
@@ -323,13 +322,12 @@ void MDIP_MenuNormal(BYTE index);							// 菜单选择一般模式
 void MDIP_MenuSelect(BYTE index, MENU_SET mode);			// 菜单选择高级模式，mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 
 BYTE MDIP_GetSpeakerChar(BYTE index);						// 0前置 1中置 2超低音 3环绕 4后置
 void MDIP_AdjDelayTime(BYTE index, BYTE mode);				// 0=LINSYNC 1前置 2中置 3环绕 4后置 
-
-
+void MDIP_PlaySkip(BYTE operate);							// 多媒体播放前/后一首
+void MDIP_CleanSymbol();									// 统一清除屏幕及符号
 BYTE MKCM_ToRegister(BYTE index, BYTE counter);				// 从本机处理的值，转换到KCM寄存器的值
 BYTE MKCM_FromRegister(BYTE index, BYTE value);				// 从KCM来的寄存器，转换到本机处理的值
-
 BYTE MKCM_PresetEQ(BYTE counter, BYTE tone);				// 预设EQ
-
+BYTE MKCM_AutoTrack(BYTE value);
 void MKEY_AudioMute();
 void MKEY_TestTone();
 void MKEY_VideoSelect();

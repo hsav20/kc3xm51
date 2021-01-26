@@ -11,7 +11,7 @@ typedef enum {
 	KCM_TEST_TONE = 0x09,				// 噪音测试
 	KCM_SRC_DETECT = 0x0a,				// 检测所有有效的音源一次
 	KCM_SRC_FORMAT = 0x18,				// 数码信号输入格式及通道信息指示
-	KCM_BPS_RATE = 0x1a,				// 采样频率及码流率指示
+	KCM_SRC_FREQ = 0x1a,				// 采样频率及码流率指示
 	KCM_SRC_VALID = 0x1c,				// 有效的音源输入改变，16位寄存器
 	KCM_WORK_STATUS = 0x1f,				// 模块工作/运行状态指示
 

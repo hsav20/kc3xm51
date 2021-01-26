@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -174,33 +174,33 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
     		MKEY_AudioMute();
 			break;
 		case cRmKey_MeunCtrl:
-			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
+			if (gDIP_MenuSelect >= MENU_LIP_SYNC && gDIP_MenuSelect <= MENU_SPEAK_FILTER){	// 已经进入设置菜单 
 				MDIP_MenuNormal(MENU_RESTORE);
 			}
 			else {
-				MDIP_MenuNormal(cMenu_LipSync);
+				MDIP_MenuNormal(MENU_LIP_SYNC);
 			}
 			break;
 		case cRmKey_MeunUp:
-			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
+			if (gDIP_MenuSelect >= MENU_LIP_SYNC && gDIP_MenuSelect <= MENU_SPEAK_FILTER){	// 已经进入设置菜单 
 				++gDIP_MenuSelect;
-				if (gDIP_MenuSelect == cMenu_DelayCenter){	// 菜单中置声道延迟时间调整
+				if (gDIP_MenuSelect == MENU_DELAY_CENTER){	// 菜单中置声道延迟时间调整
 					if (gDIP_SpeakSetup[1] == 0){			// 没有中置喇叭
 						++gDIP_MenuSelect;					// 跳过
 					}
 				}
-				if (gDIP_MenuSelect == cMenu_DelaySurround){	// 菜单环绕声道延迟时间调整
+				if (gDIP_MenuSelect == MENU_DELAY_SURR){	// 菜单环绕声道延迟时间调整
 					if (gDIP_SpeakSetup[3] == 0){			// 没有环绕声喇叭
 						++gDIP_MenuSelect;					// 跳过
 					}
 				}
-				if (gDIP_MenuSelect == cMenu_DelayBack){	// 菜单后置声道延迟时间调整
+				if (gDIP_MenuSelect == MENU_DELAY_BACK){	// 菜单后置声道延迟时间调整
 					if (gDIP_SpeakSetup[4] == 0){			// 没有后置喇叭
 						++gDIP_MenuSelect;					// 跳过
 					}
 				}
-				if (gDIP_MenuSelect > cMenu_SpeakFilter){
-					gDIP_MenuSelect = cMenu_LipSync;
+				if (gDIP_MenuSelect > MENU_SPEAK_FILTER){
+					gDIP_MenuSelect = MENU_LIP_SYNC;
 				}
 				MDIP_MenuNormal(gDIP_MenuSelect);
 				gDIP_MenuTimer = 50;
@@ -208,26 +208,26 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 //MDEBUG(0xa9);MDEBUG(gDIP_MenuSelect);
 			break;
 		case cRmKey_MeunDown:
-			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
+			if (gDIP_MenuSelect >= MENU_LIP_SYNC && gDIP_MenuSelect <= MENU_SPEAK_FILTER){	// 已经进入设置菜单 
 				--gDIP_MenuSelect;
-				if (gDIP_MenuSelect == cMenu_DelayBack){	// 菜单后置声道延迟时间调整
+				if (gDIP_MenuSelect == MENU_DELAY_BACK){	// 菜单后置声道延迟时间调整
 					if (gDIP_SpeakSetup[4] == 0){			// 没有后置喇叭
 						--gDIP_MenuSelect;					// 跳过
 					}
 				}
-				if (gDIP_MenuSelect == cMenu_DelaySurround){	// 菜单环绕声道延迟时间调整
+				if (gDIP_MenuSelect == MENU_DELAY_SURR){	// 菜单环绕声道延迟时间调整
 					if (gDIP_SpeakSetup[3] == 0){			// 没有环绕声喇叭
 						--gDIP_MenuSelect;					// 跳过
 					}
 				}
 
-				if (gDIP_MenuSelect == cMenu_DelayCenter){	// 菜单中置声道延迟时间调整
+				if (gDIP_MenuSelect == MENU_DELAY_CENTER){	// 菜单中置声道延迟时间调整
 					if (gDIP_SpeakSetup[1] == 0){			// 没有中置喇叭
 						--gDIP_MenuSelect;					// 跳过
 					}
 				}
-				if (gDIP_MenuSelect < cMenu_LipSync){
-					gDIP_MenuSelect = cMenu_SpeakFilter;
+				if (gDIP_MenuSelect < MENU_LIP_SYNC){
+					gDIP_MenuSelect = MENU_SPEAK_FILTER;
 				}
 				MDIP_MenuNormal(gDIP_MenuSelect);
 				gDIP_MenuTimer = 50;
@@ -235,13 +235,13 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 //MDEBUG(0xa8);MDEBUG(gDIP_MenuSelect);
 			break;
 		case cRmKey_MeunLeft:
-			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
+			if (gDIP_MenuSelect >= MENU_LIP_SYNC && gDIP_MenuSelect <= MENU_SPEAK_FILTER){	// 已经进入设置菜单 
 				gRmKeyContinCanclTm = 1;
 				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_DOWN);
 			}
 			break;
 		case cRmKey_MeunRight:
-			if (gDIP_MenuSelect >= cMenu_LipSync && gDIP_MenuSelect <= cMenu_SpeakFilter){	// 已经进入设置菜单 
+			if (gDIP_MenuSelect >= MENU_LIP_SYNC && gDIP_MenuSelect <= MENU_SPEAK_FILTER){	// 已经进入设置菜单 
 				gRmKeyContinCanclTm = 1;
 				MDIP_MenuSelect(gDIP_MenuSelect, MENU_SET_ADJ_UP);
 			}
@@ -300,10 +300,10 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_FAST_FORW);  // 多媒体播放快进
 			break;
 		case cRmKey_SkipDown:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_DOWN);  // 多媒体播放后一首
+			MDIP_PlaySkip(KCM_OPERATE_SKIP_DOWN);			// 多媒体播放后一首
 			break;
 		case cRmKey_SkipUp:
-			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_UP);  // 多媒体播放前一首
+			MDIP_PlaySkip(KCM_OPERATE_SKIP_UP);			// 多媒体播放前一首
 			break;
 		case cRmKey_EqSelect:
             MEQMIC_KeyEqSelect();                           // 按键EQ均衡器选择
@@ -322,11 +322,12 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_Surround:                               // 面板环绕声按键
             MKEY_ListenMode(0);                             // 按键聆听模式选择
 			break;
-		case cRmKey_VideoSrc:
+		case cRmKey_VideoSrc:								// SD输入
 			MKEY_VideoSelect();
 			break;
-		case cRmKey_InputNet:
-			MAUD_Preemptible();							// 抢占式输入选择 
+		case cRmKey_InputNet:								// UDisk输入
+			MAUD_InputSelect(INPUT_SWITCH_UDISK);			// UDISK   
+//			MAUD_Preemptible();								// 抢占式输入选择 
 			break;
 		case cRmKey_InputHdmi1:
 			MAUD_InputSelect(INPUT_SWITCH_HDMI1);
@@ -337,8 +338,9 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_InputHdmi3:
 			MAUD_InputSelect(INPUT_SWITCH_HDMI3);
 			break;
-		case cRmKey_InputHdmiArc:
-			MAUD_InputSelect(INPUT_SWITCH_H_ARC);
+		case cRmKey_InputHdmiArc:							// HDMI_ARC或外置7.1输入
+			MAUD_InputSelect(INPUT_SWITCH_E8CH);			// 外置7.1声道
+			// MAUD_InputSelect(INPUT_SWITCH_H_ARC);
 			break;
 		case cRmKey_InputOptica:
 			MAUD_InputSelect(INPUT_SWITCH_OPTIC);
@@ -512,7 +514,10 @@ void MKEY_CheckJop(){										// 旋转按钮 旋转
     return;
 }
 CONST_CHAR Tab_ListenModeRegister[] = {
-    0x00, 0x01, 0x10, 0x20, 0x21, 0x30,
+    0x00, 0x01, 											// 双声道立体声，B0为0关闭超低音；为1打开超低音
+	0x10, 													// 多声道源码模式，超低音自动
+	0x20, 0x21, 											// 多声道模式，B1:0为各种不同算法的多声道模式；
+	0x30,													// 多声道音效，B1:0为各种不同算法的多声道音效；
 };
 
 void MKEY_ListenMode(BYTE stereo){                          // 按键聆听模式选择
@@ -530,6 +535,7 @@ void MKEY_ListenMode(BYTE stereo){                          // 按键聆听模式选择
         }
         value = Tab_ListenModeRegister[state];
         MKCM_WriteRegister(KCM_LISTEN_MODE, value);
+// MLOG("ListenMode %d %02x", state, value);		
     }
     MDIP_ListenMode(value);
 }

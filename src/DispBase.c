@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -62,7 +62,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
     return;
 }
 void MDIP_MenuNormal(BYTE index){							// ²Ëµ¥Ñ¡ÔñÒ»°ãÄ£Ê½ 
-	MDIP_MenuSelect(index, MENU_SET_NORMAL);					// ²Ëµ¥Ñ¡Ôñ
+	MDIP_MenuSelect(index, MENU_SET_NORMAL);				// ²Ëµ¥Ñ¡Ôñ
 }
 void MDIP_SetNormal(){                                      // ÉèÖÃ²Ëµ¥Ò»°ãÄ£Ê½ÏÔÊ¾µÄÊ±¼ä
 	gDIP_MenuTimer = 20;
@@ -72,28 +72,24 @@ void MDIP_SetState(MENU_STATE state){                       // ÉèÖÃ²Ëµ¥×´Ì¬
     gDIP_MenuSelect = state;
     MDIP_SetNormal();
 }
+void MDIP_CleanSymbol(){									// Í³Ò»Çå³ýÆÁÄ»¼°·ûºÅ
+	FDIP_FreqSymbol = 0;
+    HAL_DIP_LED(0);                                         // Ï¨ÃðÏÔÊ¾ÆÁ¹Ì¶¨µÄ·ûºÅ
+	MDIP_ClearSpectrum();
+    DIP_DOT_OFF();
+}
 
 void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ²Ëµ¥Ñ¡Ôñ¸ß¼¶Ä£Ê½£¬mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË¸Ï¨Ãð 3µ÷Õû- 4µ÷Õû+ 
-	if (mode == MENU_SET_NORMAL){								// Õý³£µÄÏÔÊ¾Ä£Ê½
+	if (mode == MENU_SET_NORMAL){							// Õý³£µÄÏÔÊ¾Ä£Ê½
 		MDIP_SetNormal();
 		//gDIP_MenuTimer = 20;
 		//FDIP_MenuTwinkle = 0;
 	}
-	FDIP_FreqSymbol = 0;
-    HAL_DIP_LED(0);                                         // Ï¨ÃðÏÔÊ¾ÆÁ¹Ì¶¨µÄ·ûºÅ
-	MDIP_ClearSpectrum();
-    
-    DIP_DOT_OFF();
-	
-//g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);
+	MDIP_CleanSymbol();
 	switch (index){
 	case MENU_RESTORE:                                      // ²Ëµ¥»Ö¸´×´Ì¬
 		if (!FKCM_I2C_Error){
-			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-				MDIP_PlayTime();
-			}else {
-				MDIP_InputSource();
-			}
+			MDIP_InputSource();
 		}
 		else {
 			MDIP_WriteString("KCM-NO");
@@ -156,18 +152,18 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ²Ëµ¥Ñ¡Ôñ¸ß¼¶Ä£Ê½£¬mode 0Ò»
     case MENU_UD_INSERT:                                // ÏÔÊ¾UÅÌ²åÈë
     case MENU_SD_REMOVE:                                   // ÏÔÊ¾SD°Î³ö 
     case MENU_UD_REMOVE:                                // ÏÔÊ¾UÅÌ°Î³ö
-    case cMenu_UsbaRemove:               	               // ÏÔÊ¾USBÉù¿¨°Î³ö
-    case cMenu_HdmiRemove:                                 // ÏÔÊ¾HDMI°Î³ö 
-    case cMenu_BtRemove:               	                 	// ÏÔÊ¾À¶ÑÀÒôÆµ°Î³ö
+    case MENU_PC_REMOVE:               	               // ÏÔÊ¾USBÉù¿¨°Î³ö
+    case MENU_HDMI_REMOVE:                                 // ÏÔÊ¾HDMI°Î³ö 
+    case MENU_BT_REMOVE:               	                 	// ÏÔÊ¾À¶ÑÀÒôÆµ°Î³ö
 		MDIP_InsertRemove(index - MENU_SD_INSERT);			// ÏÔÊ¾ÍâÖÃÒôÔ´²åÈë/°Î³ö
 		break;
-    case cMenu_PlayTrack:                                  // ÏÔÊ¾¶àÃ½ÌåÎÄ¼þÐÅÏ¢
+    case MENU_PLAY_TRACK:                                  // ÏÔÊ¾¶àÃ½ÌåÎÄ¼þÐÅÏ¢
         MDIP_PlayTrack();
 		break;
-    case cMenu_PlayTime:                                   // ÏÔÊ¾¶àÃ½Ìå²¥·ÅÊ±¼ä
-        MDIP_PlayTime();
-        FDIP_FreqSymbol = 1;								// ÐèÒªÕâ¸ö±êÖ¾²Å¿ÉÒÔÏÔÊ¾ÆµÆ×
-		break;
+    // case MENU_PLAY_TIME:                                   // ÏÔÊ¾¶àÃ½Ìå²¥·ÅÊ±¼ä
+    //     MDIP_PlayTime();
+    //     FDIP_FreqSymbol = 1;								// ÐèÒªÕâ¸ö±êÖ¾²Å¿ÉÒÔÏÔÊ¾ÆµÆ×
+	// 	break;
 
 
 	case MENU_AUDIO_MUTE:
@@ -242,19 +238,19 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ²Ëµ¥Ñ¡Ôñ¸ß¼¶Ä£Ê½£¬mode 0Ò»
         MAUD_AutoCanclTestTone();
 		MEQMIC_MicDisplay(index, mode);                     // ÏÔÊ¾»°Í²¸÷ÖÖ²ÎÊýµ÷½Ú
 		break;
-	case cMenu_SpeakFront:
-	case cMenu_SpeakCenter:
-	case cMenu_SpeakWoofer:
-	case cMenu_SpeakSurround:
-	case cMenu_SpeakBack:
+	case MENU_SPEAK_FRONT:
+	case MENU_SPEAK_CENTER:
+	case MENU_SPEAK_WOOFER:
+	case MENU_SPEAK_SURR:
+	case MENU_SPEAK_BACK:
         MAUD_AutoCanclTestTone();
 		MDIP_SpeakSetup(index, mode);
 		break;
-	case cMenu_LipSync:
-	case cMenu_DelayFront:
-	case cMenu_DelayCenter:
-	case cMenu_DelaySurround:
-	case cMenu_DelayBack:
+	case MENU_LIP_SYNC:
+	case MENU_DELAY_FRONT:
+	case MENU_DELAY_CENTER:
+	case MENU_DELAY_SURR:
+	case MENU_DELAY_BACK:
         MAUD_AutoCanclTestTone();
 		MDIP_DelayTime(index, mode);
 		break;
@@ -394,7 +390,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 	MDIP_SingleChar(4, ' ');
 	MDIP_SingleChar(5, ' ');
 	switch (index){
-	case cMenu_SpeakFront :
+	case MENU_SPEAK_FRONT :
 		MDIP_WriteString("FRSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[0] > 1){
@@ -404,7 +400,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 		}
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(0));
 		break;
-	case cMenu_SpeakCenter :
+	case MENU_SPEAK_CENTER :
 		MDIP_WriteString("CESP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[1] > 2){
@@ -414,7 +410,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 		}
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(1));
 		break;
-	case cMenu_SpeakWoofer :
+	case MENU_SPEAK_WOOFER :
 		MDIP_WriteString("SWSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[2] > 1){
@@ -424,7 +420,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 		}
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(2));
 		break;
-	case cMenu_SpeakSurround :
+	case MENU_SPEAK_SURR :
 		MDIP_WriteString("SRSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[3] > 2){
@@ -434,7 +430,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 		}
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(3));
 		break;
-	case cMenu_SpeakBack :
+	case MENU_SPEAK_BACK :
 		MDIP_WriteString("BKSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[4] > 2){
@@ -444,7 +440,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 		}
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(4));
 		break;
-	case cMenu_SpeakFilter :
+	case MENU_SPEAK_FILTER :
 		MDIP_WriteString("LPF ");
 		if (mode >= 3){
 		}
@@ -453,35 +449,35 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 }
 void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË¸Ï¨Ãð 3µ÷Õû- 4µ÷Õû+  
 	switch (index){
-	case cMenu_LipSync :
+	case MENU_LIP_SYNC :
 		g2DIP_ShowBuffer[6] |= 0x4000;	
 		MDIP_WriteString("LIPS");
 		if (mode >= 3){
 			MDIP_AdjDelayTime(0, mode);
 		}
 		break;
-	case cMenu_DelayFront :
+	case MENU_DELAY_FRONT :
 		MDIP_WriteString("FRDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(1, mode);
 		}
 		break;
-	case cMenu_DelayCenter :
+	case MENU_DELAY_CENTER :
 		MDIP_WriteString("CEDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(2, mode);
 		}
 		break;
-	case cMenu_DelaySurround :
+	case MENU_DELAY_SURR :
 		MDIP_WriteString("SWDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(3, mode);
 		}
 		break;
-	case cMenu_DelayBack :
+	case MENU_DELAY_BACK :
 		MDIP_WriteString("BKDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
@@ -490,8 +486,8 @@ void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0Ò»°ãÄ£Ê½ 1ÉÁË¸µãÁÁ 2ÉÁË
 		break;
 	}
 	gDIP_MenuTimer = 50;
-//MDEBUG(0xc8);MDEBUG(index - cMenu_LipSync);
-	MDIP_Write2Digit(4, gDIP_DelayTime[index - cMenu_LipSync] * 5);
+//MDEBUG(0xc8);MDEBUG(index - MENU_LIP_SYNC);
+	MDIP_Write2Digit(4, gDIP_DelayTime[index - MENU_LIP_SYNC] * 5);
 }
 
 
@@ -499,17 +495,91 @@ CONST_CHAR Tab_DIP_InputSwitch[] = {
 	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC-  E8CH -BT-  HDMI-1HDMI-2HDMI-3HDMI-A"
 //	 ++++++------++++++------++++++------++++++------++++++------++++++------++++++
 };
-
+CONST_CHAR Tab_DIP_Bps[] = {
+    "32K48K56K64K80K96K112128160192224256320384"
+//	 +++---+++---+++---+++---+++---+++---+++---
+	
+};
 void MDIP_InputSource(){
+	g2DIP_ShowBuffer[6] &= ~(0x4000|0x0020);				// Ï¨ÃðÔÆ·ûºÅ¼°:
 	if (mINPUT_SWITCH >= INPUT_SWITCH_SD && mINPUT_SWITCH <= INPUT_SWITCH_BT){
-		g2DIP_ShowBuffer[6] |= 0x0020;	
+		g2DIP_ShowBuffer[6] |= 0x0020;						// µãÁÁÔÆ·ûºÅ
+		if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+			if (g2PlayTime > 0){
+				if (g2PlayTime < 3){
+					MDIP_PlayTrack();
+					return;
+				}
+				if (g2PlayTime < 5){
+					 BYTE temp = gAUD_SrcFreq >> 3;
+					if ((gAUD_SrcFormat & 0x0f) == KCM_SRC_MP3){
+						gDIP_MenuTimer = 20;
+						if (temp > 0 && temp < 16){
+							BYTE gLocal_Buffer[6];
+							MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
+							MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
+							MDIP_WriteString((char*)gLocal_Buffer);
+							return;
+						}
+					}
+				}
+				MDIP_WriteString("  ");
+				MDIP_Write2Digit(2, g2PlayTime/60);
+				MDIP_Write2Digit(4, g2PlayTime%60);
+				g2DIP_ShowBuffer[6] |= 0x4000;                          // µãÁÁ:
+				return;
+			}
+		}
 	}
-	else {
-		g2DIP_ShowBuffer[6] &= ~0x0020;	
-	}
-MLOG("Source: %02x %02x", mINPUT_SWITCH, g2DIP_ShowBuffer[6]);
+// MLOG("Source: %02x %02x", mINPUT_SWITCH, g2DIP_ShowBuffer[6]);
 	MDIP_WriteString((char*)&Tab_DIP_InputSwitch[mINPUT_SWITCH * 6]);
 }
+
+void MDIP_PlayTrack(){
+    BYTE temp;
+	WORD index;
+
+	index = MKCM_Read2Byte(KCM_PLAY_INDEX) + 1;
+    g2DIP_ShowBuffer[6] &= ~0x4000;                     // Ï¨Ãð·ûºÅ:
+    MDIP_WriteString("      ");
+    temp = MDIP_WriteDec(0, index);
+    MDIP_SingleChar(temp++, '/');
+    MDIP_WriteDec(temp, (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty);
+	// MLOG("MDIP_PlayTrack %d %d ", index, g2UDiskQty);
+}
+
+void MDIP_PlaySkip(BYTE operate){
+	g2PlayTime = 0;
+	gAUD_SrcFreq = 0;
+	MDIP_InputSource();		
+	MKCM_WriteRegister(KCM_PLAY_OPERATE, operate);  // ¶àÃ½Ìå²¥·ÅºóÒ»Ê×
+}
+void MDIP_PlayTime(){
+   /* if (g2PlayTime < 3){
+        MDIP_PlayTrack();
+        return;
+    }
+    if (g2PlayTime < 5){
+        BYTE temp = gAUD_SrcFreq >> 3;
+        if ((gAUD_SrcFormat & 0x0f) == KCM_SRC_MP3){
+            gDIP_MenuTimer = 20;
+            if (temp > 0 && temp < 16){
+                BYTE gLocal_Buffer[6];
+                MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
+                MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
+                MDIP_WriteString((char*)gLocal_Buffer);
+                return;
+            }
+        }
+    }
+	MDIP_WriteString("  ");
+    MDIP_Write2Digit(2, g2PlayTime/60);
+    MDIP_Write2Digit(4, g2PlayTime%60);
+    g2DIP_ShowBuffer[6] |= 0x4000;                          // :
+	*/
+}
+
+
 void MDIP_VideoSrc(){
 //	MDIP_WriteString("VIDE0 ");
 //	MDIP_SingleChar(5, (gAUD_AutoInputSrc >> 5) + '1');
@@ -531,9 +601,7 @@ LISTEN_MODE_STATE GetListenModeIndex(BYTE value){
 }
 void MDIP_ListenMode(BYTE value){                           // ÏÔÊ¾ñöÌýÄ£Ê½
 	LISTEN_MODE_STATE state = GetListenModeIndex(value);
-	
-//	MDIP_SurroundSymbol();                                          
-
+    MDIP_CleanSymbol();                                     // Í³Ò»Çå³ýÆÁÄ»¼°·ûºÅ
     DIP_SURROUND_OFF();
     if (state < LISTEN_MODE_SURROUND1){
         MDIP_WriteString((char*)&Tab_DIP_Surround[state * 6]);
@@ -646,44 +714,6 @@ void MDIP_InsertRemove(BYTE type){						// ÏÔÊ¾ÍâÖÃÒôÔ´²åÈë/²å³ö
 	gDIP_MenuTimer = 50;
 //MDEBUG(0xd9);MDEBUG(type);
     MDIP_WriteString((char*)&Tab_DIP_ExtrInOut[type * 6]);
-}
-void MDIP_PlayTrack(){
-    BYTE temp;
-
-    gDIP_MenuTimer = 20;
-    g2DIP_ShowBuffer[6] &= ~0x4000;                     // :
-    MDIP_WriteString("      ");
-    temp = MDIP_WriteDec(0, g2PlayIndex+1);
-    MDIP_SingleChar(temp++, '/');
-    MDIP_WriteDec(temp, (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty);
-}
-CONST_CHAR Tab_DIP_Bps[] = {
-    "32K48K56K64K80K96K112128160192224256320384"
-//	 +++---+++---+++---+++---+++---+++---+++---
-	
-};
-void MDIP_PlayTime(){
-    if (g2PlayTime < 3){
-        MDIP_PlayTrack();
-        return;
-    }
-    if (g2PlayTime < 5){
-        BYTE temp = gAUD_BpsRate >> 3;
-        if ((gAUD_SrcFormat & 0x0f) == KCM_SRC_MP3){
-            gDIP_MenuTimer = 20;
-            if (temp > 0 && temp < 16){
-                BYTE gLocal_Buffer[6];
-                MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
-                MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
-                MDIP_WriteString((char*)gLocal_Buffer);
-                return;
-            }
-        }
-    }
-	MDIP_WriteString("  ");
-    MDIP_Write2Digit(2, g2PlayTime/60);
-    MDIP_Write2Digit(4, g2PlayTime%60);
-    g2DIP_ShowBuffer[6] |= 0x4000;                          // :
 }
 
 

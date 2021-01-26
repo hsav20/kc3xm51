@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -41,10 +41,14 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // ÊıÂëĞÅºÅÊäÈë¸ñÊ½¸Ä±äÖĞ¶Ï£¬ĞèÒª¶ÁÈ¡"KCM_SRC_FORMAT"¼Ä´æÆ÷
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
 			//MLOG("gAUD_SrcFormat %02x", gAUD_SrcFormat);
-            gAUD_BpsRate = MKCM_ReadRegister(KCM_BPS_RATE);
-			if (gDIP_MenuLock == 0){						// 
-				if (!FSYS_TestTone){						// Ã»ÓĞ´ò¿ªÔëÒô²âÊÔ
-					MDIP_MenuNormal(MENU_SRC_FORMAT);		// ²Ëµ¥ÏÔÊ¾ÊäÈëÂëÁ÷¸ñÊ½
+            gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
+			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+                g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
+            }else {
+				if (gDIP_MenuLock == 0){						// 
+					if (!FSYS_TestTone){						// Ã»ÓĞ´ò¿ªÔëÒô²âÊÔ
+						MDIP_MenuNormal(MENU_SRC_FORMAT);		// ²Ëµ¥ÏÔÊ¾ÊäÈëÂëÁ÷¸ñÊ½
+					}
 				}
 			}
 			if (gAUD_SrcFormat == 0){
@@ -52,9 +56,7 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	    	}
 			MDIP_SrcFormatSymbol();
             MDIP_SurroundSymbol();
-        	if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-                g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
-            }
+        	
 		}
 		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// ÓĞĞ§µÄÒôÔ´ÊäÈë¸Ä±äÖĞ¶Ï£¬ĞèÒª¶ÁÈ¡"KCM_SRC_VALID"¼Ä´æÆ÷
             MKCM_ReadSrcValid();
@@ -69,15 +71,19 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
             MDIP_FirewareInfo();                            // ÏÔÊ¾¹Ì¼ş¸üĞÂ
 //            MDIP_MenuNormal(cMenu_Fireware);
         }
-        if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           		// ¶àÃ½Ìå²¥·ÅÊ±¼ä¸Ä±ä
-            g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
-            if (g2PlayTime){                                	// ²¥·ÅÊ±¼ä¸Ä±ä 
-				if (gDIP_MenuSelect != MENU_INPUT_SOURCE){
-	                MDIP_MenuNormal(cMenu_PlayTime);
-				}
-            }else {                                         	// ²¥·ÅÍê³ÉÁË
-                MDIP_MenuNormal(cMenu_PlayTrack);
-            }
+        if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           	// ¶àÃ½Ìå²¥·ÅÊ±¼ä¸Ä±ä
+            if (gDIP_MenuSelect == MENU_RESTORE || gDIP_MenuSelect == MENU_INPUT_SOURCE){	// Ö»ÓĞÔÚ²Ëµ¥»Ö¸´»òÊäÈëÒôÔ´Ñ¡Ôñ×´Ì¬
+				g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
+				MDIP_InputSource();
+			}
+			// g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
+            // if (g2PlayTime){                                	// ²¥·ÅÊ±¼ä¸Ä±ä 
+			// 	if (gDIP_MenuSelect != MENU_INPUT_SOURCE){
+	        //         MDIP_MenuNormal(MENU_PLAY_TIME);
+			// 	}
+            // }else {                                         	// ²¥·ÅÍê³ÉÁË
+            //     MDIP_MenuNormal(MENU_PLAY_TRACK);
+            // }
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_STATE) > 0){           // ¶àÃ½ÌåÎÄ¼ş²¥·Å×´Ì¬¸Ä±ä
         	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATE);     // ¶ÁÈ¡¶àÃ½ÌåÎÄ¼ş²¥·Å×´Ì¬
@@ -173,7 +179,8 @@ void MKCM_RestoreMemory(){ 									// ¿ª»ú£¬´ÓKCMÖ®ÖĞ»Ö¸´¼ÇÒä
 
 	// Çå³ıÒ»Ğ©ÉÏµçĞèÒªÈ·¶¨ÖµµÄ±äÁ¿¼°±êÖ¾
 	gAUD_SrcFormat = 0;
-    gAUD_BpsRate = 0;
+    gAUD_SrcFreq = 0;
+	g2PlayTime = 0;
     gPlayStatus = 0;
 	FSYS_Standby = 0;
 	FSYS_TestTone = 0;
@@ -293,9 +300,7 @@ CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE     KC3X_INPUT_TYPE
 
 
 
-CONST_CHAR Tab_SurroundMode[] = {
-	0x00, 0x01, 0x10, 0x11, 0x12, 0x13,
-};  						 
+ 						 
 CONST_CHAR Tab_TestToneChannel[] = {
 // ¹æ·¶µÄÍ¨µÀË³Ğò£ºFL FR CN SW SL SR BL BR
 // ²âÊÔÔëÒôµÄË³Ğò£ºFL CN SW FR SR BR BL SL 					// ÊôÓÚÉùÒô´ÓÀ®°È·Ö²¼µÄË³Ê±Õë
@@ -312,8 +317,6 @@ BYTE MKCM_ToRegister(BYTE index, BYTE counter){				// ´Ó±¾»ú´¦ÀíµÄÖµ£¬×ª»»µ½KCM¼
 	switch (index){
 	case KCM_INPUT_SOURCE :									// ÊäÈë¶Ë¿ÚÑ¡Ôñ
     	return Tab_InputSwitch[counter];
-	case KCM_LISTEN_MODE :									// »·ÈÆÉùÄ£Ê½
-    	return Tab_SurroundMode[counter];
 	case KCM_TEST_TONE :									// ÔëÒô²âÊÔ
     	return Tab_TestToneChannel[counter];
 	case KCM_FL_TRIM :										// ÉùµÀÎ¢µ÷
@@ -347,13 +350,6 @@ BYTE MKCM_FromRegister(BYTE index, BYTE value){				// ´ÓKCMÀ´µÄ¼Ä´æÆ÷£¬×ª»»µ½±¾»
 			}
 		} while (++gLocal_1 < sizeof(Tab_InputSwitch));
 		return INPUT_SWITCH_AUX;								// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµAUX
-	case KCM_LISTEN_MODE :									// »·ÈÆÉùÄ£Ê½
-		do {
-			if (Tab_SurroundMode[gLocal_1] == value){
-				return gLocal_1;
-			}
-		} while (++gLocal_1 < sizeof(Tab_SurroundMode));
-		return 0x01;										// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµ
 	case KCM_TEST_TONE :									// ÔëÒô²âÊÔ
 		do {
 			if (Tab_TestToneChannel[gLocal_1] == value){

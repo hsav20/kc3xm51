@@ -1,5 +1,5 @@
 
-// Copyright (c) 2002-2020, Hard & Soft Technology Co.,LTD.
+// Copyright (c) 2002-2021, Hard & Soft Technology Co.,LTD.
 // SPDX-License-Identifier: Apache-2.0
 // https://gitee.com/hsav20/kc3xm51.git
 // https://github.com/hsav20/kc3xm51.git
@@ -22,6 +22,9 @@ void main(){
 			MKEY_10msTimer(gTBascTimer);					// 按键模块10ms时间处理
             MDIP_10msTimer(gTBascTimer);  					// 显示模块10ms时间处理
             MAUD_10msTimer(gTBascTimer);                	// 音频模块10ms时间处理
+			if ((gTBascTimer & 0x08) > 0){					// 1000ms
+				//  MLOG("gDIP_MenuSelect %d %d", gDIP_MenuSelect, g2DIP_ShowBuffer[6]>>8);
+			}
 			gTBascTimer = 0;
 		}
     }
