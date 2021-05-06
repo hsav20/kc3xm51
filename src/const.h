@@ -104,9 +104,9 @@
 #define cPanKey_Stereo    				0x14				// Á¢ÌåÉù
 #define cPanKey_SurroundMode    		0x12
 #define cPanKey_EqSelect    			0x11
-#define cPanKey_SkipDown   				0x01
-#define cPanKey_SkipUp    				0x02
-#define cPanKey_PlayPause    			0x04
+#define cPanKey_SkipDown   				0x02
+#define cPanKey_SkipUp    				0x04
+#define cPanKey_PlayPause    			0x01
 #define cPanKey_AudioMute    			0x08
 #define cPanKey_JogMenu    				0x28
 

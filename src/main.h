@@ -203,7 +203,7 @@ void MPKey_Scan();											// 面板按键扫描
 void MTestToneShow();
 void MMenuSelect();
 void MPowerCtrl();
-
+void MKEY_PlayPause();										// 按键 多媒体播放/暂停
 
 
 void MAUD_VolumeSend();

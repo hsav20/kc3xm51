@@ -13,16 +13,7 @@ void MKEY_Initialize(){
 char aaaa;	  
 void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
 	MPKey_Scan();
-/*if(baseTimer&0x08){
-	if (aaaa){
-		aaaa=0;
-		g2DIP_ShowBuffer[6] |= 0x0020;	
-	}
-	else {
-		aaaa=1;
-		g2DIP_ShowBuffer[6] &= ~0x0020;	
-	}	
-}*/
+
 	if (gDIP_MenuLock > 0){
 		if (!FSYS_Standby){									// 不是在待机模式
 			if ((baseTimer & 0x02) > 0){					// 100ms时间
@@ -67,13 +58,15 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MEQMIC_KeyEqSelect();                           // 按键EQ均衡器选择
 			break;
 
-		case cPanKey_PlayPause:
+		case cPanKey_PlayPause:								// 面板按键 
+			MKEY_PlayPause();								// 多媒体播放/暂停
 			break;
 		case cPanKey_SkipDown:
+			MDIP_PlaySkip(KCM_OPERATE_SKIP_DOWN);			// 多媒体播放后一首
 			break;
 		case cPanKey_SkipUp:
+			MDIP_PlaySkip(KCM_OPERATE_SKIP_UP);				// 多媒体播放前一首
 			break;
-
   		case cPanKey_AudioMute: 							// MUTE
 			if (gDIP_MenuSelect >= MENU_MASTER_VOL && gDIP_MenuSelect <= MENU_MIC_TREBLE){		// 已经在JOG菜单 
 				MDIP_MenuNormal(MENU_RESTORE);
@@ -278,20 +271,8 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		case cRmKey_Stop:
             MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_STOP);  // 多媒体播放停止
 			break;
-		case cRmKey_PlayPause:
-			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-				BYTE flag = gPlayStatus & KC3X_STATE_PLAY_FLAG;
-				if (flag == KC3X_STATE_PLAY_PLAY){					// 如果已经在播放之中
-		            MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_PAUSE);  // 暂停
-		            gPlayStatus &= ~KC3X_STATE_PLAY_FLAG;					
-		            gPlayStatus |= KC3X_STATE_PLAY_PAUSE;
-		        }else {
-			        MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_PLAY);  // 播放
-			        gPlayStatus &= ~KC3X_STATE_PLAY_FLAG;
-		            gPlayStatus |= KC3X_STATE_PLAY_PLAY;
-		        }
-		        MDIP_PlaySymbol(gPlayStatus);								// 加快图标显示，让操作感觉好点
-			}
+		case cRmKey_PlayPause:								// 按键播放/暂停
+			MKEY_PlayPause();
 			break;
 		case cRmKey_FastBack:
 			MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_FAST_BACK);  // 多媒体播放播放快退
@@ -393,6 +374,21 @@ void MKEY_TestTone(){                                       // MENU_SET mode
 		MAUD_TestToneChannel(0xff);
 	}
     return;
+}
+void MKEY_PlayPause(){										// 按键播放/暂停
+	if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+		BYTE flag = gPlayStatus & KC3X_STATE_PLAY_FLAG;
+		if (flag == KC3X_STATE_PLAY_PLAY){					// 如果已经在播放之中
+			MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_PAUSE);  // 暂停
+			gPlayStatus &= ~KC3X_STATE_PLAY_FLAG;					
+			gPlayStatus |= KC3X_STATE_PLAY_PAUSE;
+		}else {
+			MKCM_WriteRegister(KCM_PLAY_STATE, KC3X_STATE_PLAY_PLAY);  // 播放
+			gPlayStatus &= ~KC3X_STATE_PLAY_FLAG;
+			gPlayStatus |= KC3X_STATE_PLAY_PLAY;
+		}
+		MDIP_PlaySymbol(gPlayStatus);								// 加快图标显示，让操作感觉好点
+	}
 }
 
 CONST_CHAR Tab_VideoSelect[] = {
