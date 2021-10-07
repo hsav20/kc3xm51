@@ -54,7 +54,9 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
         }
 		if (!FSYS_Standby && !FSYS_MuteEnable && !FSYS_TestTone && FDIP_FreqSymbol && ((gAUD_SrcFormat & 0x0f) >= KCM_SRC_NOS)){
+#ifdef SPECTRUM_ENABLE
             MDIP_ReadSpectrum();
+#endif			
 		}else {
 //		MLOG("FSYS_TestTone:%d %d", FSYS_TestTone, FSYS_TestTone);
 		}
@@ -119,19 +121,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 		}
 		MDIP_Brightness(1, gDIP_Brightness);
 		break;
-	/*case cMenu_Surround2Ch:
-        MAUD_AutoCanclTestTone();
-		MDIP_SurroundMode(cMenu_Surround2Ch, mode);
-		break;
-	case cMenu_Surround8Ch:
-        MAUD_AutoCanclTestTone();
-		MDIP_SurroundMode(cMenu_Surround8Ch, mode);
-		break;
-	case cMenu_SoundEffect:
-        MAUD_AutoCanclTestTone();
-		MDIP_SoundEffect(4);
-		break;
-        */
+
 	case MENU_VIDEO_SRC:
 		gDIP_MenuTimer = 50;
 		MDIP_VideoSrc();
@@ -145,9 +135,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
 	case MENU_TEST_TONE:
 		MDIP_NoiseSignal();
 		break;
-//	case cMenu_Fireware:                                    // 显示固件升级
-//		MDIP_Fireware();
-//		break;
+
     case MENU_SD_INSERT:                                   // 显示SD插入
     case MENU_UD_INSERT:                                // 显示U盘插入
     case MENU_SD_REMOVE:                                   // 显示SD拔出 
@@ -160,10 +148,6 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
     case MENU_PLAY_TRACK:                                  // 显示多媒体文件信息
         MDIP_PlayTrack();
 		break;
-    // case MENU_PLAY_TIME:                                   // 显示多媒体播放时间
-    //     MDIP_PlayTime();
-    //     FDIP_FreqSymbol = 1;								// 需要这个标志才可以显示频谱
-	// 	break;
 
 
 	case MENU_AUDIO_MUTE:
@@ -254,6 +238,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// 菜单选择高级模式，mode 0一
         MAUD_AutoCanclTestTone();
 		MDIP_DelayTime(index, mode);
 		break;
+	default: MDIP_MenuCustom(index, mode); break;	
 	}
 	gDIP_MenuSelect = index;
 }

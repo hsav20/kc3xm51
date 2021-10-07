@@ -75,7 +75,7 @@ void MAUD_MixTrimAdjust(BYTE index, BYTE directUp){
     
     address = MKCM_ToRegister(KCM_TEST_TONE, index);
     value = MKCM_ToRegister(KCM_FL_TRIM, gDIP_TrimCtrl[index]);
-//MDEBUG(0xaa);MDEBUG(index);MDEBUG(KCM_FL_TRIM + address);MDEBUG(value);
+//MLOG("MAUD_MixTrimAdjust A %d %d %d", index, KCM_FL_TRIM + address, value);
     MKCM_WriteRegister(KCM_FL_TRIM + address, value);
 }
 void MAUD_AutoCanclTestTone(){

@@ -52,6 +52,103 @@ void MUSDELAY(BYTE gLocal_1){
     }
     return;
 }
+void MDIP_MenuCustom(BYTE index, MENU_SET mode){    
+}
+void MPKey_Scan(){
+    BYTE gLocal_1;
+    BYTE gLocal_2;
+
+	if(gKeyScan == 0){
+		HAL_PKEY_0(0);
+		HAL_PKEY_1(1);
+		HAL_PKEY_2(1);
+	}		
+	else if(gKeyScan == 1){
+		HAL_PKEY_0(1);
+		HAL_PKEY_1(0);
+		HAL_PKEY_2(1);
+	}		
+	else {
+		HAL_PKEY_0(1);
+		HAL_PKEY_1(1);
+		HAL_PKEY_2(0);
+	}
+
+	gLocal_1 = 0;
+	if(!HAL_IN_PKEY_0()) gLocal_1 |= 0x01;		
+	if(!HAL_IN_PKEY_1()) gLocal_1 |= 0x02;		
+	if(!HAL_IN_PKEY_2()) gLocal_1 |= 0x04;		
+	if(!HAL_IN_PKEY_3()) gLocal_1 |= 0x08;		
+
+    if (gLocal_1){
+        gLocal_1 = (gKeyScan << 4) + gLocal_1;    
+        if (GPKeyData == gLocal_1){
+            if (++gPKeyConfirmTm > 8){ 
+		        if (!FPKeyStep){
+	                FPKeyDecodeDone = 1;
+	            }
+				gPKeyConfirmTm = 0;
+            }
+        }
+		else {
+			FPKeyStep = 0; 
+			gPKeyConfirmTm = 0; 
+			GPKeyData = gLocal_1;
+		}
+    }
+    else{ 
+        if (++gKeyScan > 2){ 
+            gKeyScan = 0;  
+        }           
+		FPKeyStep = 0; 
+		gPKeyConfirmTm = 0; 
+    }
+    return;
+}
+void MKEY_CheckJop(){										// 旋转按钮 旋转
+    if (!FKeyJopInputEnl){
+        if (HAL_IN_JOP0() && HAL_IN_JOP1() && (++gKeyJopInputTm > 3)){
+            gKeyJopInputTm = 0; 
+            FKeyJopInputEnl = 1;
+        }
+        FKeyJopSta00 = 0;
+        FKeyJopSta01 = 0;
+    }                 
+    else if (HAL_IN_JOP0() != HAL_IN_JOP1()){
+        if (FKeyJopInputEnl){
+            FKeyJogUp = HAL_IN_JOP1();
+            if ((FKeyJogUp == FKeyJogUpSave) || (gKeyJopLockTm == 0)){
+                FKeyJogSwOK = 1;
+            }
+            FKeyJogUpSave = FKeyJogUp;
+            gKeyJopLockTm = 3;
+            gKeyJopInputTm = 0;
+            FKeyJopInputEnl = 0;
+            FKeyJopSta01 = 0;
+        }
+        else {
+            if (FKeyJopSta01){
+                gKeyJopLockTm = 3;
+                gKeyJopInputTm = 0;                          
+                FKeyJopInputEnl = 0;
+            }
+            FKeyJopSta01 = 1;
+        }                                
+        FKeyJopSta00 = 0;
+    }
+    else if (!HAL_IN_JOP0() && !HAL_IN_JOP1()){ 
+        if (FKeyJopSta00){
+            gKeyJopLockTm = 3;
+            gKeyJopInputTm = 0; 
+            FKeyJopInputEnl = 0;
+        }
+        FKeyJopSta00 = 1;
+        FKeyJopSta01 = 0;
+    }
+    return;
+}
+
+// 时间中断 ----------------------------------------------------------------
 void TBascTimer(void) interrupt 1 {
     TL0 = (BYTE)(cSYS_TIMER0);                              // 100us
     TH0 = (BYTE)(cSYS_TIMER0 >> 8);
@@ -110,7 +207,7 @@ void TBascTimer(void) interrupt 1 {
     return;
 }
 
-// ----------------------------------------------------------------
+// 外置中断0 ---------------------------------------------------------------
 void EX0_int (void) interrupt 0 {		  
     if (!FRmError){
         ++gRmStatus;                                    
@@ -124,18 +221,19 @@ void EX0_int (void) interrupt 0 {
                  GRmCodeData = gRmBuffer;
             }
             else if (gRmStatus == 2+16){
-	            if ((gRmBuffer != cRmNCustom) || (GRmCodeData != cRmCustom)){
-                    gRmKeyContinCanclTm = 0;
-                    FRmError = 1;
-                } 
+	             if ((gRmBuffer != cRmNCustom) || (GRmCodeData != cRmCustom)){
+                     gRmKeyContinCanclTm = 0;
+                     FRmError = 1;
+                 } 
+				
             }
             else if (gRmStatus == 2+32){ 
-                FRmDecodDone = 1;
-				gRmKeyContinSpeed = 0;
-                if ((gRmBuffer ^ 0xff) != GRmCodeData){
-                    FRmDecodDone = 0; 
+                 if ((gRmBuffer ^ 0xff) == GRmCodeData){
+                    FRmDecodDone = 1;
+                    gRmKeyContinSpeed = 0;
+                 }else{
                     FRmError = 1;
-                }
+                 }
             }
         }
     }

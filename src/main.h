@@ -6,24 +6,10 @@
 // http://www.hsav.com/download/kc3xm51.zip
 
 // ！！！编译版本选择
+#include "custom.h"
 
-#define CUSTOM_CODE                     0x12123010          // 标准版本 使用PT2258音量IC，支持话筒
-//#define CUSTOM_CODE                     0x12123018          // 数码输出 使用PT2258音量IC，字节1(B3:PT2258)字节0(B3:模拟从MIC输入)
-//#define CUSTOM_CODE                     0x12120000          // 标准版本
-//#define CUSTOM_CODE                     0x44443000          // 旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
-
-// ！！！以上设置请选择一个适合自己的编译，而且必须选择一个(只有一个没有//注释)
-
-#define DISPLAY_OLD                                         // 定义就编译 旧版本显示屏(P2.5取反)
-
-#define TONE_ENABLE                                       	// 定义就使用遥控器的音调、音调+、音调-
-
-#if (CUSTOM_CODE & 0x00000010) != 0							// 支持话筒
-#define MICROPHONE                                         	// 定义就将遥控器的音调、音调+、音调-改变为话筒控制
-#endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "c51tiny.h"
 #include "Kc3xType.h"
 #include "const.h"
@@ -88,6 +74,8 @@ EXTR idata BYTE gRmKeyContinSpeed;
 EXTR idata BYTE GPKeyData;
 EXTR idata BYTE gPKeyBuffer;
 EXTR idata BYTE gKeyScan;
+EXTR idata BYTE gTemp0;
+EXTR idata BYTE gTemp1;
 
 EXTR idata BYTE gKeyJopLockTm;
 EXTR idata BYTE gKeyJopInputTm;
@@ -320,6 +308,7 @@ void MKCM_ReadSrcValid();
 void MAPI_COPY_BUFF8(BYTE length, BYTE* in_data, BYTE* out_data);
 void MDIP_MenuNormal(BYTE index);							// 菜单选择一般模式 
 void MDIP_MenuSelect(BYTE index, MENU_SET mode);			// 菜单选择高级模式，mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 
+void MDIP_MenuCustom(BYTE index, MENU_SET mode);
 BYTE MDIP_GetSpeakerChar(BYTE index);						// 0前置 1中置 2超低音 3环绕 4后置
 void MDIP_AdjDelayTime(BYTE index, BYTE mode);				// 0=LINSYNC 1前置 2中置 3环绕 4后置 
 void MDIP_PlaySkip(BYTE operate);							// 多媒体播放前/后一首

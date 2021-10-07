@@ -145,13 +145,14 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);	// 记忆的音量值
 	// 音效处理通道：使用KCM_EQ_SELECT及各自的寄存器的记忆值
 //	gDIP_SoundEffect = MKCM_ReadRegister(KCM_EQ_SELECT);			// 记忆的音效处理通道选择
-
 	for (counter = 0; counter < sizeof(gDIP_TrimCtrl); counter++){ // 声道微调：使用KCM_FL_TRIM等寄存器的记忆值
-		gLocal_1 = MKCM_FromRegister(KCM_TEST_TONE, counter);	// 测试噪音的顺序
+		gLocal_1 = MKCM_ToRegister(KCM_TEST_TONE, counter);	// 测试噪音的顺序
 		value = MKCM_ReadRegister(KCM_FL_TRIM + gLocal_1);	// 记忆微调值
-		gDIP_TrimCtrl[gLocal_1] = MKCM_FromRegister(KCM_FL_TRIM, value);	// 微调 寄存器->调节值
-//MDEBUG(0xf9);MDEBUG(gLocal_1);MDEBUG(gDIP_TrimCtrl[gLocal_1]);
+		gDIP_TrimCtrl[counter] = MKCM_FromRegister(KCM_FL_TRIM, value);	// 微调 寄存器->调节值
+//MLOG("gDIP_TrimCtrl A %d %02x %d %d", counter, KCM_FL_TRIM+gLocal_1, gDIP_TrimCtrl[gLocal_1], value);
 	};
+//MLOG("gDIP_TrimCtrl B %d %d", gDIP_TrimCtrl[1], gDIP_TrimCtrl[2]);		
+//MLOG("gDIP_TrimCtrl C %d %d", MKCM_ReadRegister(KCM_CE_TRIM), MKCM_ReadRegister(KCM_SW_TRIM));		
 
 	value = MKCM_ReadRegister(KCM_MIC_VOLUME);	            // 话筒1及话筒2音量比例
 	gDIP_MicCtrl[0] = MKCM_FromRegister(KCM_MIC_VOLUME, value & 0x0f);  // 0-15转换到0-9
@@ -297,14 +298,12 @@ CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE     KC3X_INPUT_TYPE
 	KCM_INPUT_HDMI3,				                        // 音源选择HDMI3输入
 	KCM_INPUT_ARC,				                            // 音源选择HDMI ARC输入
 };  						 
-
-
-
- 						 
+						 
 CONST_CHAR Tab_TestToneChannel[] = {
 // 规范的通道顺序：FL FR CN SW SL SR BL BR
 // 测试噪音的顺序：FL CN SW FR SR BR BL SL 					// 属于声音从喇叭分布的顺时针
-	0,2,3,1, 5,7, 6,4,
+	CHANNEL_FL, CHANNEL_CE, CHANNEL_SW, CHANNEL_FR, 		//	0,2,3,1, 5,7, 6,4,
+	CHANNEL_SR, CHANNEL_BR, CHANNEL_BL, CHANNEL_SL, 
 };
 
 CONST_CHAR Tab_ChannelTrim[] = {
