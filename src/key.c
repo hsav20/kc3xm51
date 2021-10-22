@@ -13,7 +13,7 @@ void MKEY_Initialize(){
 
 void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
 	MPKey_Scan();
-
+/*
 	if (gDIP_MenuLock > 0){
 		if (!FSYS_Standby){									// 不是在待机模式
 			if ((baseTimer & 0x02) > 0){					// 100ms时间
@@ -21,7 +21,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			}
 		}
 		return;	
-	}
+	}*/
 	if (FSYS_Standby){
 		if (FRmDecodDone){
 			FRmDecodDone = 0;
@@ -105,7 +105,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				MDIP_MenuNormal(MENU_STANDBY);
 			}
 			else {
-				MKCM_WriteRegister(KCM_POWER_ON, 1);
+				MKCM_WriteRegister(KCM_POWER_ON, KCM_SET_POWER_ON);		// 设置模块进入正常工作状态
 			    MDIP_MenuNormal(MENU_POWER_ON);             // 菜单状态:电源打开
 				gDIP_MenuLock = 30;							// 暂时锁定显示3秒
 			}
@@ -115,7 +115,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MDIP_MenuSelect(MENU_BRIGHTNESS, gLocal_1);
 			break;
 		case cRmKey_FactorySet:
-			MDIP_WriteString(" RESET");
+			MDIP_WrString(" RESET");
 			MDIP_ScreenUpdata();
 			MKCM_FactorySet();
 			break;
@@ -375,6 +375,7 @@ void MKEY_TestTone(){                                       // MENU_SET mode
     return;
 }
 void MKEY_PlayPause(){										// 按键播放/暂停
+MLOG("MKEY_PlayPause A %d %02x", mINPUT_SWITCH, gPlayStatus);
 	if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
 		BYTE flag = gPlayStatus & KC3X_STATE_PLAY_FLAG;
 		if (flag == KC3X_STATE_PLAY_PLAY){					// 如果已经在播放之中

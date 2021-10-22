@@ -6,7 +6,7 @@
 typedef enum {
 	KCM_READ_IRQ = 0x01,				// 读中断请求寄存器，16位寄存器
 	KCM_CLEAR_IRQ = 0x03,				// 清除中断请求寄存器，16位寄存器
-	KCM_POWER_ON = 0x05,				// 用户主机上电	
+	KCM_POWER_ON = 0x05,				// 模块上电开机、重新同步、待机及重启寄存器
 	KCM_VOLUME_MUTE = 0x08,				// 音频静音及音量加减控制
 	KCM_TEST_TONE = 0x09,				// 噪音测试
 	KCM_SRC_DETECT = 0x0a,				// 检测所有有效的音源一次
@@ -74,7 +74,7 @@ typedef enum {
 } KC3X_REGISTER;
 
 typedef enum {
-	KCM_IRQ_SYSTEM_INIT = 0x0001,       // 模式初始化完成中断，需要写入"KCM_POWER_ON"寄存器，
+	KCM_IRQ_SYSTEM_INIT = 0x0001,       // 模式初始化完成中断，可以读取一些寄存器恢复本地的记忆
 	KCM_IRQ_FORMAT_INFO = 0x0002,       // 输入信号格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
 	KCM_IRQ_VOLUME = 0x0004,            // 音量调节改变中断，需要读取"KCM_VOLUME_CTRL"寄存器获取更新的音量值
 	KCM_IRQ_SRC_VALID = 0x0008,        	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
@@ -86,6 +86,13 @@ typedef enum {
 
 	KCM_IRQ_EX_FONT = 0x0400			// 字库读取完成中断
 } KC3X_IRQ_TYPE;
+typedef enum {
+	KCM_SET_STANDBY = 0x00,       		// 设置模块进入待机状态，成功待机后状态改变为KCM_IS_STANDBY
+	KCM_SET_POWER_ON = 0x01,       		// 设置模块进入正常工作状态，成功待机后状态改变为KCM_IS_POWER_ON
+	KCM_SET_REBOOT = 0x55,            	// 设置模块重启，成功待机后状态改变为KCM_SET_POWER_ON
+	KCM_IS_STANDBY = 0x80,        		// 读取到模块进入待机状态
+	KCM_IS_POWER_ON = 0x81        		// 读取到模块进入正常工作状态
+} KC3X_POWER_ON;
 
 typedef enum {
 	KCM_SRC_NOS = 0x00,					// 输入没有信号

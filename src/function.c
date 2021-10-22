@@ -13,7 +13,7 @@ void MKCM_Initialize(){										// KCM模块初始化
 	MKCM_SetPowerOn();										// KCM开机
 }	  
 void MKCM_SetPowerOn(){ 									// KCM开机
-	MKCM_WriteRegister(KCM_POWER_ON, 1);
+	MKCM_WriteRegister(KCM_POWER_ON, KCM_SET_POWER_ON);		// 设置模块进入正常工作状态
     MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 100;									// 暂时锁定显示10秒
     MLOG("KCM_POWER_ON");
@@ -35,8 +35,8 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// 不是多媒体播放时间改变
 // MLOG("KCM_READ_IRQ %02x", gLocal_1);
 		}
-		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// 模式初始化完成中断，需要写入"KCM_POWER_ON"寄存器，
-            MKCM_RestoreMemory();
+		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// KCM模式初始化完成中断
+            MKCM_RestoreMemory();							// 从KCM恢复本地的记忆
 		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
@@ -76,14 +76,6 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 				g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
 				MDIP_InputSource();
 			}
-			// g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
-            // if (g2PlayTime){                                	// 播放时间改变 
-			// 	if (gDIP_MenuSelect != MENU_INPUT_SOURCE){
-	        //         MDIP_MenuNormal(MENU_PLAY_TIME);
-			// 	}
-            // }else {                                         	// 播放完成了
-            //     MDIP_MenuNormal(MENU_PLAY_TRACK);
-            // }
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_STATE) > 0){           // 多媒体文件播放状态改变
         	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATE);     // 读取多媒体文件播放状态
@@ -203,7 +195,7 @@ void MKCM_FactorySet(){										// 出厂设置
 	BYTE gLocal_2;
 	BYTE temp[4];
 
-	MDIP_WriteString("SET ");
+	MDIP_WrString("SET ");
 	gLocal_1 = 0;
 	do {
 		MDIP_Write2Digit(4, gLocal_1);
@@ -228,7 +220,7 @@ void MKCM_FactorySet(){										// 出厂设置
 	} while (++gLocal_1 < 8);
 
 	MKCM_WriteRegister(KCM_SPK_CONFIG, 0xab);				// 后置大、环绕大、中置大、前置大、有超低音
-	MKCM_WriteRegister(KCM_POWER_ON, 1);
+	MKCM_WriteRegister(KCM_POWER_ON, KCM_SET_POWER_ON);		// 设置模块进入正常工作状态
     MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 30;										// 暂时锁定显示3秒
     return;

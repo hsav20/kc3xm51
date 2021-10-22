@@ -9,4 +9,4 @@
 
 #define CUSTOM_CODE                     0x13123010          // ºú¹¤13°æ±¾
 
-
+#define CUSTOM_DIP_INPUT

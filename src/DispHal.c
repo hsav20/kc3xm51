@@ -36,7 +36,7 @@ CONST_CHAR Tab_DIP_Brightness[] = {
 };
 void MDIP_Brightness(BYTE show, BYTE bright){
 	if (show > 0){
-		MDIP_WriteString("BRIGH");
+		MDIP_WrString("BRIGH");
 		MDIP_SingleChar(5, bright + '1');
 	}
 
@@ -54,30 +54,6 @@ void MDIP_Brightness(BYTE show, BYTE bright){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MDIP_SurroundSymbol(){
-    /*
-    BYTE surround = gDIP_Select2Ch ? gDIP_Surround[0] : (2 + gDIP_Surround[1]);
-	//g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);	
-    DIP_SURROUND_OFF();
-	switch (surround){
-	case cDIP_SURR_STEREO :
-	case cDIP_SURR_ST_SW :
-		g2DIP_ShowBuffer[6] |= 0x0001;	
-		break;
-	case cDIP_SURR_MODE1 :
-		g2DIP_ShowBuffer[6] |= 0x0002;	
-		break;
-	case cDIP_SURR_MODE2 :
-		g2DIP_ShowBuffer[6] |= 0x0080;	
-		break;
-	case cDIP_SURR_MODE3 :
-		g2DIP_ShowBuffer[6] |= 0x0040;	
-		break;
-	case cDIP_SURR_MODE4 :
-		g2DIP_ShowBuffer[6] |= 0x0010;	
-		break;
-	}
-	FDIP_ScreenUpdata = 1;
-    */
 }
 void MDIP_SrcFormatSymbol(){
 	DIP_SRC_FORMAT_OFF();
@@ -140,8 +116,18 @@ void MDIP_WifiSymbol(BYTE turnOn){
 	}
 	FDIP_ScreenUpdata = 1;
 }
+void MDIP_WrText(char* string, BYTE length){
+	BYTE index = 0;
+	for (; index < length; index++){
+		if (string[index] != 0){
+			MDIP_SingleChar(index, string[index]);
+		}else{
+			break;
+		}
+	}
+}
 
-void MDIP_WriteString(char* string){
+void MDIP_WrString(char* string){
 	BYTE gLocal_1;
 	char counter = 0;
 	do {

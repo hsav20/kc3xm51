@@ -106,7 +106,7 @@ void MAUD_InputSelect(INPUT_SWITCH select){
 		mINPUT_SWITCH = select;
 		MAUD_InputWrite(mINPUT_SWITCH, mINPUT_SWITCH);
 		if (mINPUT_SWITCH == INPUT_SWITCH_SD){
-			MKCM_AutoTrack(KCM_PLAY_SD_QTY);					// 输入KCM_PLAY_SD_QTY，如果可以播放返回1
+			MKCM_AutoTrack(KCM_PLAY_SD_QTY);				// 输入KCM_PLAY_SD_QTY，如果可以播放返回1
 		}else if (mINPUT_SWITCH == INPUT_SWITCH_UDISK){
 			MKCM_AutoTrack(KCM_PLAY_UDISK_QTY);				// 输入KCM_PLAY_UDISK_QTY，如果可以播放返回1
 		}
@@ -125,14 +125,14 @@ void MAUD_Preemptible(){									// 抢占式输入选择
 	}
 }
 CONST_CHAR TabInputOneKey[] = {
-	INPUT_SWITCH_AUX,                                   // 0=模拟输入
-    INPUT_SWITCH_OPTIC,                                 // 1=数码1   
-    INPUT_SWITCH_COA1,                                  // 2=数码2   
-    INPUT_SWITCH_COA2,                                  // 3=数码3   
+	INPUT_SWITCH_AUX,                                   	// 0=模拟输入
+    INPUT_SWITCH_OPTIC,                                 	// 1=数码1   
+    INPUT_SWITCH_COA1,                                  	// 2=数码2   
+    INPUT_SWITCH_COA2,                                  	// 3=数码3   
 };
-void MAUD_InputOneKey(){								// 所有输入用一个按键选择 
-	gDIP_MenuSelect = MENU_RESTORE;					// 菜单即刻进入输入的恢复 
-	if (gWithHdmiQty && gWithHdmiStep < gWithHdmiQty){	 // 循环方式
+void MAUD_InputOneKey(){									// 所有输入用一个按键选择 
+	gDIP_MenuSelect = MENU_RESTORE;							// 菜单即刻进入输入的恢复 
+	if (gWithHdmiQty && gWithHdmiStep < gWithHdmiQty){	 	// 循环方式
 		MAUD_InputSelect(gPreemptibleIn[gWithHdmiStep]);
 	}else {
 		MAUD_InputSelect(TabInputOneKey[gWithHdmiStep - gWithHdmiQty]);

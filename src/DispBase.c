@@ -29,6 +29,7 @@ void MDIP_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		}
 		
 		if (gDIP_MenuLock > 0){								// ‘› ±À¯∂®œ‘ æ
+			gDIP_MenuLock = 0;								// ‘› ±‘⁄’‚¿ÔΩ‚≥˝À¯∂®
 			return;
 		}
 		if (FSYS_MuteEnable && (gDIP_MenuTimer == 0)){
@@ -94,7 +95,7 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª
 			MDIP_InputSource();
 		}
 		else {
-			MDIP_WriteString("KCM-NO");
+			MDIP_WrString("KCM-NO");
 		}
 		gDIP_MenuSelect = 0;
 		gDIP_MenuTimer = 0;
@@ -104,10 +105,10 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª
 		MDIP_InputSource();
 		break;
 	case MENU_STANDBY:
-		MDIP_WriteString(" -OFF-");
+		MDIP_WrString(" -OFF-");
 		break;
 	case MENU_POWER_ON:                                     // ≤Àµ•◊¥Ã¨:µÁ‘¥¥Úø™
-		MDIP_WriteString(" HELLO");
+		MDIP_WrString(" HELLO");
 		MDIP_ScreenUpdata();
 		gDIP_MenuTimer = 10;
 		break;
@@ -156,10 +157,10 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª
 			FDIP_MenuTwinkle = 1;
 		}
 		if (mode < 2 || mode == 4){
-			MDIP_WriteString("MUTE  ");
+			MDIP_WrString("MUTE  ");
 		}	
 		else if (mode == 2){
-			MDIP_WriteString("MUTE--");
+			MDIP_WrString("MUTE--");
 		}
 		if (mode == 4){										// æ≤“Ù”––ß
 			MKCM_WriteRegister(KCM_VOLUME_MUTE, 0x03);      // B1Œ™øÿ÷∆“Ù∆µµƒæ≤“Ù B0=1æ≤“Ù¥Úø™
@@ -177,10 +178,10 @@ void MDIP_MenuSelect(BYTE index, MENU_SET mode){			// ≤Àµ•—°‘Ò∏ﬂº∂ƒ£ Ω£¨mode 0“ª
 			}
 		}
 		if (mode == 2){										// 2…¡À∏œ®√
-			MDIP_WriteString("VOL   ");
+			MDIP_WrString("VOL   ");
 		}
 		else {
-			MDIP_WriteString("VOL ");
+			MDIP_WrString("VOL ");
 			MDIP_Write2Digit(4, gAUD_MasterVolume);
 			if (mode == 0){
 				gDIP_MenuTimer = 80;
@@ -252,7 +253,7 @@ void MDIP_NoiseSignal(){
 		}
 	}
 	MKCM_WriteRegister(KCM_TEST_TONE, gLocal_1); 
-	MDIP_WriteString("NOISE ");
+	MDIP_WrString("NOISE ");
 	MDIP_SingleChar(5, gLocal_1 + '1');
 	if (FSYS_TestTone){									// “—æ≠¥Úø™¡À‘Î“Ù≤‚ ‘
 		gDIP_TestToneChannel = 0;
@@ -311,7 +312,7 @@ void MDIP_TestTone(BYTE index, MENU_SET mode){             // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
 		}
 	}
     index -= MENU_TESTTONE_FL;                             // ¥”…˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿ø™ º
-    MDIP_WriteString((char*)&Tab_DIP_TToneShow[index * 4]);
+    MDIP_WrString((char*)&Tab_DIP_TToneShow[index * 4]);
 	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFF…¡À∏œ®√
 		MDIP_SingleChar(4, ' ');
 		MDIP_SingleChar(5, ' ');
@@ -345,7 +346,7 @@ void MDIP_TrimControl(BYTE index, MENU_SET mode){          // …˘µ¿Œ¢µ˜≤Œ ˝µ˜Ω⁄
 		}
 	}
     index -= MENU_CH_TRIM_FL;                            // ¥”…˘µ¿Œ¢µ˜«∞÷√◊Û…˘µ¿ø™ º
-    MDIP_WriteString((char*)&Tab_DIP_TrimShow[index * 4]);
+    MDIP_WrString((char*)&Tab_DIP_TrimShow[index * 4]);
 	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFF…¡À∏œ®√
 		MDIP_SingleChar(4, ' ');
 		MDIP_SingleChar(5, ' ');
@@ -376,7 +377,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 	MDIP_SingleChar(5, ' ');
 	switch (index){
 	case MENU_SPEAK_FRONT :
-		MDIP_WriteString("FRSP ");
+		MDIP_WrString("FRSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[0] > 1){
 				gDIP_SpeakSetup[0] = 0;
@@ -386,7 +387,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(0));
 		break;
 	case MENU_SPEAK_CENTER :
-		MDIP_WriteString("CESP ");
+		MDIP_WrString("CESP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[1] > 2){
 				gDIP_SpeakSetup[1] = 0;
@@ -396,7 +397,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(1));
 		break;
 	case MENU_SPEAK_WOOFER :
-		MDIP_WriteString("SWSP ");
+		MDIP_WrString("SWSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[2] > 1){
 				gDIP_SpeakSetup[2] = 0;
@@ -406,7 +407,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(2));
 		break;
 	case MENU_SPEAK_SURR :
-		MDIP_WriteString("SRSP ");
+		MDIP_WrString("SRSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[3] > 2){
 				gDIP_SpeakSetup[3] = 0;
@@ -416,7 +417,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(3));
 		break;
 	case MENU_SPEAK_BACK :
-		MDIP_WriteString("BKSP ");
+		MDIP_WrString("BKSP ");
 		if (mode >= 3){
 			if (++gDIP_SpeakSetup[4] > 2){
 				gDIP_SpeakSetup[4] = 0;
@@ -426,7 +427,7 @@ void MDIP_SpeakSetup(BYTE index, BYTE mode){				// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 		MDIP_SingleChar(5, MDIP_GetSpeakerChar(4));
 		break;
 	case MENU_SPEAK_FILTER :
-		MDIP_WriteString("LPF ");
+		MDIP_WrString("LPF ");
 		if (mode >= 3){
 		}
 		break;
@@ -436,34 +437,34 @@ void MDIP_DelayTime(BYTE index, BYTE mode){					// mode 0“ª∞„ƒ£ Ω 1…¡À∏µ„¡¡ 2…¡À
 	switch (index){
 	case MENU_LIP_SYNC :
 		g2DIP_ShowBuffer[6] |= 0x4000;	
-		MDIP_WriteString("LIPS");
+		MDIP_WrString("LIPS");
 		if (mode >= 3){
 			MDIP_AdjDelayTime(0, mode);
 		}
 		break;
 	case MENU_DELAY_FRONT :
-		MDIP_WriteString("FRDL ");
+		MDIP_WrString("FRDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(1, mode);
 		}
 		break;
 	case MENU_DELAY_CENTER :
-		MDIP_WriteString("CEDL ");
+		MDIP_WrString("CEDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(2, mode);
 		}
 		break;
 	case MENU_DELAY_SURR :
-		MDIP_WriteString("SWDL ");
+		MDIP_WrString("SWDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(3, mode);
 		}
 		break;
 	case MENU_DELAY_BACK :
-		MDIP_WriteString("BKDL ");
+		MDIP_WrString("BKDL ");
 		g2DIP_ShowBuffer[6] |= 0x5000;	
 		if (mode >= 3){
 			MDIP_AdjDelayTime(4, mode);
@@ -485,7 +486,11 @@ CONST_CHAR Tab_DIP_Bps[] = {
 //	 +++---+++---+++---+++---+++---+++---+++---
 	
 };
-void MDIP_InputSource(){
+void MDIP_InputSource(){									// “Ù‘¥ ‰»Îœ‘ æ
+#ifdef CUSTOM_DIP_INPUT
+	MDIP_CustomInput();										// ”√ªß∂®÷∆“Ù‘¥ ‰»Îœ‘ æ
+	return;
+#endif
 	g2DIP_ShowBuffer[6] &= ~(0x4000|0x0020);				// œ®√‘∆∑˚∫≈º∞:
 	if (mINPUT_SWITCH >= INPUT_SWITCH_SD && mINPUT_SWITCH <= INPUT_SWITCH_BT){
 		g2DIP_ShowBuffer[6] |= 0x0020;						// µ„¡¡‘∆∑˚∫≈
@@ -503,12 +508,12 @@ void MDIP_InputSource(){
 							BYTE gLocal_Buffer[6];
 							MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
 							MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
-							MDIP_WriteString((char*)gLocal_Buffer);
+							MDIP_WrString((char*)gLocal_Buffer);
 							return;
 						}
 					}
 				}
-				MDIP_WriteString("  ");
+				MDIP_WrString("  ");
 				MDIP_Write2Digit(2, g2PlayTime/60);
 				MDIP_Write2Digit(4, g2PlayTime%60);
 				g2DIP_ShowBuffer[6] |= 0x4000;                          // µ„¡¡:
@@ -517,7 +522,7 @@ void MDIP_InputSource(){
 		}
 	}
 // MLOG("Source: %02x %02x", mINPUT_SWITCH, g2DIP_ShowBuffer[6]);
-	MDIP_WriteString((char*)&Tab_DIP_InputSwitch[mINPUT_SWITCH * 6]);
+	MDIP_WrString((char*)&Tab_DIP_InputSwitch[mINPUT_SWITCH * 6]);
 }
 
 void MDIP_PlayTrack(){
@@ -526,7 +531,7 @@ void MDIP_PlayTrack(){
 
 	index = MKCM_Read2Byte(KCM_PLAY_INDEX) + 1;
     g2DIP_ShowBuffer[6] &= ~0x4000;                     // œ®√∑˚∫≈:
-    MDIP_WriteString("      ");
+    MDIP_WrString("      ");
     temp = MDIP_WriteDec(0, index);
     MDIP_SingleChar(temp++, '/');
     MDIP_WriteDec(temp, (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty);
@@ -538,35 +543,14 @@ void MDIP_PlaySkip(BYTE operate){
 	gAUD_SrcFreq = 0;
 	MDIP_InputSource();		
 	MKCM_WriteRegister(KCM_PLAY_OPERATE, operate);  // ∂‡√ΩÃÂ≤•∑≈∫Û“ª ◊
+	MLOG("MDIP_PlaySkip A %d", operate);
 }
 void MDIP_PlayTime(){
-   /* if (g2PlayTime < 3){
-        MDIP_PlayTrack();
-        return;
-    }
-    if (g2PlayTime < 5){
-        BYTE temp = gAUD_SrcFreq >> 3;
-        if ((gAUD_SrcFormat & 0x0f) == KCM_SRC_MP3){
-            gDIP_MenuTimer = 20;
-            if (temp > 0 && temp < 16){
-                BYTE gLocal_Buffer[6];
-                MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
-                MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
-                MDIP_WriteString((char*)gLocal_Buffer);
-                return;
-            }
-        }
-    }
-	MDIP_WriteString("  ");
-    MDIP_Write2Digit(2, g2PlayTime/60);
-    MDIP_Write2Digit(4, g2PlayTime%60);
-    g2DIP_ShowBuffer[6] |= 0x4000;                          // :
-	*/
 }
 
 
 void MDIP_VideoSrc(){
-//	MDIP_WriteString("VIDE0 ");
+//	MDIP_WrString("VIDE0 ");
 //	MDIP_SingleChar(5, (gAUD_AutoInputSrc >> 5) + '1');
 }
 
@@ -589,10 +573,10 @@ void MDIP_ListenMode(BYTE value){                           // œ‘ æÒˆÃ˝ƒ£ Ω
     MDIP_CleanSymbol();                                     // Õ≥“ª«Â≥˝∆¡ƒªº∞∑˚∫≈
     DIP_SURROUND_OFF();
     if (state < LISTEN_MODE_SURROUND1){
-        MDIP_WriteString((char*)&Tab_DIP_Surround[state * 6]);
+        MDIP_WrString((char*)&Tab_DIP_Surround[state * 6]);
 		g2DIP_ShowBuffer[6] |= 0x0001;	
     }else {
-        MDIP_WriteString((char*)&Tab_DIP_Surround[LISTEN_MODE_SURROUND1 * 6]);
+        MDIP_WrString((char*)&Tab_DIP_Surround[LISTEN_MODE_SURROUND1 * 6]);
         MDIP_SingleChar(5, (state-LISTEN_MODE_SURROUND1) + '1');
     	switch (value){
     	case LISTEN_MODE_SURROUND1 :
@@ -623,19 +607,19 @@ void MDIP_SourceFormat(){
 
     	gLocal_Buffer[3] = 0;
     	gLocal_1 = (gAUD_SrcFormat >> 4) * 3;
-    	MDIP_WriteString("      ");
+    	MDIP_WrString("      ");
 	
     //MDEBUG(0xa8);MDEBUG(gAUD_SrcFormat);	
     	MDIP_SrcFormatSymbol();
     	switch (gAUD_SrcFormat & 0x0f){
     	case KCM_SRC_PCM :
-    		MDIP_WriteString("PCM");
+    		MDIP_WrString("PCM");
     		break;
     	case KCM_SRC_AC3 :                                      //  ‰»ÎAC-3–≈∫≈
     	case KCM_SRC_E_AC3 :                                    //  ‰»ÎEnhanced AC-3–≈∫≈
     	case KCM_SRC_AC3_HD :                                   //  ‰»Î∂≈±»TRUE HD–≈∫≈    
     		MAPI_COPY_BUFF8(3, &Tab_DIP_SRC_CH[gLocal_1], gLocal_Buffer);
-    		MDIP_WriteString(gLocal_Buffer);
+    		MDIP_WrString(gLocal_Buffer);
     		break;
     	case KCM_SRC_DTS :                                      //  ‰»ÎDTS–≈∫≈
         case KCM_SRC_DTS_CD:				                    //  ‰»ÎDTS CD–≈∫≈
@@ -643,10 +627,10 @@ void MDIP_SourceFormat(){
         case KCM_SRC_DTS_HRA:				                    //  ‰»ÎDTS HD High Resolution Audio–≈∫≈
         case KCM_SRC_DTS_MA:				                    //  ‰»ÎDTS HD Master Audio–≈∫≈
     		MAPI_COPY_BUFF8(3, &Tab_DIP_SRC_CH[gLocal_1], gLocal_Buffer);
-    		MDIP_WriteString(gLocal_Buffer);
+    		MDIP_WrString(gLocal_Buffer);
     		break;
     	case KCM_SRC_LPCM :
-    		MDIP_WriteString("2/4");
+    		MDIP_WrString("2/4");
     		break;
     	}
 	}else {
@@ -684,10 +668,10 @@ void MDIP_NightMode(){
 		MKCM_WriteRegister(KCM_DYN_COMPRES, gLocal_1); 
 	}
 	if (gLocal_1){
-		MDIP_WriteString("NIG-ON");
+		MDIP_WrString("NIG-ON");
 	}
 	else {
-		MDIP_WriteString("NIG-OF");
+		MDIP_WrString("NIG-OF");
 	}
 }
 CONST_CHAR Tab_DIP_ExtrInOut[] = {
@@ -698,7 +682,7 @@ CONST_CHAR Tab_DIP_ExtrInOut[] = {
 void MDIP_InsertRemove(BYTE type){						// œ‘ æÕ‚÷√“Ù‘¥≤Â»Î/≤Â≥ˆ 
 	gDIP_MenuTimer = 50;
 //MDEBUG(0xd9);MDEBUG(type);
-    MDIP_WriteString((char*)&Tab_DIP_ExtrInOut[type * 6]);
+    MDIP_WrString((char*)&Tab_DIP_ExtrInOut[type * 6]);
 }
 
 
@@ -731,7 +715,7 @@ void MDIP_AdjDelayTime(BYTE index, BYTE mode){				// 0=LINSYNC 1«∞÷√ 2÷–÷√ 3ª∑»∆
 /*
 void MDIP_Fireware(){
 	gDIP_MenuTimer = 50;
-    MDIP_WriteString("FWDONE");
+    MDIP_WrString("FWDONE");
 }
   */
 
@@ -740,15 +724,18 @@ void MDIP_FirewareInfo(){				                    // œ‘ æπÃº˛∏¸–¬
     BYTE tmpData[10];
     MKCM_ReadXByte(KCM_RD_INFO, tmpData, 2);
     if (tmpData[0] == 100){
-        MDIP_WriteString("FWDONE");
+        MDIP_WrString("FWDONE");
     }else if (tmpData[0] == 104){
-        MDIP_WriteString("FW Err");
+        MDIP_WrString("FW Err");
     }else {
-        MDIP_WriteString("FW -");
+        MDIP_WrString("FW -");
         MDIP_Write2Digit(4, tmpData[0]);
     }
     MDIP_SetState(MENU_FIREWARE_INFO);
     gDIP_MenuTimer = 60;
+}
+void MDIP_ShowVolume(){										// ‘⁄4º∞5µƒŒª÷√œ‘ æ“Ù¡øµƒ÷µ
+	MDIP_Write2Digit(4, gAUD_MasterVolume);
 }
 void MDIP_ShowNegative9(BYTE value){						// ‘⁄œ‘ æ◊Ó∫Û¡Ω∏ˆ◊÷µƒŒª÷√œ‘ æ-9µΩ+9µƒ ˝÷µ
 	if (value < 9){											// ∏∫ ˝

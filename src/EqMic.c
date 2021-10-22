@@ -86,7 +86,7 @@ CONST_CHAR Tab_DIP_EqMode[] = {
 };
 void MDIP_EqSelect(BYTE value){                             // ÏÔÊ¾EQ¾ùºâÆ÷Ñ¡Ôñ
     MDIP_CleanSymbol();                                     // Í³Ò»Çå³ýÆÁÄ»¼°·ûºÅ
-    MDIP_WriteString((char*)&Tab_DIP_EqMode[value ? 6 : 0]);
+    MDIP_WrString((char*)&Tab_DIP_EqMode[value ? 6 : 0]);
     if (value){
         MDIP_SingleChar(4, value + '0');
     }
@@ -208,7 +208,7 @@ void MEQMIC_MicDisplay(BYTE index, MENU_SET mode){          // ÏÔÊ¾»°Í²¸÷ÖÖ²ÎÊýµ
 		}
 	}
     temp0 = index - MENU_MIC_VOL1;                          // ´Ó»°Í²1ÒôÁ¿¿ªÊ¼
-	MDIP_WriteString((char*)&Tab_DIP_MicShow[temp0 * 4]);
+	MDIP_WrString((char*)&Tab_DIP_MicShow[temp0 * 4]);
     MDIP_SingleChar(4, ' ');
 
 	if (mode == MENU_SET_TWINKLE_OFF){							// MENU_SET_TWINKLE_OFFÉÁË¸Ï¨Ãð

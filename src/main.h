@@ -230,7 +230,8 @@ void MDIP_TrimShow(BYTE gLocal_0,BYTE gLocal_1);
 
 void MDIP_HalInit();										// ÏÔÊ¾Ä£¿éÓ²¼şµ×²ã³õÊ¼»¯
 void MDIP_BaseInit();										// ÏÔÊ¾Ä£¿é»ù´¡²ã³õÊ¼»¯
-void MDIP_WriteString(char* string);
+void MDIP_WrString(char* string);							// Ğ´×Ö·û´®
+void MDIP_WrText(char* string, BYTE length);				// Ğ´×Ö£¬Ö¸¶¨³¤¶È
 void MPKey_Scan();
 void MDIP_ScreenUpdata();    
 void MDIP_SingleChar(BYTE gLocal_1, BYTE gLocal_2);
@@ -268,11 +269,13 @@ void MDIP_ShowNegative9(BYTE value);						// ÔÚÏÔÊ¾×îºóÁ½¸ö×ÖµÄÎ»ÖÃÏÔÊ¾-9µ½+9µÄÊ
 BYTE GetListenModeIndex(BYTE value);
 
 void MDIP_SourceFormat();
-void MDIP_InputSource();
+void MDIP_InputSource();									// ÒôÔ´ÊäÈëÏÔÊ¾
+void MDIP_CustomInput();									// ÓÃ»§¶¨ÖÆÒôÔ´ÊäÈëÏÔÊ¾
 void MDIP_VideoSrc();
 void MDIP_ListenMode(BYTE value);                           // ÏÔÊ¾ñöÌıÄ£Ê½
 void MDIP_FirewareInfo();                                   // ÏÔÊ¾¹Ì¼ş¸üĞÂ
 
+void MDIP_ShowVolume();										// ÔÚ4¼°5µÄÎ»ÖÃÏÔÊ¾ÒôÁ¿µÄÖµ
 void MDIP_SurroundMode(BYTE index, MENU_SET mode);
 void MDIP_SurroundSymbol();
 void MDIP_SrcFormatSymbol();
@@ -295,6 +298,8 @@ void MDIP_Fireware();
 void MDIP_InsertRemove(BYTE type);							// ÏÔÊ¾ÍâÖÃÒôÔ´²åÈë/²å³ö 
 void MDIP_PlayTrack();
 BYTE MDIP_GetNextChannel(BYTE index);                       // ²âÊÔÔëÒôÉùµÀÎ¢µ÷»ñÈ¡ÏÂÒ»¸öÉùµÀ
+
+extern CONST_CHAR Tab_DIP_Bps[];
 
 #define DIP_SURROUND_OFF()              {g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);}
 #define DIP_SRC_FORMAT_OFF()            {g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);}

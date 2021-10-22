@@ -9,10 +9,13 @@
 
 #define cSYS_TIMER0                     (65536 - 160)		// 使用6T双倍速，晶振为11.059MHz，中断时间为100us
 
-#define HAL_IN_PKEY_0()					(P05)
-#define HAL_PKEY_0(b)					{}
-#define HAL_PKEY_1(b)					{}
-#define HAL_PKEY_2(b)					{}
+#define HAL_IN_PKEY_0()					(P02)
+#define HAL_IN_PKEY_1()					(P03)
+#define HAL_IN_PKEY_2()					(P04)
+#define HAL_IN_PKEY_3()					(P05)
+#define HAL_PKEY_0(b)					{P20=b;}
+#define HAL_PKEY_1(b)					{P21=b;}
+#define HAL_PKEY_2(b)					{P22=b;}
 #define HAL_PKEY_3(b)					{}
 
 #ifdef DISPLAY_OLD                                          // 定义就编译 旧版本显示屏(P2。5取反)
@@ -34,7 +37,7 @@
 #define cRmNCustom                      0xde
 #define cRmCustom                       0x21
 
-#define cPanKey_Standby    			    0x08
+#define cPanKey_Standby    			    0x18                // 原输入音源选择
 #define cPanKey_JogMenu    				0x28
 
 #define cRmKey_Standby                 	0x26
@@ -45,9 +48,9 @@
 #define cRmKey_MeunCtrl            		0x5a
 #define cRmKey_MeunLeft            		0x20
 #define cRmKey_MeunRight           		0x6d
-#define cRmKey_PlayPause               	0x13
-#define cRmKey_SkipDown             	0x14
-#define cRmKey_SkipUp             		0x17
+#define cRmKey_PlayPause               	0x5e
+#define cRmKey_SkipDown             	0x2a
+#define cRmKey_SkipUp             		0x2e
 #define cRmKey_Surround	    			0x54
 #define cRmKey_InputOnKey    			0x2d                // 所有输入
 
