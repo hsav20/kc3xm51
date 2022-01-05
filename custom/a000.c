@@ -10,12 +10,71 @@
 
 BYTE gDelayInput;
 BYTE gA000Input;
-//BOOL FStandbyBreak;
-//BOOL FSetPowerOff;
+BYTE gA000Mode;
+BYTE gMuteTime;
+BYTE gBtCtrlTime;
+BOOL isStandKey;
+BOOL isBtInput;
+BOOL isPlayCtrl;
+BOOL isAc3Dts;
+BOOL isSaveAc3Dts;
+
+#define MEMORY_INPUT		(KCM_EXTR_MEMORY + 4)	
+#define MEMORY_MODE			(KCM_EXTR_MEMORY + 5)	
+
+
+
+void MA000_ListenMode(BOOL isChange, BOOL isText){          // 按键聆听模式选择
+	BYTE listen;
+	BYTE config;
+	g2DIP_ShowBuffer[6] &= ~0x00d0;							// B7:PROLOGIC B6:NEO6 B4:DSP
+	if (!isAc3Dts){
+		if (isChange){
+			if (++gA000Mode > 3){
+				gA000Mode = 0;
+			}
+			MKCM_WriteRegister(MEMORY_MODE, gA000Mode);
+			MKCM_WriteRegister(KCM_LPF_FREQ, 200);			// 超低音的低通滤波器的高频截止频率
+			MKCM_WriteRegister(KCM_HPF_FREQ, 200);			// 当选择小喇叭时，相应的声道就使用本寄存器设置的频率
+		}
+	
+		// 新[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:LPCM B9:HD    B8:DTS  B7:PROLOGIC B6:NEO6  B5:云  B4:DSP B3:ATMOS B2:DD  B1:AUTO B0:ST
+		if ((gA000Mode & 1) == 0){
+			config = 0xab;
+			listen = 0x00;
+		}else{
+			config = 0x55;
+			listen = 0x01;
+		}
+		if (gA000Mode == 0){								// 模式1，显示屏显示NEO6，7.1声道输出
+			// 大喇叭模式，超重低音输出打开，中置合成左右声道突出人声，四路环绕声为轻声音输出
+			listen |= 0x20;
+			g2DIP_ShowBuffer[6] |= 0x0040;	
+		}else if (gA000Mode == 1){							// 模式 2，显示屏显示PROLOGII，7.1 声道输出
+			// 小喇叭模式，超重低音打开，中置合成左右声道突出人声，四路环绕复制前置左右声音信号不做任何处理，
+			// 但需将前置，中置，环绕共7 个声道高通截止频率设为200Hz
+			listen |= 0x20;
+			g2DIP_ShowBuffer[6] |= 0x0080;	
+		}else{												// 模式 3-n，显示屏显示dsp
+			g2DIP_ShowBuffer[6] |= 0x0010;
+			if (isText){
+				MDIP_MenuNormal(MENU_MODE_DSP);
+			}
+			listen |= 0x30;
+		}
+	}else{													// DTS5.1或杜比5.1
+		listen = 0x20;
+		config = 0xab;
+	}
+	MKCM_WriteRegister(KCM_LISTEN_MODE, listen);
+	MKCM_WriteRegister(KCM_SPK_CONFIG, config);
+	FDIP_ScreenUpdata = 1;
+}
+
 
 
 CONST_CHAR Tab_InputTextA000[] = {
-	"AUXOPTCO1CO2SD USBUSB   BT HD1HD2HD3"
+	"AUXOPTCO1 BTSD USBUSB   BT HD1HD2HD3"
 //	 +++---+++---+++---+++---+++---+++---+++
 };
 
@@ -62,17 +121,37 @@ void MDIP_CustomInput(){									// 用户定制音源输入显示
 CONST_CHAR Tab_InputA000[] = {
     INPUT_SWITCH_HDMI1, INPUT_SWITCH_HDMI2, INPUT_SWITCH_HDMI3,
 	INPUT_SWITCH_OPTIC, INPUT_SWITCH_COA1, INPUT_SWITCH_COA2, 
-	INPUT_SWITCH_UDISK, INPUT_SWITCH_AUX, INPUT_SWITCH_BT
+	INPUT_SWITCH_UDISK, INPUT_SWITCH_AUX
 };
 void MAUD_InputA000(){         								// 所有输入用一个按键选择
+	isBtInput = (Tab_InputA000[gA000Input] != INPUT_SWITCH_COA2) ? 0 : 1;
+	isPlayCtrl = (Tab_InputA000[gA000Input] != INPUT_SWITCH_UDISK) ? 0 : 1;
+	P27 = isBtInput;
 	gDIP_MenuSelect = MENU_RESTORE;							// 菜单即刻进入输入的恢复 
 	MAUD_InputSelect(Tab_InputA000[gA000Input]);
+	MA000_ListenMode(0, 0);
 }
 void MAUD_InputSave(){         								// 所有输入用一个按键选择
 	if (++gA000Input >= sizeof(Tab_InputA000)){
 		gA000Input = 0;
 	}
-	MKCM_WriteRegister(KCM_EXTR_MEMORY + 4, gA000Input);
+	MKCM_WriteRegister(MEMORY_INPUT, gA000Input);
+}
+void MAUD_SET_BT(BYTE type){								// 0=恢复 1=播放 2=上一首 3=下一首
+	if (type != 0){
+		if (type == 1){
+			P26 = 0;
+		}else if (type == 2){
+			P24 = 0;
+		}else {
+			P23 = 0;
+		}
+		gBtCtrlTime = 10;									// 10 * 100毫秒
+	}else{
+		P26 = 1;
+		P24 = 1;
+		P23 = 1;
+	}
 }
 
 CONST_CHAR Tab_TrimMenu[] = {
@@ -146,6 +225,16 @@ void MDIP_TrimMenu(BYTE index, BYTE mode){					// mode 0一般模式 1闪烁点亮 2闪烁
 
 void MDIP_MenuCustom(BYTE index, MENU_SET mode){
 	switch (index){
+    case MENU_BT_1 :                                   		// 蓝牙配对
+		MDIP_WrString("BT----");
+		break;
+    case MENU_BT_2 :                                   		// 蓝牙清空配对
+		MDIP_WrString("000000");
+		break;
+    case MENU_MODE_DSP :                               		// 蓝牙清空配对
+		MDIP_WrString(" DSP  ");
+		MDIP_SingleChar(5, (gA000Mode - 2) + '0');
+		break;
     case MENU_TRIM_WOOFER :                                 // 菜单声道微调超低音声道
     case MENU_TRIM_CENTER :                                 // 菜单声道微调中置声道
     case MENU_TRIM_SURROUND :                               // 菜单声道微调环绕声道
@@ -153,28 +242,46 @@ void MDIP_MenuCustom(BYTE index, MENU_SET mode){
         MAUD_AutoCanclTestTone();
 		MDIP_TrimMenu(index, mode);
 		break;
+		
 	}
 }
 void MA000_Standby(){
+	P27 = 0;
+	P33 = 1;												// 高为静音，低为正常输出
+	P34 = 1;												// 高为正常输出，低为待机，控制35H的电源
+	P00 = 1;												// 单片机39脚(P00)输出高电平驱动LED红色灯点亮
+	P01 = 0;												// 单片机38脚(P01)输出高电平驱动LED红色灯灭
 	FSYS_Standby = 1;
+	MKCM_WriteRegister(KCM_POWER_ON, KCM_SET_STANDBY);		// 设置模块进入待机状态
 	MDIP_MenuNormal(MENU_STANDBY);
-	MDIP_WrString("      ");
-	P00 = 1;									// 单片机39脚(P00)输出高电平驱动LED红色灯点亮
-	P01 = 0;									// 单片机38脚(P01)输出高电平驱动LED红色灯灭
 	DIP_SURROUND_OFF();
 	DIP_SRC_FORMAT_OFF();
 	DIP_DOT_OFF();
 	DIP_PLAY_OFF();
-
-	MKCM_WriteRegister(KCM_POWER_ON, KCM_SET_STANDBY);	// 设置模块进入待机状态
+	MDIP_WrString("      ");
 }
 void MA000_SetPowerOn(){
-	P00 = 0;									// 单片机39脚(P00)输出高电平驱动LED红色灯灭
-	P01 = 1;									// 单片机38脚(P01)输出高电平驱动LED红色灯点亮
+	P34 = 0;												// 高为正常输出，低为待机，控制35H的电源
+	P00 = 0;												// 单片机39脚(P00)输出高电平驱动LED红色灯灭
+	P01 = 1;												// 单片机38脚(P01)输出高电平驱动LED红色灯点亮
 	FSYS_Standby = 0;
-	MKCM_SetPowerOn();							// KCM开机
-//	gDelayInput = gDIP_MenuTimer;
-// MLOG("SetPowerOn %d", gA000Input);
+	MKCM_SetPowerOn();										// KCM开机
+	gMuteTime = 30;	
+}
+void MA000_KEY_SKIP(BOOL isUp){
+	if (isPlayCtrl){
+		MDIP_PlaySkip(isUp ? KCM_OPERATE_SKIP_DOWN : KCM_OPERATE_SKIP_UP);		// 多媒体播放前/后一首
+	}else if (isBtInput && !gBtCtrlTime){
+		
+		if (P21){											// 没有面板的输入按键
+			MAUD_SET_BT(isUp ? 3 : 2);						// 0=恢复 1=播放 2=上一首 3=下一首			
+		}else{												// 按住面板的输入按键
+			P26 = 0;
+			MDIP_MenuNormal(isUp ? MENU_BT_1 : MENU_BT_2);  // 蓝牙配对/蓝牙清空配对 
+			gBtCtrlTime = isUp ? 30 : 50;					// 低3秒蓝牙配对 低5秒蓝牙清空配对
+		}
+	
+	}
 }
 void MA000_KEY_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B0=10ms 
 	MPKey_Scan();
@@ -188,7 +295,7 @@ void MA000_KEY_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 	   	if (FPKeyDecodeDone){
 			FPKeyDecodeDone = 0;
 			FPKeyStep = 1;
-			if (GPKeyData == cPanKey_InputSource){
+			if (GPKeyData == cPanKey_Standby){
 				MA000_SetPowerOn();	
 			}
 		}
@@ -198,10 +305,10 @@ void MA000_KEY_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 		FPKeyDecodeDone = 0;
 		FPKeyStep = 1;
 
-//MLOG("FPKeyDecodeDone %02x", GPKeyData);		
+// MLOG("FPKeyDecodeDone %02x", GPKeyData);		
 		switch (GPKeyData){
   		case cPanKey_Standby:								// JOG
-		 	MA000_Standby();	
+		 	MA000_Standby();
             break;
   		case cPanKey_JogMenu:								// JOG			
 			MAUD_InputSave();
@@ -269,16 +376,20 @@ void MA000_KEY_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 			}
 			break;
 		case cRmKey_PlayPause:								// 按键播放/暂停
-			MKEY_PlayPause();
+			if (isPlayCtrl){
+				MKEY_PlayPause();
+			}else if (isBtInput){
+				MAUD_SET_BT(1);								// 0=恢复 1=播放 2=上一首 3=下一首			
+			}
 			break;
 		case cRmKey_SkipDown:
-			MDIP_PlaySkip(KCM_OPERATE_SKIP_DOWN);			// 多媒体播放后一首
+			MA000_KEY_SKIP(0);
 			break;
 		case cRmKey_SkipUp:
-			MDIP_PlaySkip(KCM_OPERATE_SKIP_UP);				// 多媒体播放前一首
+			MA000_KEY_SKIP(1);
 			break;
 		case cRmKey_Surround:                               // 面板环绕声按键
-            MKEY_ListenMode(0);                             // 按键聆听模式选择
+            MA000_ListenMode(1, 1);                            // 按键聆听模式选择
 			break;
 		case cRmKey_InputOnKey:
 			MAUD_InputSave();
@@ -310,21 +421,38 @@ void MA000_KCM_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 			return;
 		}
 		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// 不是多媒体播放时间改变
-// MLOG("KCM_READ_IRQ %02x", gLocal_1);
+//MLOG("KCM_READ_IRQ %02x", gLocal_1);
 // MLOG("FSYS_Standby %D", FSYS_Standby?1:0);
 		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// KCM模式初始化完成中断
             if (!FSYS_Standby){
 				MKCM_RestoreMemory();						// 从KCM恢复本地的记忆
-				gA000Input = MKCM_ReadRegister(KCM_EXTR_MEMORY + 4);	// 恢复输入选择
+				gA000Input = MKCM_ReadRegister(MEMORY_INPUT);	// 恢复输入选择
+				gA000Mode = MKCM_ReadRegister(MEMORY_MODE);
 				MAUD_InputA000();
+				MA000_ListenMode(0, 0);
 			}else{
 				MKCM_WriteRegister(KCM_POWER_ON, KCM_SET_STANDBY);	// 设置模块进入待机状态
 				gLocal_1 = 0;								//后面的都不再处理
 			}
 		}
+		if (FSYS_Standby){									// 待机状态下不处理后面的中断了
+			return;
+		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
+			BYTE mode;
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
+			mode = gAUD_SrcFormat & 0x0f;
+			isAc3Dts = (mode == KCM_SRC_AC3 || mode == KCM_SRC_DTS) ? 1 : 0;
+			if (isSaveAc3Dts != isAc3Dts){
+				if (isAc3Dts){
+					MKCM_WriteRegister(KCM_LISTEN_MODE, 0x20);
+				}else{
+
+				}
+				
+				isSaveAc3Dts = isAc3Dts;
+			}
 			//MLOG("gAUD_SrcFormat %02x", gAUD_SrcFormat);
             gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
 			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
@@ -341,7 +469,7 @@ void MA000_KCM_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 	    	}
 			MDIP_SrcFormatSymbol();
             MDIP_SurroundSymbol();
-        	
+			MA000_ListenMode(0, 0);        	
 		}
 		// if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
         //     MKCM_ReadSrcValid();
@@ -377,14 +505,13 @@ void MA000_KCM_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void main(){
+	P27 = 0;
 	MSYS_Initialize(); 										// CPU基本部件初始化
 	MDIP_HalInit();											// 显示模块硬件底层初始化	
 	MDIP_BaseInit();										// 显示模块基础层初始化
 	MAUD_Initialize();       								// 音频模块初始化
-    // MKCM_Initialize();                                      // KCM模块初始化
 	gDIP_Brightness = 0;
 	MA000_Standby();
-	
 	while (1){ 					   
         if ((gTBascTimer & 0x01) > 0){						// 10ms (B3=1000ms B2=500ms B1=100ms B0=10ms) 
 	        MA000_KCM_10msTimer(gTBascTimer);               // 子处理模块10ms时间处理 		
@@ -395,15 +522,20 @@ void main(){
 			//	 MLOG("gDIP_MenuSelect %d %d", FSYS_Standby?1:0, gDIP_MenuLock);
 			}
 			if ((gTBascTimer & 0x02) > 0){					// 100ms时间
-			//	if (gDelayInput > 0 && --gDelayInput == 0){
-					// MLOG("gDelayInput B %d", gA000Input);
-		//			MAUD_InputA000();
-			//	}
+				if (gMuteTime > 0 && --gMuteTime == 0){		// 3秒后取消静音
+					P33 = 0;								// 高为静音，低为正常输出
+				}
+				if (gBtCtrlTime > 0 && --gBtCtrlTime == 0){	// 0.6秒后蓝牙输出控制
+					P26 = 1;
+					P24 = 1;
+					P23 = 1;
+				}
 			}			
 			gTBascTimer = 0;
 		}
     }
 } 
+
 
 void MSYS_Initialize(){
     TMOD = 0x21; 											// 8bit Auto Timer1 / 16bit Timer0
@@ -426,51 +558,31 @@ void MPKey_Scan(){
     BYTE gLocal_1;
     BYTE gLocal_2;
 
-	if(gKeyScan == 0){
-		HAL_PKEY_0(0);
-		HAL_PKEY_1(1);
-		HAL_PKEY_2(1);
-	}		
-	else if(gKeyScan == 1){
-		HAL_PKEY_0(1);
-		HAL_PKEY_1(0);
-		HAL_PKEY_2(1);
-	}		
-	else {
-		HAL_PKEY_0(1);
-		HAL_PKEY_1(1);
-		HAL_PKEY_2(0);
-	}
+	P05 = 0;
+	if (!P22){
+		if (++gPKeyConfirmTm > 8){ 
+			gPKeyConfirmTm = 0;
+			if (!FPKeyStep){
+				GPKeyData = cPanKey_JogMenu;
+				FPKeyDecodeDone = 1;
+				FPKeyStep = 1;
 
-	gLocal_1 = 0;
-	// if(!HAL_IN_PKEY_0()) gLocal_1 |= 0x01;		
-	// if(!HAL_IN_PKEY_1()) gLocal_1 |= 0x02;		
-	// if(!HAL_IN_PKEY_2()) gLocal_1 |= 0x04;		
-	if(!HAL_IN_PKEY_3()) gLocal_1 |= 0x08;					// 只用到一个按键，接在P05及P21
-
-    if (gLocal_1){
-        gLocal_1 = (gKeyScan << 4) + gLocal_1;    
-        if (GPKeyData == gLocal_1){
-            if (++gPKeyConfirmTm > 8){ 
-		        if (!FPKeyStep){
-	                FPKeyDecodeDone = 1;
-	            }
-				gPKeyConfirmTm = 0;
-            }
-        }
-		else {
-			FPKeyStep = 0; 
-			gPKeyConfirmTm = 0; 
-			GPKeyData = gLocal_1;
+			}
 		}
-    }
-    else{ 
-        if (++gKeyScan > 2){ 
-            gKeyScan = 0;  
-        }           
+		return;
+	}else if (!P21){
+		isStandKey = 1;
+	}else if (isStandKey){
+		isStandKey = 0;
+		if (!gBtCtrlTime){
+			GPKeyData = cPanKey_Standby;
+			FPKeyDecodeDone = 1;
+			FPKeyStep = 1;
+		}
+	}else{
+		gPKeyConfirmTm = 0;
 		FPKeyStep = 0; 
-		gPKeyConfirmTm = 0; 
-    }
+	}
     return;
 }
 

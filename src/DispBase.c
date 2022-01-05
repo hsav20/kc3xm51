@@ -530,12 +530,12 @@ void MDIP_PlayTrack(){
 	WORD index;
 
 	index = MKCM_Read2Byte(KCM_PLAY_INDEX) + 1;
+
     g2DIP_ShowBuffer[6] &= ~0x4000;                     // 熄灭符号:
     MDIP_WrString("      ");
     temp = MDIP_WriteDec(0, index);
     MDIP_SingleChar(temp++, '/');
     MDIP_WriteDec(temp, (mINPUT_SWITCH == INPUT_SWITCH_SD) ? g2SdQty : g2UDiskQty);
-	// MLOG("MDIP_PlayTrack %d %d ", index, g2UDiskQty);
 }
 
 void MDIP_PlaySkip(BYTE operate){
@@ -659,8 +659,8 @@ void MDIP_NightMode(){
 	BYTE gLocal_1 = MKCM_ReadRegister(KCM_DYN_COMPRES);
 
 	if (gDIP_MenuSelect == MENU_NIGHT_MODE){	
-		if (gLocal_1 < 50){                                 
-            gLocal_1 = 50;                                  // 50%
+		if (gLocal_1 < 100){                                 
+            gLocal_1 = 100;                                 // 100%
         }else {
 			gLocal_1 = 0;                                   // 0%
 		}
@@ -722,6 +722,7 @@ void MDIP_Fireware(){
 
 void MDIP_FirewareInfo(){				                    // 显示固件更新
     BYTE tmpData[10];
+MLOG("XByte A1");						
     MKCM_ReadXByte(KCM_RD_INFO, tmpData, 2);
     if (tmpData[0] == 100){
         MDIP_WrString("FWDONE");

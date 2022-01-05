@@ -52,14 +52,9 @@ BYTE MKCM_ReadRegister(										// Read byte from DA32C. 读取8位的寄存器
 	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
 	if (!FKCM_I2C_Error){
 		MI2C_Bus_Write(address);							// Index. 写入I2C从机的寄存器索引值
-	//	MI2C_Bus_Stop();										// I2C Stop
-	//	MUSDELAY(10);											// delay 10us
 		MI2C_Bus_Start();									// I2C Start
 		MI2C_Bus_Write(cI2C_ADDRESS+1);						// KCM I2C read address
-	//gLocal_1 = MI2C_Bus_Read(0);							// Read 1 byte 
-	//MDEBUG(gLocal_1);
 	    gLocal_1 = MI2C_Bus_Read(1);							// Read 1 byte 
-//MDEBUG(gLocal_1);
 	}
 	MI2C_Bus_Stop();										// I2C Stop
 	return gLocal_1;
@@ -71,9 +66,6 @@ WORD MKCM_Read2Byte(										// Read word from DA32C. 读取16位的寄存器
 	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
 	if (!FKCM_I2C_Error){
 		MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
-	//	MI2C_Bus_Stop();										// I2C Stop
-	//	MUSDELAY(10);											// delay 10us
-  
 		MI2C_Bus_Start();									// I2C Start
 		MI2C_Bus_Write(cI2C_ADDRESS+1);						// KCM I2C read address
 	    g2Local_1 = MI2C_Bus_Read(0);						// Read 1 byte 
@@ -85,12 +77,14 @@ WORD MKCM_Read2Byte(										// Read word from DA32C. 读取16位的寄存器
 
 
 void MKCM_MutilRead(WORD length, BYTE* outData){
-	if (length > 1){									// 防止只有一次时g2Local_1变为0产生跨界错误
-		length = length - 1;							// Counter. 做少一次，最后的字节使用MI2C_Bus_Read(1);
+	if (length > 0){
+		if (length > 1){									// 防止只有一次时g2Local_1变为0产生跨界错误
+			length = length - 1;							// Counter. 做少一次，最后的字节使用MI2C_Bus_Read(1);
+		}
+		do {													
+			*outData++ = MI2C_Bus_Read(0);					// Read 1 byte 
+		} while (--length != 0);
 	}
-	do {													
-	    *outData++ = MI2C_Bus_Read(0);					// Read 1 byte 
-	} while (--length != 0);
     *outData = MI2C_Bus_Read(1);						// Read last byte 
 	MI2C_Bus_Stop();										// I2C Stop
 }

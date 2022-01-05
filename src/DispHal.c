@@ -88,7 +88,7 @@ void MDIP_SrcFormatSymbol(){
 }
 void MDIP_PlaySymbol(BYTE status){
 	BYTE flag = status & 0x03;
-//	MLOG("MDIP_PlaySymbol %02x", status);
+
 	DIP_PLAY_OFF();
 	if (flag == KC3X_STATE_PLAY_PAUSE){
 		g2DIP_ShowBuffer[7] |= 0x08;
@@ -103,6 +103,7 @@ void MDIP_PlaySymbol(BYTE status){
 		}	
 	}
 	FDIP_ScreenUpdata = 1;
+	MLOG("PlaySymbol %02x", (WORD)g2DIP_ShowBuffer[7]);	
 }
 void MDIP_WifiSymbol(BYTE turnOn){
 	if (turnOn == 0xff){
@@ -274,16 +275,17 @@ void MDIP_SingleChar(
 		}
 	}
 	else {
-		if(gLocal_1 > 6 && gLocal_1 < 13){ // 波形
-		    if ((gLocal_2 >= 1) && (gLocal_2 <= 5)) {
-		       gLocal_Tab = gLocal_2+10+3+26-1;
-		    }
-		}
-		else {
-		}
+		// if(gLocal_1 > 6 && gLocal_1 < 13){ // 波形
+		//     if ((gLocal_2 >= 1) && (gLocal_2 <= 5)) {
+		//        gLocal_Tab = gLocal_2+10+3+26-1;
+		//     }
+		// }
+		// else {
+		// }
 
-		g2DIP_ShowBuffer[gLocal_1] = ((WORD)TabDIPmiLED_BASE[gLocal_Tab*2])<<8;
-		g2DIP_ShowBuffer[gLocal_1] |= TabDIPmiLED_BASE[gLocal_Tab*2+1];
+		// g2DIP_ShowBuffer[gLocal_1] = ((WORD)TabDIPmiLED_BASE[gLocal_Tab*2])<<8;
+		// g2DIP_ShowBuffer[gLocal_1] |= TabDIPmiLED_BASE[gLocal_Tab*2+1];
+		
 	//	g2DIP_ShowBuffer[gLocal_1]=0xffff;
 //MDEBUG(0xbc);MDEBUG(gLocal_Tab);MDEBUG(g2DIP_ShowBuffer[gLocal_1]>>8);MDEBUG(g2DIP_ShowBuffer[gLocal_1]);
 	}
@@ -311,6 +313,7 @@ void MDIP_ReadSpectrum(){
 	BYTE outData[3];
 
 	// 5段频谱，字节0的B2:0为第1列，B5:3为第2列，字节1的 B2:0为第3列，B5:3为第4列，字节2的 B2:0为第5列
+P35=~P35;  
 	MKCM_ReadXByte(KCM_RD_SPECTRUM, outData, 3);
 //MDEBUG(0xaa);/*MDEBUG(outData[0]);MDEBUG(outData[1]);*/MDEBUG(outData[2]);
 	if (FKCM_I2C_Error){

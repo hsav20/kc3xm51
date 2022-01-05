@@ -25,7 +25,6 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
     if (!HAL_KCM_I2C_INT()){                           		// detect KCM interrupt 检测到I2C从机产生中断,INT为低
 	    BYTE gLocal_1;
 	    BYTE gLocal_2;
-
 		gLocal_1 = MKCM_ReadRegister(KCM_READ_IRQ);			// Read interrupt 读取KCM中断
 		MKCM_WriteRegister(KCM_CLEAR_IRQ, gLocal_1);  		// Clear interrupt 清除相应的中断
 		if (FKCM_I2C_Error){
@@ -33,15 +32,19 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			return;
 		}
 		if (gLocal_1 != KCM_IRQ_PLAY_TIME){					// 不是多媒体播放时间改变
-// MLOG("KCM_READ_IRQ %02x", gLocal_1);
+ MLOG("KCM_READ_IRQ %02x", gLocal_1);
 		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// KCM模式初始化完成中断
             MKCM_RestoreMemory();							// 从KCM恢复本地的记忆
 		}
+		if (FSYS_Standby){									// 待机状态下不处理后面的中断了
+			return;
+		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
-			//MLOG("gAUD_SrcFormat %02x", gAUD_SrcFormat);
             gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
+
+		//	MLOG("SrcFormat %02x %02x", gAUD_SrcFormat, gAUD_SrcFreq);
 			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
                 g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
             }else {
@@ -56,7 +59,6 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 	    	}
 			MDIP_SrcFormatSymbol();
             MDIP_SurroundSymbol();
-        	
 		}
 		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
             MKCM_ReadSrcValid();
@@ -69,13 +71,13 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		}
         if ((gLocal_1 & KCM_IRQ_FIRMWARE) > 0){             // 固件更新，需要读取"KCM_RD_INFO"寄存器
             MDIP_FirewareInfo();                            // 显示固件更新
-//            MDIP_MenuNormal(cMenu_Fireware);
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_TIME) > 0){           	// 多媒体播放时间改变
             if (gDIP_MenuSelect == MENU_RESTORE || gDIP_MenuSelect == MENU_INPUT_SOURCE){	// 只有在菜单恢复或输入音源选择状态
-				g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
-				MDIP_InputSource();
+				 g2PlayTime = MKCM_Read2Byte(KCM_PLAY_TIME);
+				 MDIP_InputSource();
 			}
+		//	MLOG("PLAY_TIME %d %02x", gDIP_MenuSelect, g2PlayTime);
         }
         if ((gLocal_1 & KCM_IRQ_PLAY_STATE) > 0){           // 多媒体文件播放状态改变
         	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATE);     // 读取多媒体文件播放状态
@@ -228,6 +230,7 @@ void MKCM_FactorySet(){										// 出厂设置
 void MKCM_AppCommand(){
     BYTE inData[8];
     BYTE length = MKCM_ReadAutoByte(KCM_APP_COMMAND, inData, 8);
+//	 MLOG("AppCommand %d", length);
     if (length == 2){
 //        MKCM_WriteRegister(inData[0], inData[1]);
     	switch (inData[0]){

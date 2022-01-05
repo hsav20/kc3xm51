@@ -174,6 +174,9 @@ typedef enum {
     MENU_MIC_BASS = 62,                                     // 菜单话筒音调低音调节
     MENU_MIC_TREBLE = 63,                                   // 菜单话筒音调高音调节
 
+    MENU_BT_1 = 65,                                         // 蓝牙配对
+    MENU_BT_2 = 66,                                         // 蓝牙清空配对
+    MENU_MODE_DSP = 67,
 
     MENU_LIP_SYNC = 70,
     MENU_DELAY_FRONT = 71,
@@ -187,10 +190,11 @@ typedef enum {
     MENU_SPEAK_BACK = 79,
     MENU_SPEAK_FILTER = 80,
 
-    MENU_TRIM_WOOFER = 81,                                  // 菜单声道微调超低音声道
-    MENU_TRIM_CENTER = 82,                                  // 菜单声道微调中置声道
-    MENU_TRIM_SURROUND = 83,                                // 菜单声道微调环绕声道
-    MENU_TRIM_BACK = 84                                     // 菜单声道微调后置声道
+
+    MENU_TRIM_WOOFER = 86,                                  // 菜单声道微调超低音声道
+    MENU_TRIM_CENTER = 87,                                  // 菜单声道微调中置声道
+    MENU_TRIM_SURROUND = 88,                                // 菜单声道微调环绕声道
+    MENU_TRIM_BACK = 89                                     // 菜单声道微调后置声道
 
 } MENU_STATE;
 

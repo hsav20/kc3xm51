@@ -302,7 +302,7 @@ BYTE MDIP_GetNextChannel(BYTE index);                       // ≤‚ ‘‘Î“Ù…˘µ¿Œ¢µ˜ª
 extern CONST_CHAR Tab_DIP_Bps[];
 
 #define DIP_SURROUND_OFF()              {g2DIP_ShowBuffer[6] &= ~(0x0001 | 0x0002 | 0x0080 | 0x0040 | 0x0010);}
-#define DIP_SRC_FORMAT_OFF()            {g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004);}
+#define DIP_SRC_FORMAT_OFF()            {g2DIP_ShowBuffer[6] &= ~(0x0700 | 0x0004 | 0x0020);}
 #define DIP_DOT_OFF()                   {g2DIP_ShowBuffer[6] &= ~0xf000;}
 #define DIP_PLAY_OFF()              	{g2DIP_ShowBuffer[7] &= ~(0x0001 | 0x0002 | 0x0004 | 0x0008);}
 
