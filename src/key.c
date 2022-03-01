@@ -307,7 +307,8 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			break;
 		case cRmKey_InputNet:								// UDisk输入
 			MAUD_InputSelect(INPUT_SWITCH_UDISK);			// UDISK   
-//			MAUD_Preemptible();								// 抢占式输入选择 
+			//  MAUD_InputSelect(INPUT_SWITCH_BT);			// BT
+			// MAUD_Preemptible();								// 抢占式输入选择 
 			break;
 		case cRmKey_InputHdmi1:
 			MAUD_InputSelect(INPUT_SWITCH_HDMI1);

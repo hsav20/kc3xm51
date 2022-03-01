@@ -258,14 +258,14 @@ void MKCM_ReadSrcValid(){
 					MAUD_InputWrite(TabValidSwitch[index], mINPUT_SWITCH);
 					mINPUT_SWITCH = TabValidSwitch[index];
 MLOG("mINPUT_A %02x", mINPUT_SWITCH);
-					gDIP_MenuSelect = MENU_RESTORE;				// 菜单即刻进入输入的恢复 
+					gDIP_MenuSelect = MENU_RESTORE;			// 菜单即刻进入输入的恢复 
 					MDIP_MenuNormal(MENU_INPUT_SOURCE);     // 菜单状态:输入音源选择
-					gRemoveTimer = 0;					// 取消拔出恢复到非抢占式插入
+					gRemoveTimer = 0;						// 取消拔出恢复到非抢占式插入
 			    }
-	        	break;									// 只处理一个抢占式插入
+	        	break;										// 只处理一个抢占式插入
         	}
         }
-        if (!found){									// 没有非抢占式插入
+        if (!found){										// 没有非抢占式插入
 			for (index = 0; index < sizeof(TabSrcValid)/2; index++){
 	        	flag = TabSrcValid[index];
 	    //MLOG("KCM_SRC_VALID C %d %02x%02x", index, flag>>8, flag);  

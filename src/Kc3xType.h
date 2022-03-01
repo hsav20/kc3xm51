@@ -212,10 +212,11 @@ typedef enum {
 
 typedef enum {
 	KCM_VOL_CHIP_NONE = 0x00,			// 不使用模块内部的音量
-	KCM_VOL_CHIP_DSP = 0x01,			// 使用模块内部的DSP数码音量
-	KCM_VOL_CHIP_DAC = 0x02,			// 使用模块内部的DAC数码音量
+	KCM_VOL_CHIP_DSP_05 = 0x01,			// 使用DSP数码音量，每步0.5dB
+	KCM_VOL_CHIP_DSP_10 = 0x02,			// 使用DSP数码音量，每步1dB
 	KCM_VOL_CHIP_PT2258 = 0x03,			// 为使用PT2258 + PT2259或者兼容的音量芯片
-	KCM_VOL_CHIP_M62446 = 0x04			// 使用M62446或者兼容的音量芯片
+	KCM_VOL_CHIP_M62446 = 0x04,	 		// 使用M62446或者兼容的音量芯片
+	KCM_VOL_CHIP_CS3318 = 0x05			// 使用CS3318或者兼容的音量芯片
 } KC3X_VOLUME_CHIP;
 
 #define CUSTOM_SWAP_CHANNEL				0x00070000			// 互换输出声道
@@ -224,7 +225,8 @@ typedef enum {
 #define CUSTOM_IN_EACH_MODE				0x00800000			// 为每个输入通道单独记忆聆听模式及多段EQ均衡音效选择
 #define CUSTOM_MIC_LTRT_SWAP			0x08000000			// 话筒MIC与模拟输入交换
 #define CUSTOM_MIC_ENABLE				0x10000000			// 话筒声音混合功能
-#define CUSTOM_BCK_WCK_INPUT			0x80000000			// BCK与WCK端口为输入
+#define CUSTOM_BCK_WCK_INPUT			0x20000000			// 数码输入输出时钟输入输出选择
+#define CUSTOM_I2C_DATA					0xc0000000			// 数码输入输出格式数据选择
 
 
 #endif		// __KC3X_TYPE_H
