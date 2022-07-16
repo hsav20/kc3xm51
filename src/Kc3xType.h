@@ -10,8 +10,9 @@ typedef enum {
 	KCM_VOLUME_MUTE = 0x08,				// 音频静音及音量加减控制
 	KCM_TEST_TONE = 0x09,				// 噪音测试
 	KCM_SRC_DETECT = 0x0a,				// 检测所有有效的音源一次
-	KCM_SRC_FORMAT = 0x18,				// 数码信号输入格式及通道信息指示
-	KCM_SRC_FREQ = 0x1a,				// 采样频率及码流率指示
+	KCM_SRC_FORMAT = 0x18,				// 数码信号输入格式指示
+	KCM_SRC_CH_SR = 0x19,				// 数码信号输入通道信息及采样频率指示
+	KCM_SRC_FREQ = 0x1a,				// 数码信号输入码流率及播放实际采样率指示
 	KCM_SRC_VALID = 0x1c,				// 有效的音源输入改变，16位寄存器
 	KCM_WORK_STATUS = 0x1f,				// 模块工作/运行状态指示
 
@@ -96,21 +97,22 @@ typedef enum {
 
 typedef enum {
 	KCM_SRC_NOS = 0x00,					// 输入没有信号
-	KCM_SRC_ANA = 0x01,					// 输入模拟信号
-	KCM_SRC_PCM = 0x02,					// 输入PCM信号
-	KCM_SRC_AC3 = 0x03,					// 输入AC-3信号
-	KCM_SRC_DTS = 0x04,					// 输入DTS信号
-	KCM_SRC_DTS_CD = 0x05,				// 输入DTS CD信号
-	KCM_SRC_AAC = 0x06,					// 输入AAC信号
-	KCM_SRC_LPCM = 0x07,				// 输入LPCM信号
-	KCM_SRC_HDCD = 0x08,				// 输入HD-CD信号
-	KCM_SRC_DSD = 0x09,					// 输入DSD信号
-	KCM_SRC_MP3 = 0x0a,					// 输入MP3信号
-	KCM_SRC_E_AC3 = 0x10,				// 输入Enhanced AC-3信号
-	KCM_SRC_AC3_HD = 0x11,				// 输入杜比TRUE HD信号
-	KCM_SRC_DTS_ES = 0x14,				// 输入DTS Extended Surround信号
-	KCM_SRC_DTS_HRA = 0x15,				// 输入DTS HD High Resolution Audio信号
-	KCM_SRC_DTS_MA = 0x16				// 输入DTS HD Master Audio信号
+	KCM_SRC_PCM = 0x01,					// PCM信号输入
+	KCM_SRC_AC3 = 0x02,					// 标准的AC3信号输入
+	KCM_SRC_DTS = 0x03,					// 标准的DTS/DTS-CD信号输入
+	KCM_SRC_AAC = 0x04,					// AAC信号输入
+	KCM_SRC_MPEG2 = 0x05,				// MPEG2多声道信号输入
+	KCM_SRC_DSD = 0x06,					// DSD信号输入
+	KCM_SRC_MP3 = 0x07,					// MP3信号输入
+	KCM_SRC_SBC = 0x08,					// SBC蓝牙信号输入
+	KCM_SRC_LPCM = 0x11,				// LPCM信号输入
+	KCM_SRC_HDCD = 0x21,				// HD-CD信号输入
+	KCM_SRC_EAC3 = 0x12,				// Enhanced AC-3信号输入
+	KCM_SRC_TRUEHD = 0x22,				// 杜比TRUE HD信号输入
+	KCM_SRC_MLP = 0x32,					// DVD AUDIO MLP信号输入
+	KCM_SRC_DTS_ES = 0x13,				// DTS Extended Surround信号输入
+	KCM_SRC_DTS_MA = 0x23,				// DTS HD Master Audio信号输入
+	KCM_SRC_DTS_HRA = 0x33				// DTS HD High Resolution Audio信号输入
 } KC3X_SRC_TYPE;
 
 typedef enum {
@@ -185,10 +187,12 @@ typedef enum {
 
 typedef enum {
 	KCM_MODEL_32C = 0x31,				// 模块型号KC32C
+	KCM_MODEL_33A = 0x37,				// 模块型号KC33A
 	KCM_MODEL_35H = 0x53,				// 模块型号KC35H
 	KCM_MODEL_36H = 0x56				// 模块型号KC36H
 } KC3X_MODEL_TYPE;
 
+#define KC3X_STATE_PLAY_END				0x00				// 不能写入，读取为文件播放完成，已经停止
 #define KC3X_STATE_PLAY_PAUSE			0x01				// 写入暂停，读取为已经暂停
 #define KC3X_STATE_PLAY_PLAY			0x02				// 写入播放，读取为已经播放
 #define KC3X_STATE_PLAY_STOP			0x03				// 写入停止，读取为已经停止
@@ -219,10 +223,18 @@ typedef enum {
 	KCM_VOL_CHIP_CS3318 = 0x05			// 使用CS3318或者兼容的音量芯片
 } KC3X_VOLUME_CHIP;
 
+#define CUSTOM_ENA_DOWNMIX				0x00000100			// 允许解码输出后的声道下混模式及各种聆听模式
+#define CUSTOM_ENA_BASSMANAGE			0x00000200 			// 允许喇叭设置及低音管理
+#define CUSTOM_ENA_DELAY_LIN			0x00000400 			// 允许各声道延迟时间及齿音同步
+#define CUSTOM_ENA_VOL_TRIM				0x00000800 			// 允许各声道音量及声道微调
+#define CUSTOM_ENA_TONE_EQ				0x00001000 			// 允许音调及多段EQ均衡音效
+#define CUSTOM_ENA_SPECTRUM				0x00008000 			// 允许电平取样及频谱输出
+
 #define CUSTOM_SWAP_CHANNEL				0x00070000			// 互换输出声道
 #define CUSTOM_6CH_TO_8CH				0x00080000			// 在设计为5.1的系统之中使用7.1功能
 #define CUSTOM_VOLUME_CHIP				0x00700000			// 音量芯片类型
 #define CUSTOM_IN_EACH_MODE				0x00800000			// 为每个输入通道单独记忆聆听模式及多段EQ均衡音效选择
+#define CUSTOM_TRACK_MODE				0x00800000			// 为每个输入通道单独记忆聆听模式及多段EQ均衡音效选择
 #define CUSTOM_MIC_LTRT_SWAP			0x08000000			// 话筒MIC与模拟输入交换
 #define CUSTOM_MIC_ENABLE				0x10000000			// 话筒声音混合功能
 #define CUSTOM_BCK_WCK_INPUT			0x20000000			// 数码输入输出时钟输入输出选择
@@ -230,3 +242,4 @@ typedef enum {
 
 
 #endif		// __KC3X_TYPE_H
+

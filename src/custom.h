@@ -8,31 +8,31 @@
 // ！！！编译版本选择
 
 // 标准版本 使用PT2258音量IC，支持话筒，字节2(B6:4为PT2258)字节3(B4打开MIC输入)
-#define CUSTOM_CODE                     0x12123010
+#define CUSTOM_CODE                     0x00ff3010
 
 // 数码输出 使用PT2258音量IC，支持话筒MIC，字节2(B6:4为PT2258)字节3(B4打开MIC输入)
-//#define CUSTOM_CODE                     0x12123010          
+//#define CUSTOM_CODE                     0x00ff3010          
 
 // 数码输出 使用PT2258音量IC，I2S数码格式为左对齐，字节2(B6:4为PT2258)字节3(B7:6为1)
-//#define CUSTOM_CODE                     0x12123040          
+//#define CUSTOM_CODE                     0x00ff3040          
 
 // 数码输出 使用PT2258音量IC，I2S数码格式为右对齐，字节2(B6:4为PT2258)字节3(B7:6为2)
-//#define CUSTOM_CODE                     0x12123080          
+//#define CUSTOM_CODE                     0x00ff3080          
 
 // 数码输出 使用PT2258音量IC，选择BCK及WCK为输入，字节2(B6:4为PT2258)字节3(B5为1)
-//#define CUSTOM_CODE                     0x12123020          
+//#define CUSTOM_CODE                     0x00ff3020          
 
 // 数码输出 每步1dB的DSP数码音量，支持话筒MIC，字节2(B6:4为DSP每步1dB音量)字节3(B4打开MIC输入)
-//#define CUSTOM_CODE                     0x12122010 
+//#define CUSTOM_CODE                     0x00ff2010 
 
 // 数码输出 每步0.5dB的DSP数码音量，支持话筒MIC，字节2(B6:4为DSP每步0.5dB音量)字节3(B4打开MIC输入)
-//#define CUSTOM_CODE                     0x12121010 
+//#define CUSTOM_CODE                     0x00ff1010 
 
 // 数码输出 使用PT2258音量IC，支持话筒MIC(与模拟输入交换)，字节2(B6:4为PT2258)字节3(B4打开MIC输入 B3话筒MIC与模拟输入交换)
-//#define CUSTOM_CODE                     0x12123018          
+//#define CUSTOM_CODE                     0x00ff3018          
 
  // 标准版本旧
-//#define CUSTOM_CODE                     0x12120000 
+//#define CUSTOM_CODE                     0x00ff0000 
 
 // 旧音频板，中置超低音与环绕声 对调  使用PT2258音量IC
 //#define CUSTOM_CODE                     0x44443000          
@@ -45,6 +45,7 @@
 
 #define TONE_ENABLE                                       	// 定义就使用遥控器的音调、音调+、音调-
 #define SPECTRUM_ENABLE                                    	// 定义就显示频谱
+// #define NO_PLAY_NEXT                                    	// 定义就不继续播放后一首当文件播放完后就停止
 
 #if (CUSTOM_CODE & 0x00000010) != 0							// 支持话筒
 #define MICROPHONE                                         	// 定义就将遥控器的音调、音调+、音调-改变为话筒控制

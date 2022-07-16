@@ -37,10 +37,10 @@ void MKCM_ReadXByte(	                                    // Read buffer from DA3
 					BYTE address,      						// Index. 寄存器索引值
 					BYTE* outData,   						// Buffer address. 数据缓冲
 					WORD length);      						// Length. 长度
-WORD MKCM_ReadAutoByte(	                                    // 读取由字节指示长度的多字节
+BYTE MKCM_ReadAutoByte(	                                    // 读取由字节0指示长度的多字节
 					BYTE address,      						// Index. 寄存器索引值
 					BYTE* outData,   						// Buffer address. 数据缓冲
-					WORD limit);      						// limit. 最大输出长度
+					BYTE limit);      						// limit. 最大输出长度
 void MKCM_MutilRead(WORD length, BYTE* outData);
 
 void MI2C_Bus_Write(BYTE gLocal_1);      					// 往I2C总线写入一个字节，gLocal为待写数据，返回为0表示成功
@@ -110,8 +110,9 @@ EXTR BOOL FSeekAuto;
 
 EXTR BOOL FAUD_MasterVolume;
 EXTR xdata BYTE gAUD_MasterVolume;
-EXTR xdata BYTE gAUD_SrcFormat;
-EXTR xdata BYTE gAUD_SrcFreq;
+EXTR xdata BYTE gAUD_SrcFormat;								// [0] 顺序不能调乱 KCM_SRC_FORMAT 数码信号输入格式指示
+EXTR xdata BYTE gAUD_ChSr;									// [1] 顺序不能调乱 KCM_SRC_CH_SR 数码信号输入通道信息及采样频率指示
+EXTR xdata BYTE gAUD_SrcFreq;								// [2] 顺序不能调乱 KCM_SRC_FREQ码流率及播放实际采样率指
 EXTR xdata WORD g2AUD_SrcValid;
 EXTR xdata BYTE gPlayOperate;
 EXTR xdata WORD g2SdQty;
@@ -182,6 +183,7 @@ EXTR xdata BYTE gPreemptibleStep;
 EXTR xdata BYTE gPreemptibleQty;
 EXTR xdata BYTE gWithHdmiStep;
 EXTR xdata BYTE gWithHdmiQty;
+EXTR xdata BYTE gVideoSelect;
 
 void MUSDELAY(BYTE gLocal_1);                
 BYTE MKEY_FirstPress(BYTE gLocal_0);

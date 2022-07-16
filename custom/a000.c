@@ -440,21 +440,20 @@ void MA000_KCM_10msTimer(BYTE baseTimer){   				// B3=1000ms B2=500ms B1=100ms B
 			return;
 		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
-			BYTE mode;
-			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
-			mode = gAUD_SrcFormat & 0x0f;
-			isAc3Dts = (mode == KCM_SRC_AC3 || mode == KCM_SRC_DTS) ? 1 : 0;
+			// BYTE mode;
+			MKCM_ReadXByte(KCM_SRC_FORMAT, &gAUD_SrcFormat, 3);   // 连续读3字节到gAUD_SrcFormat gAUD_ChSr gAUD_SrcFreq
+			// gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
+			// mode = gAUD_SrcFormat & 0x0f;
+			isAc3Dts = (gAUD_SrcFormat == KCM_SRC_AC3 || gAUD_SrcFormat == KCM_SRC_DTS) ? 1 : 0;
 			if (isSaveAc3Dts != isAc3Dts){
 				if (isAc3Dts){
 					MKCM_WriteRegister(KCM_LISTEN_MODE, 0x20);
 				}else{
-
-				}
-				
+				}				
 				isSaveAc3Dts = isAc3Dts;
 			}
-			//MLOG("gAUD_SrcFormat %02x", gAUD_SrcFormat);
-            gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
+			MLOG("gAUD_SrcFormat %02x %02x %02x", gAUD_SrcFormat, gAUD_ChSr, gAUD_SrcFreq);
+            // gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
 			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
                 g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
             }else {

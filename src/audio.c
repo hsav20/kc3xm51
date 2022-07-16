@@ -11,8 +11,10 @@ void MAUD_Initialize(){										// 按键模块初始化
 }	  
 void MAUD_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=10ms 
     if (gRemoveTimer && ++gRemoveTimer > 200){			    // 大约2秒后 
-		INPUT_SWITCH select = MKCM_ReadRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO);	// 自动输入的恢复
-    	MLOG("gRemoveTimer %02x", select);
+		INPUT_SWITCH select;
+		BYTE value = MKCM_ReadRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO);	// 自动输入的恢复
+    	select = MKCM_FromRegister(KCM_INPUT_SOURCE, value);				// 从KCM来的寄存器，转换到本机处理的值
+		MLOG("RemoveA %02x %d ", value, select);
 		gDIP_MenuSelect = MENU_RESTORE;				        // 菜单即刻进入输入的恢复 
 		MAUD_InputSelect(select);
     	gRemoveTimer = 0;
@@ -130,6 +132,13 @@ CONST_CHAR TabInputOneKey[] = {
     INPUT_SWITCH_COA1,                                  	// 2=数码2   
     INPUT_SWITCH_COA2,                                  	// 3=数码3   
 };
+
+    // INPUT_SWITCH_HDMI1 = 9,                                 // HDMI1   
+    // INPUT_SWITCH_HDMI2 = 10,                                // HDMI2   
+    // INPUT_SWITCH_HDMI3 = 11,                                // HDMI3   
+    // INPUT_SWITCH_H_ARC = 12,                                // HDMI-ARC
+
+
 void MAUD_InputOneKey(){									// 所有输入用一个按键选择 
 	gDIP_MenuSelect = MENU_RESTORE;							// 菜单即刻进入输入的恢复 
 	if (gWithHdmiQty && gWithHdmiStep < gWithHdmiQty){	 	// 循环方式
@@ -142,35 +151,37 @@ void MAUD_InputOneKey(){									// 所有输入用一个按键选择
 	}
 }
 void MAUD_InputWrite(INPUT_SWITCH select, INPUT_SWITCH last){
-	MKCM_WriteRegister(KCM_INPUT_SOURCE, MKCM_ToRegister(KCM_INPUT_SOURCE, select));
- //   MLOG("SourceW:%02x(%02x)%02x(%02x)", select, MKCM_ToRegister(KCM_INPUT_SOURCE, select), last, MKCM_ToRegister(KCM_INPUT_SOURCE, last));
+	BYTE value1 = MKCM_ToRegister(KCM_INPUT_SOURCE, select);
+	BYTE value2 = MKCM_ToRegister(KCM_INPUT_SOURCE, last);
+	MKCM_WriteRegister(KCM_INPUT_SOURCE, value1);
+    MLOG("SourceW:%d(%d)%02x(%02x)", select, last, value1, value2);
 	if (last <= INPUT_SWITCH_COA2){ 								// 如果原来不是抢占式输入
-	    MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO, MKCM_ToRegister(KCM_INPUT_SOURCE, last));	// 自动输入的恢复
-		// MLOG("SourceJ:%02x last:%02x", select, MKCM_ReadRegister(KCM_INPUT_SOURCE));
+	    MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO, value1);	// 自动输入的恢复
+		MLOG("SourceJ:%d %02x", select, value1);
 	}
 }
 CONST_WORD TabSrcValid[] = {
 	KCM_SRC_VALID_SD, KCM_SRC_VALID_UDISK,
-	KCM_SRC_VALID_USBA, KCM_SRC_VALID_BT,
-	KCM_SRC_VALID_HDMI1, KCM_SRC_VALID_HDMI2, KCM_SRC_VALID_HDMI3
+	KCM_SRC_VALID_USBA, KCM_SRC_VALID_BT, KCM_SRC_VALID_E8CH
+	// KCM_SRC_VALID_HDMI1, KCM_SRC_VALID_HDMI2, KCM_SRC_VALID_HDMI3
 	
 }; 
 CONST_CHAR TabValidSwitch[] = {
 	INPUT_SWITCH_SD, INPUT_SWITCH_UDISK,
-	INPUT_SWITCH_USBA, INPUT_SWITCH_BT,
-	INPUT_SWITCH_HDMI1, INPUT_SWITCH_HDMI2, INPUT_SWITCH_HDMI3
+	INPUT_SWITCH_USBA, INPUT_SWITCH_BT, INPUT_SWITCH_E8CH
+	// INPUT_SWITCH_HDMI1, INPUT_SWITCH_HDMI2, INPUT_SWITCH_HDMI3
 };
-void MAUD_MakePreemptible(WORD g2Local_1){			        // 生成抢占式输入选择 
+void MAUD_MakePreemptible(WORD validFlag){			        // 生成抢占式输入选择 
 	BYTE qty = 0;
-    if (gSYS_ModelType == KCM_MODEL_35H){                   // 模块版本是KC35H，需要加入外置7.1声道
-        gPreemptibleIn[qty++] = INPUT_SWITCH_E8CH;
-    }    
-    if (g2Local_1){									// 有抢占式输入 
+    // if (gSYS_ModelType == KCM_MODEL_35H){                   // 模块版本是KC35H，需要加入外置7.1声道
+    //     gPreemptibleIn[qty++] = INPUT_SWITCH_E8CH;
+    // }    
+    if (validFlag){									// 有抢占式输入 
     	BYTE index;
     	WORD flag;
     	for (index = 0; index < sizeof(TabSrcValid)/2; index++){
         	flag = TabSrcValid[index];
-        	if (g2Local_1 & flag){    				// 有非抢占式
+        	if (validFlag & flag){    				// 有非抢占式
         		if (flag == KCM_SRC_VALID_SD){
 	    			if (!g2SdQty){
 			    		continue;	
@@ -205,7 +216,7 @@ void MAUD_MakePreemptible(WORD g2Local_1){			        // 生成抢占式输入选择
 		g2SdQty = 0;
 		g2UDiskQty = 0;
     }
-    g2AUD_SrcValid = g2Local_1;
+    g2AUD_SrcValid = validFlag;
 }
 
 
@@ -224,18 +235,16 @@ BYTE MKCM_AutoTrack(BYTE value){							// 输入KCM_PLAY_SD_QTY或KCM_PLAY_UDISK_QT
 }
 
 void MKCM_ReadSrcValid(){
-	WORD g2Local_1 = MKCM_Read2Byte(KCM_SRC_VALID);         // 本次的有效音源
+	WORD srcValid = MKCM_Read2Byte(KCM_SRC_VALID);         // 本次的有效音源
 //if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
-    if (g2AUD_SrcValid != g2Local_1){                       // 本次与上次的有效音源改变
+    if (g2AUD_SrcValid != srcValid){                       // 本次与上次的有效音源改变
 		BYTE index;
     	WORD flag;
     	BOOL found = 0;
-
-        MLOG("KCM_SRC_VALID:%02x%02x Last:%02x%02x", g2Local_1>>8, g2Local_1, g2AUD_SrcValid>>8, g2AUD_SrcValid);
-
+        MLOG("KCM_SRC_VALID:%02x%02x Last:%02x%02x", srcValid>>8, srcValid, g2AUD_SrcValid>>8, g2AUD_SrcValid);
         for (index = 0; index < sizeof(TabSrcValid)/2; index++){
         	flag = TabSrcValid[index];
-        	if ((g2Local_1 & flag) && !(g2AUD_SrcValid & flag)){    // 本次有及上次没有非抢占式
+        	if ((srcValid & flag) && !(g2AUD_SrcValid & flag)){    // 本次有及上次没有非抢占式
 		       	found = 1;
 	        	switch (flag){
 	            case KCM_SRC_VALID_SD:
@@ -253,6 +262,12 @@ void MKCM_ReadSrcValid(){
 	            case INPUT_SWITCH_E8CH: 
 	            	found = 0;
 					break;	
+				// case KCM_SRC_VALID_HDMI1:                    // HDMI1   
+				// case KCM_SRC_VALID_HDMI2:                    // HDMI2   
+				// case KCM_SRC_VALID_HDMI3:                    // HDMI3   
+				// case KCM_SRC_VALID_HDMIS:                    // HDMI-ARC
+	            // 	found = 0;
+				// 	break;	
       			}
       			if (found){
 					MAUD_InputWrite(TabValidSwitch[index], mINPUT_SWITCH);
@@ -269,7 +284,7 @@ MLOG("mINPUT_A %02x", mINPUT_SWITCH);
 			for (index = 0; index < sizeof(TabSrcValid)/2; index++){
 	        	flag = TabSrcValid[index];
 	    //MLOG("KCM_SRC_VALID C %d %02x%02x", index, flag>>8, flag);  
-				if (!(g2Local_1 & flag) && (g2AUD_SrcValid & flag)){    // 本次没有及上次有非抢占式
+				if (!(srcValid & flag) && (g2AUD_SrcValid & flag)){    // 本次没有及上次有非抢占式
 		            switch (flag){
 		            case KCM_SRC_VALID_SD:
 						g2SdQty = 0; 
@@ -287,10 +302,10 @@ MLOG("mINPUT_A %02x", mINPUT_SWITCH);
 		            case KCM_SRC_VALID_BT: 
 						MDIP_MenuNormal(MENU_BT_REMOVE); 
 						break;	
-		            case KCM_SRC_VALID_HDMI1: 
-		            case KCM_SRC_VALID_HDMI2: 
-		            case KCM_SRC_VALID_HDMI3: 
-			            break;
+		            // case KCM_SRC_VALID_HDMI1: 
+		            // case KCM_SRC_VALID_HDMI2: 
+		            // case KCM_SRC_VALID_HDMI3: 
+			        //     break;
 		            }
 					if (mINPUT_SWITCH == TabValidSwitch[index]){	// 有抢占式拔出而且是当前的输入
 						gRemoveTimer = 1;					// 大约2秒后 
@@ -299,9 +314,9 @@ MLOG("mINPUT_A %02x", mINPUT_SWITCH);
 	        	}
 	        }
         }
-		MAUD_MakePreemptible(g2Local_1);					// 生成抢占式输入选择 
+		MAUD_MakePreemptible(srcValid);					// 生成抢占式输入选择 
     }else {
-        MLOG("KCM_SRC_VALID = Last:%02x%02x\r\n", g2Local_1>>8, g2Local_1);
+        MLOG("KCM_SRC_VALID = Last:%02x%02x", srcValid>>8, srcValid);
     }
 }
 

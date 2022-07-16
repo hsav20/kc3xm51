@@ -283,7 +283,7 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MDIP_PlaySkip(KCM_OPERATE_SKIP_DOWN);			// 多媒体播放后一首
 			break;
 		case cRmKey_SkipUp:
-			MDIP_PlaySkip(KCM_OPERATE_SKIP_UP);			// 多媒体播放前一首
+			MDIP_PlaySkip(KCM_OPERATE_SKIP_UP);				// 多媒体播放前一首
 			break;
 		case cRmKey_EqSelect:
             MEQMIC_KeyEqSelect();                           // 按键EQ均衡器选择
@@ -306,9 +306,9 @@ void MKEY_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			MKEY_VideoSelect();
 			break;
 		case cRmKey_InputNet:								// UDisk输入
-			MAUD_InputSelect(INPUT_SWITCH_UDISK);			// UDISK   
+			// MAUD_InputSelect(INPUT_SWITCH_UDISK);			// UDISK   
 			//  MAUD_InputSelect(INPUT_SWITCH_BT);			// BT
-			// MAUD_Preemptible();								// 抢占式输入选择 
+			MAUD_Preemptible();								// 抢占式输入选择 
 			break;
 		case cRmKey_InputHdmi1:
 			MAUD_InputSelect(INPUT_SWITCH_HDMI1);
@@ -396,25 +396,29 @@ CONST_CHAR Tab_VideoSelect[] = {
 	0x01,0x02,0x04,
 };
 void MKEY_VideoSelect(){
-	/*if (mINPUT_SWITCH < INPUT_SWITCH_HDMI1){
-		BYTE gLocal_1 = gAUD_AutoInputSrc >> 5;					// B7:B5为选择的视频
-		BYTE gLocal_2 = gAUD_AutoInputSrc & 0x07;				// B4:B0为插入的视频位
-		BYTE gLocal_3 = 0;
-		do {
-			if (++gLocal_1 > 2){
-				gLocal_1 = 0;
-			}
-			if (gLocal_2 & Tab_VideoSelect[gLocal_1]){			// 选择的视频有插入
-				MKCM_WriteRegister(KCM_INPUT_VIDEO, (gLocal_1 << 5) | gLocal_2);
-			    return;
-			}
-		} while (++gLocal_3 < 3);
-	    MDIP_MenuNormal(MENU_VIDEO_SRC);
+	if (++gVideoSelect >= 3){
+		gVideoSelect = 0;
 	}
-	else {
-		MDIP_MenuNormal(MENU_RESTORE);
-	}*/
-    return;
+	MKCM_WriteRegister(KCM_INPUT_VIDEO, 1 << gVideoSelect);
+	MDIP_MenuNormal(MENU_VIDEO_SRC);
+	// if (mINPUT_SWITCH < INPUT_SWITCH_HDMI1){
+	// 	BYTE gLocal_1 = gAUD_AutoInputSrc >> 5;					// B7:B5为选择的视频
+	// 	BYTE gLocal_2 = gAUD_AutoInputSrc & 0x07;				// B4:B0为插入的视频位
+	// 	BYTE gLocal_3 = 0;
+	// 	do {
+	// 		if (++gLocal_1 > 2){
+	// 			gLocal_1 = 0;
+	// 		}
+	// 		if (gLocal_2 & Tab_VideoSelect[gLocal_1]){			// 选择的视频有插入
+	// 			MKCM_WriteRegister(KCM_INPUT_VIDEO, (gLocal_1 << 5) | gLocal_2);
+	// 		    return;
+	// 		}
+	// 	} while (++gLocal_3 < 3);
+	//     MDIP_MenuNormal(MENU_VIDEO_SRC);
+	// }
+	// else {
+	// 	MDIP_MenuNormal(MENU_RESTORE);
+	// }
 }
 CONST_CHAR Tab_ListenModeRegister[] = {
     0x00, 0x01, 											// 双声道立体声，B0为0关闭超低音；为1打开超低音

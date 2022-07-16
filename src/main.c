@@ -7,7 +7,7 @@
 
 #define ROOT     		  
 #include "main.h"    
-
+// BYTE aaa=0;
 void main(){
 	MSYS_Initialize(); 										// CPU基本部件初始化
 	MDIP_HalInit();											// 显示模块硬件底层初始化
@@ -15,6 +15,7 @@ void main(){
 	MKEY_Initialize();       								// 按键模块初始化
 	MAUD_Initialize();       								// 音频模块初始化
     MKCM_Initialize();                                      // KCM模块初始化
+// MLOG("aaaA %d", aaa++);    
     while (1){ 						   
         
         if ((gTBascTimer & 0x01) > 0){						// 10ms (B3=1000ms B2=500ms B1=100ms B0=10ms) 
@@ -24,6 +25,8 @@ void main(){
             MAUD_10msTimer(gTBascTimer);                	// 音频模块10ms时间处理
 			if ((gTBascTimer & 0x08) > 0){					// 1000ms
 				//  MLOG("gDIP_MenuSelect %d %d", gDIP_MenuSelect, g2DIP_ShowBuffer[6]>>8);
+// P37=~P37;                
+// MLOG("aaaA %d", aaa++);
 			}
 			gTBascTimer = 0;
 		}

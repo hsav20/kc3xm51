@@ -502,7 +502,7 @@ void MDIP_InputSource(){									// 音源输入显示
 				}
 				if (g2PlayTime < 5){
 					 BYTE temp = gAUD_SrcFreq >> 3;
-					if ((gAUD_SrcFormat & 0x0f) == KCM_SRC_MP3){
+					if (gAUD_SrcFormat == KCM_SRC_MP3){
 						gDIP_MenuTimer = 20;
 						if (temp > 0 && temp < 16){
 							BYTE gLocal_Buffer[6];
@@ -542,7 +542,7 @@ void MDIP_PlaySkip(BYTE operate){
 	g2PlayTime = 0;
 	gAUD_SrcFreq = 0;
 	MDIP_InputSource();		
-	MKCM_WriteRegister(KCM_PLAY_OPERATE, operate);  // 多媒体播放后一首
+	MKCM_WriteRegister(KCM_PLAY_OPERATE, operate);  		// 多媒体播放前/后一首
 	MLOG("MDIP_PlaySkip A %d", operate);
 }
 void MDIP_PlayTime(){
@@ -550,8 +550,8 @@ void MDIP_PlayTime(){
 
 
 void MDIP_VideoSrc(){
-//	MDIP_WrString("VIDE0 ");
-//	MDIP_SingleChar(5, (gAUD_AutoInputSrc >> 5) + '1');
+	MDIP_WrString("VIDE0 ");
+	MDIP_SingleChar(5, gVideoSelect + '1');
 }
 
 
@@ -601,31 +601,30 @@ CONST_CHAR Tab_DIP_SRC_CH[] = {
 //	 +++---+++---+++---+++---+++---+++---
 };
 void MDIP_SourceFormat(){
-	if ((gAUD_SrcFormat & 0x0f) >= KCM_SRC_PCM){
+	if (gAUD_SrcFormat >= KCM_SRC_PCM){
     	BYTE gLocal_1;
     	BYTE gLocal_Buffer[4];
 
     	gLocal_Buffer[3] = 0;
-    	gLocal_1 = (gAUD_SrcFormat >> 4) * 3;
+    	gLocal_1 = (gAUD_ChSr & 0x0f) * 3;
     	MDIP_WrString("      ");
-	
+	MLOG("FormatA %02x %d %02x", gAUD_SrcFormat, gLocal_1, gAUD_ChSr);
     //MDEBUG(0xa8);MDEBUG(gAUD_SrcFormat);	
     	MDIP_SrcFormatSymbol();
-    	switch (gAUD_SrcFormat & 0x0f){
+    	switch (gAUD_SrcFormat){
     	case KCM_SRC_PCM :
     		MDIP_WrString("PCM");
     		break;
-    	case KCM_SRC_AC3 :                                      // 输入AC-3信号
-    	case KCM_SRC_E_AC3 :                                    // 输入Enhanced AC-3信号
-    	case KCM_SRC_AC3_HD :                                   // 输入杜比TRUE HD信号    
+    	case KCM_SRC_AC3 :                                  // 标准的AC3信号输入
+    	case KCM_SRC_EAC3 :                                	// Enhanced AC-3信号输入
+    	case KCM_SRC_TRUEHD :                               // 杜比TRUE HD信号输入
     		MAPI_COPY_BUFF8(3, &Tab_DIP_SRC_CH[gLocal_1], gLocal_Buffer);
     		MDIP_WrString(gLocal_Buffer);
     		break;
-    	case KCM_SRC_DTS :                                      // 输入DTS信号
-        case KCM_SRC_DTS_CD:				                    // 输入DTS CD信号
-        case KCM_SRC_DTS_ES:				                    // 输入DTS Extended Surround信号
-        case KCM_SRC_DTS_HRA:				                    // 输入DTS HD High Resolution Audio信号
-        case KCM_SRC_DTS_MA:				                    // 输入DTS HD Master Audio信号
+    	case KCM_SRC_DTS :                                  // 标准的DTS/DTS-CD信号输入
+        case KCM_SRC_DTS_ES:				                // DTS Extended Surround信号输入
+        case KCM_SRC_DTS_HRA:				                // DTS HD High Resolution Audio信号输入
+        case KCM_SRC_DTS_MA:				                // DTS HD Master Audio信号输入
     		MAPI_COPY_BUFF8(3, &Tab_DIP_SRC_CH[gLocal_1], gLocal_Buffer);
     		MDIP_WrString(gLocal_Buffer);
     		break;

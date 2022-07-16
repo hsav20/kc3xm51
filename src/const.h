@@ -271,5 +271,5 @@ typedef enum {
 #define cI2C_ACK						0
 #define cI2C_NAK						1
 
-#define cI2C_ADDRESS					0xcc				// 设置I2C的从机地址
+#define cI2C_ADDRESS					0xac				// 设置I2C的从机地址
 

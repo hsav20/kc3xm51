@@ -102,18 +102,18 @@ void MKCM_ReadXByte(										// Read buffer from DA32C. 读取多个字节
     MKCM_MutilRead(length, outData);
 	return;
 }
-WORD MKCM_ReadAutoByte(										// 读取由字节指示长度的多字节
+BYTE MKCM_ReadAutoByte(										// 读取由字节0指示长度的多字节
 					BYTE address,      						// Index. 寄存器索引值
 					BYTE* outData,   						// Buffer address. 数据缓冲
-					WORD limit){      						// limit. 最大输出长度
-	WORD length;
+					BYTE limit){      						// limit. 最大输出长度
+	BYTE length;
 	MI2C_Bus_Start();										// I2C Start
 	MI2C_Bus_Write(cI2C_ADDRESS);							// KCM I2C address
 	MI2C_Bus_Write(address);								// Index. 写入I2C从机的寄存器索引值
 
 	MI2C_Bus_Start();									    // I2C Start
 	MI2C_Bus_Write(cI2C_ADDRESS+1);						    // KCM I2C read address
-	length = MI2C_Bus_Read(0);
+	length = MI2C_Bus_Read(0);								// 字节0指示长度
     if (length > limit){
         length = limit;
     }

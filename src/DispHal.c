@@ -62,22 +62,23 @@ void MDIP_SrcFormatSymbol(){
 	// 旧[6] B15:D1 B14:D1 B13:D1 B12:D1 B11:WIFI B10:云   B9:PAUSE B8:PLAY B7:RPALL    B6:RP1   B5:DTS B4:DD  B3:AUTO  B2:DSP B1:PLII B0:ST
 	
 //MDEBUG(0xa9);MDEBUG(gSYS_ModelType);MDEBUG(gAUD_SrcFormat);
-	switch (gAUD_SrcFormat & 0x0f){
+	switch (gAUD_SrcFormat){
 	case KCM_SRC_PCM :
 		if (gSYS_ModelType != KCM_MODEL_35H && gSYS_ModelType != KCM_MODEL_36H){
 			g2DIP_ShowBuffer[6] |= 0x0400;	
 		}
 		break;
-	case KCM_SRC_AC3 :                                      // 输入AC-3信号
-	case KCM_SRC_E_AC3 :                                    // 输入Enhanced AC-3信号
-	case KCM_SRC_AC3_HD :                                   // 输入杜比TRUE HD信号    
+   	case KCM_SRC_TRUEHD :                               	// 杜比TRUE HD信号输入
+		g2DIP_ShowBuffer[6] |= 0x0200;						// B9:HD 
+   	case KCM_SRC_EAC3 :                                		// Enhanced AC-3信号输入
+   	case KCM_SRC_AC3 :                                  	// 标准的AC3信号输入
 		g2DIP_ShowBuffer[6] |= 0x0004;	
 		break;
-	case KCM_SRC_DTS :                                      // 输入DTS信号
-    case KCM_SRC_DTS_CD:				                    // 输入DTS CD信号
-    case KCM_SRC_DTS_ES:				                    // 输入DTS Extended Surround信号
-    case KCM_SRC_DTS_HRA:				                    // 输入DTS HD High Resolution Audio信号
-    case KCM_SRC_DTS_MA:				                    // 输入DTS HD Master Audio信号
+	case KCM_SRC_DTS_HRA:				                	// DTS HD High Resolution Audio信号输入
+	case KCM_SRC_DTS_MA:				                	// DTS HD Master Audio信号输入
+		g2DIP_ShowBuffer[6] |= 0x0200;						// B9:HD 
+	case KCM_SRC_DTS_ES:				                	// DTS Extended Surround信号输入
+	case KCM_SRC_DTS :                                  	// 标准的DTS/DTS-CD信号输入
 		g2DIP_ShowBuffer[6] |= 0x0100;	
 		break;
 	case KCM_SRC_LPCM :
@@ -103,7 +104,7 @@ void MDIP_PlaySymbol(BYTE status){
 		}	
 	}
 	FDIP_ScreenUpdata = 1;
-	MLOG("PlaySymbol %02x", (WORD)g2DIP_ShowBuffer[7]);	
+	// MLOG("PlaySymbol %02x", (WORD)g2DIP_ShowBuffer[7]);	
 }
 void MDIP_WifiSymbol(BYTE turnOn){
 	if (turnOn == 0xff){

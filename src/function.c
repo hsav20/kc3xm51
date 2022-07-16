@@ -36,17 +36,24 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		}
 		if ((gLocal_1 & KCM_IRQ_SYSTEM_INIT) > 0){			// KCM模式初始化完成中断
             MKCM_RestoreMemory();							// 从KCM恢复本地的记忆
+			MAUD_InputWrite(mINPUT_SWITCH, mINPUT_SWITCH);
 		}
 		if (FSYS_Standby){									// 待机状态下不处理后面的中断了
 			return;
 		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
+			//  MKCM_ReadXByte(KCM_SRC_FORMAT, &gAUD_SrcFormat, 3);   // 连续读3字节到gAUD_SrcFormat gAUD_ChSr gAUD_SrcFreq
 			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
-            gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
+            gAUD_ChSr = MKCM_ReadRegister(KCM_SRC_CH_SR);
+			gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
+			// MLOG("gAUD_SrcFormat %02x %02x %02x", gAUD_SrcFormat, gAUD_ChSr, gAUD_SrcFreq);
 
 		//	MLOG("SrcFormat %02x %02x", gAUD_SrcFormat, gAUD_SrcFreq);
 			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-                g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
+                char fileName[16];
+				BYTE length = MKCM_ReadAutoByte(KCM_PLAY_FILE_NAME, fileName, 16);
+				MLOG("FILE_NAME A %d %02x %02x %02x", length, fileName[0], fileName[1], fileName[2]);
+				g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
             }else {
 				if (gDIP_MenuLock == 0){						// 
 					if (!FSYS_TestTone){						// 没有打开噪音测试
@@ -82,6 +89,12 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
         if ((gLocal_1 & KCM_IRQ_PLAY_STATE) > 0){           // 多媒体文件播放状态改变
         	gPlayStatus = MKCM_ReadRegister(KCM_PLAY_STATE);     // 读取多媒体文件播放状态
 			MLOG("KCM_IRQ_PLAY_STATE %02x", gPlayStatus);
+			if ((gPlayStatus & KC3X_STATE_PLAY_FLAG) == KC3X_STATE_PLAY_END){	// 文件播放完成，已经停止
+#ifndef NO_PLAY_NEXT	
+				// 文件播放完成，需要继续播放后一首			
+				MKCM_WriteRegister(KCM_PLAY_OPERATE, KCM_OPERATE_SKIP_UP);  // 多媒体播放后一首
+#endif				
+			}
         	MDIP_PlaySymbol(gPlayStatus);
         }
 		if ((gLocal_1 & KCM_IRQ_APP_COMMAND) > 0){          // 收到手机/远程APP控制指令，需要读取"KCM_APP_COMMAND"寄存器
@@ -117,23 +130,30 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	gDIP_Brightness = temp[MEM_BRIGHTNESS] & 0x03;          // 从记忆之中恢复显示屏亮度
 	gDIP_MicTone[0] = temp[MEM_MIC_BASS];					// 从记忆之中恢复话筒低音
 	gDIP_MicTone[1] = temp[MEM_MIC_TREBLE];					// 从记忆之中恢复话筒高音
-    value = temp[MEM_SOURCE_AUTO];							// 从记忆之中恢复自动输入
-//MLOG("BrightA_%02x_%02x_", temp[MEM_SOURCE_AUTO], temp[MEM_BRIGHTNESS]);
-
-	gLocal_1 = MKCM_FromRegister(KCM_INPUT_SOURCE, value);	// 通过寄存器反向将选择的数值恢复
-	MLOG("RestoreA %02x %02x %02x", value, gLocal_1, temp[MEM_SOURCE_AUTO]);
-	if (gLocal_1 >= INPUT_SWITCH_SD && gLocal_1 <= INPUT_SWITCH_BT){	// SD/UDISK/USB声卡/蓝牙音频
-		mINPUT_SWITCH = temp[MEM_SOURCE_AUTO];  			// 自动输入的恢复 
-	}else{
-		mINPUT_SWITCH = gLocal_1;							// 使用KCM记忆的输入端口选择
+    
+	gLocal_1 = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
+	value = MKCM_FromRegister(KCM_INPUT_SOURCE, gLocal_1);  // 自动输入的恢复
+	MLOG("INPUT_A %d %02x", value, gLocal_1); 
+	if (value >= INPUT_SWITCH_SD && value <= INPUT_SWITCH_BT){	// 抢占式输入 SD/UDISK/USB声卡/蓝牙音频
+		value = MKCM_FromRegister(KCM_INPUT_SOURCE, temp[MEM_SOURCE_AUTO]);	// 通过寄存器反向将选择的数值恢复
+		MLOG("INPUT_B %d %02x", value, temp[MEM_SOURCE_AUTO]);
 	}
-//MLOG("mINPUT_B %02x %02x", mINPUT_SWITCH, gLocal_1);
+	mINPUT_SWITCH = value;
 	
-	// 输入端口选择：使用KCM_INPUT寄存器的记忆值
-	value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
+// 	value = temp[MEM_SOURCE_AUTO];							// 从记忆之中恢复自动输入
+// //MLOG("BrightA_%02x_%02x_", temp[MEM_SOURCE_AUTO], temp[MEM_BRIGHTNESS]);
+// 	if (gLocal_1 >= INPUT_SWITCH_SD && gLocal_1 <= INPUT_SWITCH_BT){	// 抢占式输入 SD/UDISK/USB声卡/蓝牙音频
+// 		// 输入端口选择：使用KCM_INPUT寄存器的记忆值
+// 		value = MKCM_ReadRegister(KCM_INPUT_SOURCE);			// 记忆的输入端口选择
+// 		mINPUT_SWITCH = MKCM_FromRegister(KCM_INPUT_SOURCE, value);  			// 自动输入的恢复 
+// 		MLOG("INPUT_B %02x %02x", mINPUT_SWITCH, value);
+// 	}else{													// 不是抢占式输入
+// 		mINPUT_SWITCH = gLocal_1;							// 使用KCM记忆的输入端口选择
+// 		MLOG("INPUT_C %02x %02x", mINPUT_SWITCH, value);
+// 	}	
+	
 	MKCM_ReadXByte(KCM_RD_INFO, temp, 2);                   // 读取模块信息寄存器
     gSYS_ModelType = temp[1];                               // [0]文件升级百分比[1]模块型号[2-n]每8字节为各种固件的日期版本
-
 
 	// 音量：使用KCM_VOLUME寄存器的记忆值
 	gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);	// 记忆的音量值
@@ -181,7 +201,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 	FSYS_TestTone = 0;
 	FSYS_MuteEnable = 0;
 	gRemoveTimer = 0;
-	MAUD_MakePreemptible(KCM_SRC_VALID_E8CH);				// 生成抢占式输入选择，模块版本是KC35H，需要加入外置7.1声道 
+	MAUD_MakePreemptible(0);								// 没有了抢占式输入，初始化所有变量
 
     MDIP_MenuNormal(MENU_POWER_ON);                         // 菜单状态:电源打开
 	gDIP_MenuLock = 10;										// 可以退出暂时锁定显示了
