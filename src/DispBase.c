@@ -481,11 +481,11 @@ CONST_CHAR Tab_DIP_InputSwitch[] = {
 	"AUX-INOPTICACOA-D1COA-D2 -SD-  -USB- -PC-  E8CH -BT-  HDMI-1HDMI-2HDMI-3HDMI-A"
 //	 ++++++------++++++------++++++------++++++------++++++------++++++------++++++
 };
-CONST_CHAR Tab_DIP_Bps[] = {
-    "32K48K56K64K80K96K112128160192224256320384"
-//	 +++---+++---+++---+++---+++---+++---+++---
+// CONST_CHAR Tab_DIP_Bps[] = {
+//     "32K48K56K64K80K96K112128160192224256320384"
+// //	 +++---+++---+++---+++---+++---+++---+++---
 	
-};
+// };
 void MDIP_InputSource(){									// 音源输入显示
 #ifdef CUSTOM_DIP_INPUT
 	MDIP_CustomInput();										// 用户定制音源输入显示
@@ -500,17 +500,21 @@ void MDIP_InputSource(){									// 音源输入显示
 					MDIP_PlayTrack();
 					return;
 				}
+				// MLOG("g2PlayTime A %d", g2PlayTime);
 				if (g2PlayTime < 5){
-					 BYTE temp = gAUD_SrcFreq >> 3;
+					WORD temp = gAUD_SrcBps * 8;
+// MLOG("SrcFormat A %02x",gAUD_SrcFormat);					
 					if (gAUD_SrcFormat == KCM_SRC_MP3){
 						gDIP_MenuTimer = 20;
-						if (temp > 0 && temp < 16){
-							BYTE gLocal_Buffer[6];
-							MAPI_COPY_BUFF8(3, "MP3", gLocal_Buffer);
-							MAPI_COPY_BUFF8(3, &Tab_DIP_Bps[(temp-1) * 3], &gLocal_Buffer[3]);
-							MDIP_WrString((char*)gLocal_Buffer);
-							return;
+						MDIP_WrString("MP3");
+						if (temp > 96){
+							MDIP_WriteDec(3, temp);							
+						}else{
+							MDIP_SingleChar(3, ' ');
+							MDIP_SingleChar(5, ' ');
+							MDIP_WriteDec(4, temp);	
 						}
+						return;
 					}
 				}
 				MDIP_WrString("  ");
@@ -540,7 +544,7 @@ void MDIP_PlayTrack(){
 
 void MDIP_PlaySkip(BYTE operate){
 	g2PlayTime = 0;
-	gAUD_SrcFreq = 0;
+	gAUD_SrcRate = 0;
 	MDIP_InputSource();		
 	MKCM_WriteRegister(KCM_PLAY_OPERATE, operate);  		// 多媒体播放前/后一首
 	MLOG("MDIP_PlaySkip A %d", operate);
@@ -606,9 +610,9 @@ void MDIP_SourceFormat(){
     	BYTE gLocal_Buffer[4];
 
     	gLocal_Buffer[3] = 0;
-    	gLocal_1 = (gAUD_ChSr & 0x0f) * 3;
+    	gLocal_1 = (gAUD_SrcChannel & 0x0f) * 3;
     	MDIP_WrString("      ");
-	MLOG("FormatA %02x %d %02x", gAUD_SrcFormat, gLocal_1, gAUD_ChSr);
+	MLOG("FormatA %02x %d %02x", gAUD_SrcFormat, gLocal_1, gAUD_SrcChannel);
     //MDEBUG(0xa8);MDEBUG(gAUD_SrcFormat);	
     	MDIP_SrcFormatSymbol();
     	switch (gAUD_SrcFormat){

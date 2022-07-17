@@ -14,7 +14,7 @@ void MAUD_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 		INPUT_SWITCH select;
 		BYTE value = MKCM_ReadRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO);	// 自动输入的恢复
     	select = MKCM_FromRegister(KCM_INPUT_SOURCE, value);				// 从KCM来的寄存器，转换到本机处理的值
-		MLOG("RemoveA %02x %d ", value, select);
+		MLOG("RemoveA %02x %d ", value, select,mINPUT_SWITCH);
 		gDIP_MenuSelect = MENU_RESTORE;				        // 菜单即刻进入输入的恢复 
 		MAUD_InputSelect(select);
     	gRemoveTimer = 0;
@@ -156,8 +156,8 @@ void MAUD_InputWrite(INPUT_SWITCH select, INPUT_SWITCH last){
 	MKCM_WriteRegister(KCM_INPUT_SOURCE, value1);
     MLOG("SourceW:%d(%d)%02x(%02x)", select, last, value1, value2);
 	if (last <= INPUT_SWITCH_COA2){ 								// 如果原来不是抢占式输入
-	    MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO, value1);	// 自动输入的恢复
-		MLOG("SourceJ:%d %02x", select, value1);
+	    MKCM_WriteRegister(KCM_EXTR_MEMORY + MEM_SOURCE_AUTO, value2);	// 自动输入的恢复
+		MLOG("SourceJ:%d %02x", select, value2);
 	}
 }
 CONST_WORD TabSrcValid[] = {
@@ -234,7 +234,37 @@ BYTE MKCM_AutoTrack(BYTE value){							// 输入KCM_PLAY_SD_QTY或KCM_PLAY_UDISK_QT
 	return 0;
 }
 
-void MKCM_ReadSrcValid(){
+
+void MKCM_ReadSrcInfo(){									// 收到中断读取格式、通道、采样率、码流率等信息
+//  MKCM_ReadXByte(KCM_SRC_FORMAT, &gAUD_SrcFormat, 3);   // 连续读3字节到gAUD_SrcFormat gAUD_ChSr gAUD_SrcFreq
+	gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);	// 数码信号输入格式指示
+	gAUD_SrcChannel = MKCM_ReadRegister(KCM_SRC_CHANNEL);	// 数码信号输入通道信息及超低音指示
+	gAUD_SrcRate = MKCM_ReadRegister(KCM_SRC_RATE);	// 数码信号输入采样率及实际播放采样率指示
+	gAUD_SrcBps = MKCM_ReadRegister(KCM_SRC_BPS);	// 数码信号输入码流率指示
+					
+	// MLOG("gAUD_SrcFormat %02x %02x %02x", gAUD_SrcFormat, gAUD_ChSr, gAUD_SrcFreq);
+
+//	MLOG("SrcFormat %02x %02x", gAUD_SrcFormat, gAUD_SrcFreq);
+	if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
+		char fileName[16];
+		BYTE length = MKCM_ReadAutoByte(KCM_PLAY_FILE_NAME, fileName, 16);
+		// MLOG("FILE_NAME A %d %02x %02x %02x", length, fileName[0], fileName[1], fileName[2]);
+		g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
+	}else {
+		if (gDIP_MenuLock == 0){						// 
+			if (!FSYS_TestTone){						// 没有打开噪音测试
+				MDIP_MenuNormal(MENU_SRC_FORMAT);		// 菜单显示输入码流格式
+			}
+		}
+	}
+	if (gAUD_SrcFormat == 0){
+		MDIP_CleanSpectrum();
+	}
+	MDIP_SrcFormatSymbol();
+	MDIP_SurroundSymbol();
+}
+
+void MKCM_ReadSrcValid(){									// 收到中断读取有效的音源输入改变
 	WORD srcValid = MKCM_Read2Byte(KCM_SRC_VALID);         // 本次的有效音源
 //if(g2Local_1==KCM_SRC_VALID_UDISK){g2Local_1=KCM_SRC_VALID_HDMI1|KCM_SRC_VALID_HDMI2;}
     if (g2AUD_SrcValid != srcValid){                       // 本次与上次的有效音源改变

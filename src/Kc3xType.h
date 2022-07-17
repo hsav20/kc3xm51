@@ -11,8 +11,9 @@ typedef enum {
 	KCM_TEST_TONE = 0x09,				// 噪音测试
 	KCM_SRC_DETECT = 0x0a,				// 检测所有有效的音源一次
 	KCM_SRC_FORMAT = 0x18,				// 数码信号输入格式指示
-	KCM_SRC_CH_SR = 0x19,				// 数码信号输入通道信息及采样频率指示
-	KCM_SRC_FREQ = 0x1a,				// 数码信号输入码流率及播放实际采样率指示
+	KCM_SRC_CHANNEL = 0x19,				// 数码信号输入通道信息及超低音指示
+	KCM_SRC_RATE = 0x1a,				// 数码信号输入采样率及实际播放采样率指示
+	KCM_SRC_BPS = 0x1b,					// 数码信号输入码流率指示
 	KCM_SRC_VALID = 0x1c,				// 有效的音源输入改变，16位寄存器
 	KCM_WORK_STATUS = 0x1f,				// 模块工作/运行状态指示
 
@@ -156,24 +157,6 @@ typedef enum {
 	KCM_SRC_VALID_WIFI = 0x8000			// 有信号的音源输入：WIFI音频
 } KC3X_SRC_VALID;
 
-
-typedef enum {
-	KCM_FREQ_8K = 0x01,					// 信号源频率8KHz
-	KCM_FREQ_11K = 0x02,				// 信号源频率11.025KHz
-	KCM_FREQ_12K = 0x03,				// 信号源频率12KHz
-	KCM_FREQ_16K = 0x04,				// 信号源频率16KHz
-	KCM_FREQ_22K = 0x05,				// 信号源频率22.05KHz
-	KCM_FREQ_24K = 0x06,				// 信号源频率24KHz
-	KCM_FREQ_32K = 0x07,				// 信号源频率32KHz
-	KCM_FREQ_44K = 0x08,				// 信号源频率44.1KHz
-	KCM_FREQ_48K = 0x09,				// 信号源频率48KHz
-	KCM_FREQ_64K = 0x0a,				// 信号源频率64KHz
-	KCM_FREQ_88K = 0x0b,				// 信号源频率88.2KHz
-	KCM_FREQ_96K = 0x0c,				// 信号源频率96KHz
-	KCM_FREQ_128K = 0x0d,				// 信号源频率128KHz
-	KCM_FREQ_176K = 0x0e,				// 信号源频率176.4KHz
-	KCM_FREQ_192K = 0x0f				// 信号源频率192KHz
-} KC3X_INPUT_FREQ;
 
 typedef enum {
 	KCM_ERROR_EQ = 0x80,				// B7多段EQ均衡音效初始化不正常，可能超出最大的预设计段数;

@@ -111,8 +111,9 @@ EXTR BOOL FSeekAuto;
 EXTR BOOL FAUD_MasterVolume;
 EXTR xdata BYTE gAUD_MasterVolume;
 EXTR xdata BYTE gAUD_SrcFormat;								// [0] 顺序不能调乱 KCM_SRC_FORMAT 数码信号输入格式指示
-EXTR xdata BYTE gAUD_ChSr;									// [1] 顺序不能调乱 KCM_SRC_CH_SR 数码信号输入通道信息及采样频率指示
-EXTR xdata BYTE gAUD_SrcFreq;								// [2] 顺序不能调乱 KCM_SRC_FREQ码流率及播放实际采样率指
+EXTR xdata BYTE gAUD_SrcChannel;							// [1] 顺序不能调乱 KCM_SRC_CHANNEL 数码信号输入通道信息及超低音指示
+EXTR xdata BYTE gAUD_SrcRate;								// [2] 顺序不能调乱 KCM_SRC_RATE 数码信号输入采样率及实际播放采样率指示
+EXTR xdata BYTE gAUD_SrcBps;								// [3] 顺序不能调乱 KCM_SRC_BPS 数码信号输入码流率指示
 EXTR xdata WORD g2AUD_SrcValid;
 EXTR xdata BYTE gPlayOperate;
 EXTR xdata WORD g2SdQty;
@@ -311,7 +312,8 @@ extern CONST_CHAR Tab_DIP_Bps[];
 void MKCM_SetPowerOn(); 									// KCM开机
 void MKCM_RestoreMemory();									// 开机，从KCM之中恢复记忆
 void MKCM_FactorySet();
-void MKCM_ReadSrcValid();
+void MKCM_ReadSrcInfo();									// 收到中断读取格式、通道、采样率、码流率等信息
+void MKCM_ReadSrcValid();									// 收到中断读取有效的音源输入改变
 void MAPI_COPY_BUFF8(BYTE length, BYTE* in_data, BYTE* out_data);
 void MDIP_MenuNormal(BYTE index);							// 菜单选择一般模式 
 void MDIP_MenuSelect(BYTE index, MENU_SET mode);			// 菜单选择高级模式，mode 0一般模式 1闪烁点亮 2闪烁熄灭 3调整- 4调整+ 

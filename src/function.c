@@ -42,33 +42,10 @@ void MKCM_10msTimer(BYTE baseTimer){   						// B3=1000ms B2=500ms B1=100ms B0=1
 			return;
 		}
 		if ((gLocal_1 & KCM_IRQ_FORMAT_INFO) > 0){          // 数码信号输入格式改变中断，需要读取"KCM_SRC_FORMAT"寄存器
-			//  MKCM_ReadXByte(KCM_SRC_FORMAT, &gAUD_SrcFormat, 3);   // 连续读3字节到gAUD_SrcFormat gAUD_ChSr gAUD_SrcFreq
-			gAUD_SrcFormat = MKCM_ReadRegister(KCM_SRC_FORMAT);
-            gAUD_ChSr = MKCM_ReadRegister(KCM_SRC_CH_SR);
-			gAUD_SrcFreq = MKCM_ReadRegister(KCM_SRC_FREQ);
-			// MLOG("gAUD_SrcFormat %02x %02x %02x", gAUD_SrcFormat, gAUD_ChSr, gAUD_SrcFreq);
-
-		//	MLOG("SrcFormat %02x %02x", gAUD_SrcFormat, gAUD_SrcFreq);
-			if (mINPUT_SWITCH == INPUT_SWITCH_SD || mINPUT_SWITCH == INPUT_SWITCH_UDISK){
-                char fileName[16];
-				BYTE length = MKCM_ReadAutoByte(KCM_PLAY_FILE_NAME, fileName, 16);
-				MLOG("FILE_NAME A %d %02x %02x %02x", length, fileName[0], fileName[1], fileName[2]);
-				g2TimeLength = MKCM_Read2Byte(KCM_PLAY_FILE_TIME);
-            }else {
-				if (gDIP_MenuLock == 0){						// 
-					if (!FSYS_TestTone){						// 没有打开噪音测试
-						MDIP_MenuNormal(MENU_SRC_FORMAT);		// 菜单显示输入码流格式
-					}
-				}
-			}
-			if (gAUD_SrcFormat == 0){
-				MDIP_CleanSpectrum();
-	    	}
-			MDIP_SrcFormatSymbol();
-            MDIP_SurroundSymbol();
+			MKCM_ReadSrcInfo();								// 收到中断读取格式、通道、采样率、码流率等信息
 		}
-		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            	// 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
-            MKCM_ReadSrcValid();
+		if ((gLocal_1 & KCM_IRQ_SRC_VALID) > 0){            // 有效的音源输入改变中断，需要读取"KCM_SRC_VALID"寄存器
+            MKCM_ReadSrcValid();							// 收到中断读取有效的音源输入改变
 		}
 		if ((gLocal_1 & KCM_IRQ_VOLUME) > 0){               	// 音量调节改变中断，需要读取"KCM_VOLUME_CTRL"寄存器获取更新的音量值
 			gAUD_MasterVolume = MKCM_ReadRegister(KCM_VOLUME_CTRL);     // 读取当前音量值
@@ -194,7 +171,7 @@ void MKCM_RestoreMemory(){ 									// 开机，从KCM之中恢复记忆
 
 	// 清除一些上电需要确定值的变量及标志
 	gAUD_SrcFormat = 0;
-    gAUD_SrcFreq = 0;
+    gAUD_SrcRate = 0;
 	g2PlayTime = 0;
     gPlayStatus = 0;
 	FSYS_Standby = 0;
