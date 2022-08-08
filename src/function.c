@@ -164,6 +164,7 @@ void MKCM_RestoreMemory(){ 									// ¿ª»ú£¬´ÓKCMÖ®ÖÐ»Ö¸´¼ÇÒä
     temp[1] = (BYTE)(CUSTOM_CODE >> 16);
     temp[2] = (BYTE)(CUSTOM_CODE >> 8);
     temp[3] = (BYTE)(CUSTOM_CODE >> 0);
+// temp[0]=0x00;temp[1]=0x1f;temp[2]=0x38;temp[3]=0x00;	
     MKCM_WriteXByte(KCM_CUSTOM_CODE, temp, 4);              // ÉèÖÃÓÃ»§×Ô¶¨Òå¹¦ÄÜ´úÂë¼°Éý¼¶Ä£¿é¹Ì¼þ¼Ä´æÆ÷
 	MEQMIC_EqRestore();										// EQ»Ö¸´¼ÇÒä
 	MEQMIC_MicRestore();									// »°Í²»Ö¸´¼ÇÒä
@@ -290,7 +291,15 @@ CONST_CHAR Tab_InputSwitch[] = {							// KCM_INPUT_SOURCE     KC3X_INPUT_TYPE
 	KCM_INPUT_HDMI3,				                        // ÒôÔ´Ñ¡ÔñHDMI3ÊäÈë
 	KCM_INPUT_ARC,				                            // ÒôÔ´Ñ¡ÔñHDMI ARCÊäÈë
 };  						 
-						 
+CONST_CHAR Tab_ListenMode[] = {
+    KCM_LISTEN_STEREO, 										// Ë«ÉùµÀÁ¢ÌåÉù£¬¶ÔÓ¦ LISTEN_MODE_HIFI
+	KCM_LISTEN_STEREO | KCM_LISTEN_ENA_SW, 					// Ë«ÉùµÀÁ¢ÌåÉù+³¬µÍÒô£¬¶ÔÓ¦ LISTEN_MODE_2_1CH
+	KCM_LISTEN_MULTI | KCM_LISTEN_ENA_SW, 					// Ñ¡Ôñ¶àÉùµÀÔ´ÂëÄ£Ê½£¬Ã»ÓÐÈÎºÎ¶àÉùµÀËã·¨£¬¶ÔÓ¦ LISTEN_MODE_SURROUND1
+	KCM_LISTEN_SURROUND | KCM_LISTEN_ENA_SW | 0, 			// Ñ¡Ôñ¶àÉùµÀÄ£Ê½£¬Ëã·¨0£¬¶ÔÓ¦ LISTEN_MODE_SURROUND2 
+	KCM_LISTEN_SURROUND | 1, 								// Ñ¡Ôñ¶àÉùµÀÄ£Ê½£¬Ëã·¨1£¬¶ÔÓ¦ LISTEN_MODE_SURROUND3
+	KCM_LISTEN_SURROUND | KCM_LISTEN_ENA_SW | 1, 			// Ñ¡Ôñ¶àÉùµÀÄ£Ê½£¬Ëã·¨1£¬¶ÔÓ¦ LISTEN_MODE_SURROUND3
+	KCM_LISTEN_EFFECT | KCM_LISTEN_ENA_SW | 0, 				// Ñ¡Ôñ¶àÉùµÀÒôÐ§£¬Ëã·¨0£¬¶ÔÓ¦ LISTEN_MODE_SURROUND4
+};						 
 CONST_CHAR Tab_TestToneChannel[] = {
 // ¹æ·¶µÄÍ¨µÀË³Ðò£ºFL FR CN SW SL SR BL BR
 // ²âÊÔÔëÒôµÄË³Ðò£ºFL CN SW FR SR BR BL SL 					// ÊôÓÚÉùÒô´ÓÀ®°È·Ö²¼µÄË³Ê±Õë
@@ -308,6 +317,8 @@ BYTE MKCM_ToRegister(BYTE index, BYTE counter){				// ´Ó±¾»ú´¦ÀíµÄÖµ£¬×ª»»µ½KCM¼
 	switch (index){
 	case KCM_INPUT_SOURCE :									// ÊäÈë¶Ë¿ÚÑ¡Ôñ
     	return Tab_InputSwitch[counter];
+	case KCM_LISTEN_MODE :									// ñöÌýÄ£Ê½Ñ¡Ôñ
+    	return Tab_ListenMode[counter];
 	case KCM_TEST_TONE :									// ÔëÒô²âÊÔ
     	return Tab_TestToneChannel[counter];
 	case KCM_FL_TRIM :										// ÉùµÀÎ¢µ÷
@@ -340,7 +351,14 @@ BYTE MKCM_FromRegister(BYTE index, BYTE value){				// ´ÓKCMÀ´µÄ¼Ä´æÆ÷£¬×ª»»µ½±¾»
 				return gLocal_1;
 			}
 		} while (++gLocal_1 < sizeof(Tab_InputSwitch));
-		return INPUT_SWITCH_AUX;								// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµAUX
+		return INPUT_SWITCH_AUX;							// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµAUX
+	case KCM_LISTEN_MODE :									// ñöÌýÄ£Ê½Ñ¡Ôñ
+    	do {
+			if (Tab_ListenMode[gLocal_1] == value){
+				return gLocal_1;
+			}
+		} while (++gLocal_1 < sizeof(Tab_ListenMode));
+		return KCM_LISTEN_STEREO;							// ³¬³ö·¶Î§£¬·µ»ØÄ¬ÈÏÖµË«ÉùµÀÁ¢ÌåÉù
 	case KCM_TEST_TONE :									// ÔëÒô²âÊÔ
 		do {
 			if (Tab_TestToneChannel[gLocal_1] == value){

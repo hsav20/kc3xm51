@@ -10,6 +10,7 @@ typedef enum {
 	KCM_VOLUME_MUTE = 0x08,				// 音频静音及音量加减控制
 	KCM_TEST_TONE = 0x09,				// 噪音测试
 	KCM_SRC_DETECT = 0x0a,				// 检测所有有效的音源一次
+	KCM_ERROR_FLAG = 0x10,				// 获取模块错误及解码标志，32位寄存器
 	KCM_SRC_FORMAT = 0x18,				// 数码信号输入格式指示
 	KCM_SRC_CHANNEL = 0x19,				// 数码信号输入通道信息及超低音指示
 	KCM_SRC_RATE = 0x1a,				// 数码信号输入采样率及实际播放采样率指示
@@ -157,15 +158,34 @@ typedef enum {
 	KCM_SRC_VALID_WIFI = 0x8000			// 有信号的音源输入：WIFI音频
 } KC3X_SRC_VALID;
 
+typedef enum {
+	KCM_LISTEN_ENA_SW = 0x80,			// 允许超低音标志
+	KCM_LISTEN_STEREO = 0x00,			// 选择为双声道立体声，B2:0为0
+	KCM_LISTEN_MULTI = 0x10,			// 选择多声道源码模式，没有任何多声道算法，B2:0为0
+	KCM_LISTEN_SURROUND = 0x20,			// 选择多声道模式，当前支持0至3共4种不同算法的多声道模式
+	KCM_LISTEN_EFFECT = 0x30,			// 选择多声道混响音效，当前支持0至3共4种不同算法的多声道音效
+	KCM_LISTEN_MASK = 0x70,				// 选择聆听模式位掩码
+	KCM_LISTEN_NUMBER = 0x0f			// 选择聆听算法位掩码 
+} KC3X_LISTEN_FLAG;
 
 typedef enum {
-	KCM_ERROR_EQ = 0x80,				// B7多段EQ均衡音效初始化不正常，可能超出最大的预设计段数;
-	KCM_ERROR_MIC = 0x20,				// B5话筒音量芯片硬件初始化不正常;
-	KCM_ERROR_VOLUME = 0x10,			// B4模块控制音量芯片硬件初始化不正常;
-	KCM_ERROR_CODEC = 0x08,				// B3模块ADC/DAC硬件初始化不正常;
-	KCM_ERROR_SPDIF = 0x04,				// B2模块SPDIF接口芯片、时钟不正常;
-	KCM_ERROR_TEMP1 = 0x02,				// B1:0模块温度范围
-	KCM_ERROR_TEMP0 = 0x01				// B1:0模块温度范围
+	KCM_ERROR_TEMP0 = 0x00000001,		// B1:0模块温度范围
+	KCM_ERROR_TEMP1 = 0x00000002,		// B1:0模块温度范围
+	KCM_ERROR_SPDIF = 0x00000004,		// B2模块SPDIF接口芯片、时钟不正常;
+	KCM_ERROR_CODEC = 0x00000008,		// B3模块ADC/DAC硬件初始化不正常;
+	KCM_ERROR_VOLUME = 0x00000010,		// B4模块控制音量芯片硬件初始化不正常;
+	KCM_ERROR_MIC = 0x00000020,			// B5话筒音量芯片硬件初始化不正常;
+	KCM_ERROR_EQ = 0x00000040,			// B6多段EQ均衡音效初始化不正常，可能超出最大的预设计段数;
+	KCM_ERROR_WFBT = 0x00000080,		// B7音频模块WIFI蓝牙芯片通讯不正常
+	KCM_ERROR_UNICP = 0x00002000,		// B13字符集文件UNICPxxxx.fwb不存在或缺失出错
+	KCM_ERROR_UNICF = 0x00004000,		// B14字库文件UNICFxxxx.fwb不存在或缺失出错
+	KCM_ERROR_AUDB = 0x00008000,		// B15音频协处理器B芯片通讯不正常
+	KCM_ERROR_B_FWB = 0x00010000,		// B16音频协处理器B芯片固件不存在或缺失出错
+	KCM_ERROR_DECODE = 0x00020000,		// B17解码文件Decodxxxx.fwb不存在或缺失出错
+	KCM_ERROR_AC3 = 0x00040000,			// B18支持AC3解码
+	KCM_ERROR_DTS = 0x00080000,			// B19支持AC3解码
+	KCM_ERROR_AAC = 0x00100000,			// B20支持AC3解码
+	KCM_ERROR_MP3 = 0x00200000			// B21支持AC3解码
 } KC3X_ERROR_FLAG;
 
 typedef enum {

@@ -204,10 +204,11 @@ typedef enum {
 typedef enum {
     LISTEN_MODE_HIFI = 0,                                   // 聆听模式：立体声HIFI
     LISTEN_MODE_2_1CH = 1,                                  // 聆听模式：立体声2.1CH
-    LISTEN_MODE_SURROUND1 = 2,				                // 聆听模式：多声道源码模式，没有任何多声道算法
-    LISTEN_MODE_SURROUND2 = 3,				                // 聆听模式：多声道模式算法0
+    LISTEN_MODE_SURROUND1 = 2,				                // 聆听模式：多声道源码模式，没有任何多声道算法，打开超低音
+    LISTEN_MODE_SURROUND2 = 3,				                // 聆听模式：多声道模式算法0，打开超低音
     LISTEN_MODE_SURROUND3 = 4,				                // 聆听模式：多声道模式算法1
-    LISTEN_MODE_SURROUND4 = 5				                // 聆听模式：多声道音效
+    LISTEN_MODE_SURROUND4 = 5,				                // 聆听模式：多声道模式算法1，打开超低音
+    LISTEN_MODE_SURROUND5 = 6				                // 聆听模式：多声道音效，打开超低音
 } LISTEN_MODE_STATE;
 
 

@@ -420,29 +420,52 @@ void MKEY_VideoSelect(){
 	// 	MDIP_MenuNormal(MENU_RESTORE);
 	// }
 }
-CONST_CHAR Tab_ListenModeRegister[] = {
-    0x00, 0x01, 											// 双声道立体声，B0为0关闭超低音；为1打开超低音
-	0x10, 													// 多声道源码模式，超低音自动
-	0x20, 0x21, 											// 多声道模式，B1:0为各种不同算法的多声道模式；
-	0x30,													// 多声道音效，B1:0为各种不同算法的多声道音效；
-};
+// CONST_CHAR Tab_ListenModeRegister[] = {
+//     KCM_LISTEN_STEREO, 										// 双声道立体声，关闭超低音
+// 	KCM_LISTEN_STEREO | KCM_LISTEN_ENA_SW, 					// 双声道立体声，打开超低音
+// 	KCM_LISTEN_MULTI, 										// 选择多声道源码模式，没有任何多声道算法，B2:0为0
+// 	KCM_LISTEN_SURROUND | 0 | KCM_LISTEN_ENA_SW, 			// 选择多声道模式，算法0，打开超低音
+// 	KCM_LISTEN_SURROUND | 1, 								// 选择多声道模式，算法1
+// 	KCM_LISTEN_SURROUND | 1 | KCM_LISTEN_ENA_SW, 			// 选择多声道模式，算法1，打开超低音
+// 	KCM_LISTEN_EFFECT | 0 | KCM_LISTEN_ENA_SW, 				// 选择多声道音效，算法0，打开超低音
+// };
+// LISTEN_MODE_STATE GetListenModeIndex(BYTE value){
+//     switch (value & KCM_LISTEN_MASK){                       // 选择聆听模式位掩码
+//     case KCM_LISTEN_STEREO: 								// 选择为双声道立体声，B0为0关闭超低音；为1打开超低音
+// 		if (value == Tab_ListenModeRegister[LISTEN_MODE_HIFI]){
+// 			return LISTEN_MODE_HIFI;
+// 		}
+// 		return LISTEN_MODE_2_1CH;   
+//     case KCM_LISTEN_MULTI: 
+// 		return LISTEN_MODE_SURROUND1;                		// 选择为多声道源码模式，没有任何多声道算法
+//     case KCM_LISTEN_SURROUND: 
+// 		if (value == Tab_ListenModeRegister[LISTEN_MODE_SURROUND2]){
+// 			return LISTEN_MODE_SURROUND2;
+// 		}
+// 		if (value == Tab_ListenModeRegister[LISTEN_MODE_SURROUND3]){
+// 			return LISTEN_MODE_SURROUND3;
+// 		}
+// 		return LISTEN_MODE_SURROUND4;  						// 选择多声道模式，B1:0为各种不同算法的多声道模式
+//     }
+//     return LISTEN_MODE_SURROUND5;                           // 选择多声道音效，B1:0为各种不同算法的多声道音效
+// }
 
 void MKEY_ListenMode(BYTE stereo){                          // 按键聆听模式选择
     BYTE value = MKCM_ReadRegister(KCM_LISTEN_MODE);        // 聆听模式选择
     if (gDIP_MenuSelect == MENU_LISTEN_MODE){               // 只有进入对应的菜单才改变模式
-        LISTEN_MODE_STATE state = GetListenModeIndex(value);
+        LISTEN_MODE_STATE state = (LISTEN_MODE_STATE)MKCM_FromRegister(KCM_LISTEN_MODE, value);
         if (stereo){                                        // 选择立体声
             state = (state == LISTEN_MODE_HIFI) ? LISTEN_MODE_2_1CH : LISTEN_MODE_HIFI;
         }else {
             if (state < LISTEN_MODE_SURROUND1){                                // 只有在立体声才直接换到MODE1
                 state = LISTEN_MODE_SURROUND1;
-            }else if (++state > LISTEN_MODE_SURROUND4){
+            }else if (++state > LISTEN_MODE_SURROUND5){
                 state = LISTEN_MODE_SURROUND1;
             }
         }
-        value = Tab_ListenModeRegister[state];
+        value = MKCM_ToRegister(KCM_LISTEN_MODE, state);//Tab_ListenModeRegister[state];
         MKCM_WriteRegister(KCM_LISTEN_MODE, value);
-// MLOG("ListenMode %d %02x", state, value);		
+MLOG("ListenAV %d %02x", state, value);		
     }
     MDIP_ListenMode(value);
 }

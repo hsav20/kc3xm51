@@ -564,16 +564,10 @@ CONST_CHAR Tab_DIP_Surround[] = {
 //	 ++++++------++++++
 };
 
-LISTEN_MODE_STATE GetListenModeIndex(BYTE value){
-    switch (value & 0x30){                                  // B5:4为聆听模式类型选择
-    case 0x00: return (value & 1) ? LISTEN_MODE_2_1CH : LISTEN_MODE_HIFI;   // 选择为双声道立体声，B0为0关闭超低音；为1打开超低音
-    case 0x10: return LISTEN_MODE_SURROUND1;                // 选择为多声道源码模式，没有任何多声道算法
-    case 0x20: return (value & 1) ? LISTEN_MODE_SURROUND3 : LISTEN_MODE_SURROUND2;  // 选择多声道模式，B1:0为各种不同算法的多声道模式
-    }
-    return LISTEN_MODE_SURROUND4;                           // 选择多声道音效，B1:0为各种不同算法的多声道音效
-}
+
 void MDIP_ListenMode(BYTE value){                           // 显示聆听模式
-	LISTEN_MODE_STATE state = GetListenModeIndex(value);
+	// LISTEN_MODE_STATE state = GetListenModeIndex(value);
+	LISTEN_MODE_STATE state = (LISTEN_MODE_STATE)MKCM_FromRegister(KCM_LISTEN_MODE, value);
     MDIP_CleanSymbol();                                     // 统一清除屏幕及符号
     DIP_SURROUND_OFF();
     if (state < LISTEN_MODE_SURROUND1){
@@ -593,6 +587,9 @@ void MDIP_ListenMode(BYTE value){                           // 显示聆听模式
     		g2DIP_ShowBuffer[6] |= 0x0040;	
     		break;
     	case LISTEN_MODE_SURROUND4 :
+    		g2DIP_ShowBuffer[6] |= 0x0040;	
+    		break;
+    	case LISTEN_MODE_SURROUND5 :
     		g2DIP_ShowBuffer[6] |= 0x0010;	
     		break;
     	}
